@@ -781,7 +781,7 @@ if mode == "🌋 Optimization Playground":
             if show_2nd:
                 st.latex(T2_latex)
 
-        from visualizer import plot_3d_descent, plot_2d_contour  # Or use inline if not modularized
+        from visualizer import plot_3d_descent, plot_2d_contour 
 
 
         st.markdown("### 📈 3D View")
