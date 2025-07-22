@@ -25,6 +25,7 @@ from io import BytesIO
 from PIL import Image
 from mpl_toolkits.mplot3d import Axes3D
 from collections import OrderedDict
+from visualizer import plot_3d_descent, plot_2d_contour
 
 
 
@@ -780,8 +781,6 @@ if mode == "🌋 Optimization Playground":
             st.latex(T1_latex)
             if show_2nd:
                 st.latex(T2_latex)
-
-        from visualizer import plot_3d_descent, plot_2d_contour 
 
 
         st.markdown("### 📈 3D View")
