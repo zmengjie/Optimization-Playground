@@ -7,7 +7,7 @@ import streamlit.components.v1 as components
 import base64
 import tempfile
 
-st.set_page_config(page_title="ML + Optimizer Visualizer", layout="wide")
+st.set_page_config(page_title="Optimizer Visualizer", layout="wide")
 
 import pandas as pd
 import numpy as np
@@ -15,7 +15,7 @@ import numpy as np
 
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
-import seaborn as sns
+# import seaborn as sns
 from matplotlib.colors import ListedColormap
 from matplotlib.animation import FuncAnimation
 from matplotlib.animation import PillowWriter
