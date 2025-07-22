@@ -47,7 +47,7 @@ st.markdown("""
 
 # === UI Config ===
 # st.set_page_config(page_title="ML + Optimizer Visualizer", layout="wide")
-st.title("🧠 Machine Learning & Optimization Visual Explorer")
+st.title("🧠 Optimization Visual Explorer")
 
 
 # === Top-level Mode Switch ===
