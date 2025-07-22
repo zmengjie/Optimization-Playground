@@ -4,3 +4,5 @@ numpy
 sympy
 scipy
 pandas
+
+statsmodels
