@@ -93,9 +93,10 @@ def plot_3d_descent(x_vals, y_vals, Z, path, Z_path,
             text=["(a, b)"],
             textposition="bottom right",
             textfont=dict(size=12),
-            name="Expansion Point",
-            hoverinfo='text+x+y+z'
+            name="Expansion Point",  # ✅ This must end with a comma
+            hoverinfo='text+x+y+z'   # ✅ No dot or typo here
         ))
+
 
         if len(path) > 1:
             x1, y1 = path[1]
