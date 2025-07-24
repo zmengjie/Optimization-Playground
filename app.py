@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 
 
-import statsmodels.api as sm
+# import statsmodels.api as sm
 import matplotlib.pyplot as plt
 # import seaborn as sns
 from matplotlib.colors import ListedColormap
@@ -273,45 +273,31 @@ if mode == "🌋 Optimization Playground":
                 st.session_state.df_log = pd.DataFrame(logs)
                 return best_lr, best_steps
 
+
             if auto_tune:
-                # Use fresh sympy symbols to avoid conflict with Taylor's x
-                x_sym, y_sym, w_sym = sp.symbols("x y w")
-                symbolic_expr = predefined_funcs[func_name][0]
-
-                if func_name == "Multi-Objective" and w_val is not None:
-                    symbolic_expr = symbolic_expr.subs(w_sym, w_val)
-
-                f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
-
+                # Run the auto-tuning simulation to find the best lr and steps
                 best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
+
+                # Update session state with the tuned values
+                st.session_state.lr = best_lr
+                st.session_state.steps = best_steps
+                st.session_state.start_x = default_x
+                st.session_state.start_y = default_y
+                st.session_state.params_set = True  # Flag to indicate parameters are set
+
+                # Provide feedback to the user
                 st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
-                default_lr, default_steps = best_lr, best_steps
 
-            # Set in session_state
-            # if 'params_set' not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
-            #     st.session_state.lr = default_lr
-            #     st.session_state.steps = default_steps
-            #     st.session_state.start_x = default_x
-            #     st.session_state.start_y = default_y
-            #     st.session_state.params_set = True
-
-            # Force update if auto_tune is just triggered
-            if auto_tune:
+            # Ensure session state values exist to avoid AttributeError
+            if "params_set" not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
+                # Reset session state to the auto-tuned values when "Reset to Auto-Tuned" is clicked
                 st.session_state.lr = default_lr
                 st.session_state.steps = default_steps
                 st.session_state.start_x = default_x
                 st.session_state.start_y = default_y
                 st.session_state.params_set = True
-            # Manual reset fallback
-            elif 'params_set' not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
-                st.session_state.lr = default_lr
-                st.session_state.steps = default_steps
-                st.session_state.start_x = default_x
-                st.session_state.start_y = default_y
-                st.session_state.params_set = True
-            # Final user inputs
 
-            # ✅ Only show lr and steps when not using backtracking or Newton
+            # Final user inputs for learning rate and steps
             if not (
                 optimizer == "GradientDescent" and options.get("use_backtracking", False)
             ) and optimizer != "Newton's Method":
@@ -326,33 +312,115 @@ if mode == "🌋 Optimization Playground":
                 steps = None
                 st.info("📌 Using Backtracking Line Search — no need to set learning rate or step count.")
 
-
-
-            # Ensure session_state values exist to avoid AttributeError
+            # Ensure session state values exist for initial positions
             if "start_x" not in st.session_state:
                 st.session_state["start_x"] = -3.0
             if "start_y" not in st.session_state:
                 st.session_state["start_y"] = 3.0
 
-
+            # Sliders for the initial starting positions
             st.slider("Initial x", -5.0, 5.0, st.session_state.start_x, key="start_x")
             st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
-            # st.checkbox("🎮 Animate Descent Steps")
+
+            # Animation toggle
             show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
 
-        if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
-            with col_right:
-                st.markdown("### 📊 Auto-Tuning Trial Log")
-                if "df_log" in st.session_state:
-                    st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
-                    st.markdown("""
-                    **🧠 How to Read Score:**
-                    - `score = final_loss + penalty × steps`
-                    - ✅ Lower score is better (fast and accurate convergence).
-                    """)
-                else:
-                    st.info("Auto-tuning not yet triggered.")
-                #             st.info("Auto-tuning not yet triggered.")
+            # Display auto-tuning trial log if available
+            if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
+                with col_right:
+                    st.markdown("### 📊 Auto-Tuning Trial Log")
+                    if "df_log" in st.session_state:
+                        st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
+                        st.markdown("""
+                        **🧠 How to Read Score:**
+                        - `score = final_loss + penalty × steps`
+                        - ✅ Lower score is better (fast and accurate convergence).
+                        """)
+                    else:
+                        st.info("Auto-tuning not yet triggered.")
+
+        #     if auto_tune:
+        #         # Use fresh sympy symbols to avoid conflict with Taylor's x
+        #         x_sym, y_sym, w_sym = sp.symbols("x y w")
+        #         symbolic_expr = predefined_funcs[func_name][0]
+
+        #         if func_name == "Multi-Objective" and w_val is not None:
+        #             symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+
+        #         f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
+
+        #         best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
+        #         st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
+        #         default_lr, default_steps = best_lr, best_steps
+
+        #     # Set in session_state
+        #     # if 'params_set' not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
+        #     #     st.session_state.lr = default_lr
+        #     #     st.session_state.steps = default_steps
+        #     #     st.session_state.start_x = default_x
+        #     #     st.session_state.start_y = default_y
+        #     #     st.session_state.params_set = True
+
+        #     # Force update if auto_tune is just triggered
+        #     if auto_tune:
+        #         st.session_state.lr = default_lr
+        #         st.session_state.steps = default_steps
+        #         st.session_state.start_x = default_x
+        #         st.session_state.start_y = default_y
+        #         st.session_state.params_set = True
+        #     # Manual reset fallback
+        #     elif 'params_set' not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
+        #         st.session_state.lr = default_lr
+        #         st.session_state.steps = default_steps
+        #         st.session_state.start_x = default_x
+        #         st.session_state.start_y = default_y
+        #         st.session_state.params_set = True
+        #     # Final user inputs
+
+        #     # ✅ Only show lr and steps when not using backtracking or Newton
+        #     if not (
+        #         optimizer == "GradientDescent" and options.get("use_backtracking", False)
+        #     ) and optimizer != "Newton's Method":
+        #         lr = st.selectbox("Learning Rate", sorted(set([0.0001, 0.001, 0.005, 0.01, 0.02, 0.05, 0.1, default_lr])), index=0, key="lr")
+        #         steps = st.slider("Steps", 10, 100, value=st.session_state.get("steps", 50), key="steps")
+        #     elif optimizer == "Newton's Method":
+        #         lr = None
+        #         steps = None
+        #         st.info("📌 Newton’s Method computes its own step size using the Hessian inverse — learning rate is not needed.")
+        #     elif optimizer == "GradientDescent" and options.get("use_backtracking", False):
+        #         lr = None
+        #         steps = None
+        #         st.info("📌 Using Backtracking Line Search — no need to set learning rate or step count.")
+
+
+
+        #     # Ensure session_state values exist to avoid AttributeError
+        #     if "start_x" not in st.session_state:
+        #         st.session_state["start_x"] = -3.0
+        #     if "start_y" not in st.session_state:
+        #         st.session_state["start_y"] = 3.0
+
+
+        #     st.slider("Initial x", -5.0, 5.0, st.session_state.start_x, key="start_x")
+        #     st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
+        #     # st.checkbox("🎮 Animate Descent Steps")
+        #     show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
+
+        # if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
+        #     with col_right:
+        #         st.markdown("### 📊 Auto-Tuning Trial Log")
+        #         if "df_log" in st.session_state:
+        #             st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
+        #             st.markdown("""
+        #             **🧠 How to Read Score:**
+        #             - `score = final_loss + penalty × steps`
+        #             - ✅ Lower score is better (fast and accurate convergence).
+        #             """)
+        #         else:
+        #             st.info("Auto-tuning not yet triggered.")
+        #         #             st.info("Auto-tuning not yet triggered.")
+
+
 
 
         if mode == "Predefined":
