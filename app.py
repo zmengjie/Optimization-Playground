@@ -287,7 +287,7 @@ if mode == "🌋 Optimization Playground":
 
                 # Call the auto-tuning simulation function
                 best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
-                st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
+                # st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
                 default_lr, default_steps = best_lr, best_steps
 
             if auto_tune:
