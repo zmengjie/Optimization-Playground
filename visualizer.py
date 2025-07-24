@@ -15,7 +15,13 @@ def plot_3d_descent(x_vals, y_vals, Z, path, Z_path,
     fig_3d.add_trace(go.Surface(
         z=Z, x=x_vals, y=y_vals,
         colorscale='Greens', opacity=0.7,
-        name="🟢 True Surface", showscale=False
+        name="🟢 True Surface", showscale=False,
+        hoverlabel=dict(
+        bgcolor="white",  # background color
+        font_size=12,
+        font_color="black",  # text color
+        bordercolor="white"  # border color
+    )
     ))
 
     # Descent path
@@ -26,7 +32,13 @@ def plot_3d_descent(x_vals, y_vals, Z, path, Z_path,
         marker=dict(size=4),
         name='Descent Path',
         hoverinfo='x+y+z+text',
-        text=['Step {}'.format(i) for i in range(len(path))]
+        text=['Step {}'.format(i) for i in range(len(path))],
+        hoverlabel=dict(
+        bgcolor="white",  # background color
+        font_size=12,
+        font_color="black",  # text color
+        bordercolor="white"  # border color
+    )
     ))
 
     # Taylor surfaces with fading
@@ -114,15 +126,14 @@ def plot_3d_descent(x_vals, y_vals, Z, path, Z_path,
         height=600,
         margin=dict(l=60, r=40, b=40, t=50),
         legend=dict(x=0.7, y=0.9),
-        hovermode='closest',
-        
-        # 👉 Customize hoverlabel style
-        hoverlabel=dict(
-            bgcolor="white",   # background color
-            font_size=12,
-            font_color="black",  # text color
-            bordercolor="white"  # border
-        )
+        hovermode='closest'
+        # # 👉 Customize hoverlabel style
+        # hoverlabel=dict(
+        #     bgcolor="white",   # background color
+        #     font_size=12,
+        #     font_color="black",  # text color
+        #     bordercolor="white"  # border
+        # )
     )
 
 
