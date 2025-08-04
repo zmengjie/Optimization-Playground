@@ -1,11 +1,1 @@
 
-
-streamlit
-plotly
-numpy
-sympy
-
-
-
-scipy
-pandas
