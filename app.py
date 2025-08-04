@@ -12,10 +12,7 @@ st.set_page_config(page_title="Optimizer Visualizer", layout="wide")
 import pandas as pd
 import numpy as np
 
-
-# import statsmodels.api as sm
 import matplotlib.pyplot as plt
-# import seaborn as sns
 from matplotlib.colors import ListedColormap
 from matplotlib.animation import FuncAnimation
 from matplotlib.animation import PillowWriter
@@ -46,9 +43,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# === UI Config ===
-# st.set_page_config(page_title="ML + Optimizer Visualizer", layout="wide")
-# st.title("🧠 Optimization Visual Explorer")
 
 
 # === Top-level Mode Switch ===
@@ -56,7 +50,6 @@ mode = st.sidebar.radio("Choose Mode", ["🌋 Optimization Playground"])
 
 # === Optimizer Playground ===
 if mode == "🌋 Optimization Playground":
-    # Inserted full optimizer playground block here
     import sympy as sp
     import time
     from sympy import symbols, lambdify
@@ -74,78 +67,74 @@ if mode == "🌋 Optimization Playground":
     # 🪄 Optimizer Category Info Block (Outside main expander)
     with st.expander("🧠 Optimizer Category Info & Usage Tips", expanded=False):
         st.markdown("""
-        ### 🤖 Optimizer Categories:
-
-        **Gradient-based Optimizers** use derivatives (gradients) to guide updates:
-
-        - **GradientDescent**: Basic steepest descent using learning rate.
-        - **Adam**: Adaptive learning rates with momentum (recommended for noisy or sparse gradients).
-        - **RMSProp**: Like Adam but simpler; adjusts step size based on recent gradient magnitudes.
-        - **Newton's Method**: Uses second-order derivatives (Hessian) for faster convergence, but may be unstable near saddle points.
-
-        **Heuristic Optimizers** use stochastic or evolutionary strategies:
-
-        - **Simulated Annealing**: Explores search space with temperature-based random steps. Good for escaping local minima.
-        - **Genetic Algorithm**: Population-based method inspired by natural evolution. Effective for complex, non-differentiable functions.
-
+        ### 🤖 Optimizer Categories
+    
+        **Gradient-based Optimizers** rely on derivatives (gradients) to guide updates:
+    
+        - **Gradient Descent**: Basic first-order method using a fixed learning rate.
+        - **Adam**: Adaptive learning rates with momentum; ideal for noisy or sparse gradients.
+        - **RMSProp**: Similar to Adam, but simpler; scales step size based on recent gradient magnitudes.
+        - **Newton's Method**: Leverages second-order information (Hessian) for faster convergence; can be unstable near saddle points.
+    
+        **Heuristic Optimizers** use stochastic or evolutionary strategies instead of gradients:
+    
+        - **Simulated Annealing**: Explores the search space using temperature-controlled randomness. Good for escaping local minima.
+        - **Genetic Algorithm**: Population-based, inspired by natural evolution. Suitable for complex or non-differentiable functions.
+    
         ---
         ### 🎮 How to Use the Playground
-
-        - **1. Choose a function** from the dropdown.
-        - **2. Select an optimizer** and tune parameters like learning rate or mutation strength.
-        - **3. Try enabling _Auto-Tune_** to automatically pick good learning rate + steps.
-        - **4. Adjust initial x/y** starting positions to see how descent paths change.
-        - **5. Toggle _"Animate Descent"_** to visualize how the optimizer moves step-by-step.
-        - **6. Compare optimizers** in the **"Diagnostic Tools"** section using convergence plots and summary tables.
-
-        > 🧪 Try Newton's Method on **Quadratic Bowl** for fast convergence, or test **Genetic Algorithm** on **Rastrigin** to explore multimodal search.
-
+    
+        1. **Choose a function** from the dropdown menu.
+        2. **Select an optimizer**, and adjust parameters like learning rate or mutation strength.
+        3. **Enable _Auto-Tune_** (optional) to let the app find a good learning rate and step count.
+        4. **Set initial x/y positions** to observe how descent paths vary.
+        5. **Toggle _"Animate Descent"_** to see step-by-step movement.
+        6. **Compare optimizers** using the **"Diagnostic Tools"**: view convergence plots and performance summaries.
+    
+        > 🧪 Try **Newton's Method** on the _Quadratic Bowl_ for rapid convergence, or test the **Genetic Algorithm** on _Rastrigin_ to handle multimodal landscapes.
+    
         ---
-        ⚠️ *Note:* Gradient-based methods require a smooth function. Use heuristic optimizers for discontinuous or non-differentiable objectives.
+        ⚠️ **Note:** Gradient-based methods require smooth, differentiable functions. Use heuristic methods for discontinuous or rugged objectives.
         """)
 
 
-    # with st.expander("💬 Ask the LLM about Optimizers or Math", expanded=False):
-    #     user_question = st.text_input("Ask anything (e.g., What is BFGS? Why is Newton unstable?)")
-    #     if user_question:
-    #         with st.spinner("🤖 Thinking..."):
-    #             full_prompt = (
-    #                 "You are an expert on numerical optimization methods such as Gradient Descent, "
-    #                 "Adam, Newton’s Method, Simulated Annealing, and Genetic Algorithms.\n\n"
-    #                 f"Question: {user_question}\nAnswer:"
-    #             )
-    #             response = query_llm(full_prompt)
-    #             st.markdown(
-    #                 f"<div style='background-color:#f4f9ff;padding:10px;border-radius:6px;'>{response}</div>",
-    #                 unsafe_allow_html=True,
-    #             )
 
     with st.expander("🧠 Taylor Series & Optimizer Foundations", expanded=True):
         st.markdown("### 📚 How Taylor Series Explains Optimizers")
-
-        st.markdown("Many optimization methods are based on the **Taylor series expansion** of a function. This helps us approximate the function locally using its derivatives:")
-
+        st.markdown("""
+        Many optimization algorithms are grounded in the **Taylor series expansion**, which provides a local approximation of a function using its derivatives:
+        """)
+        
         st.latex(r"""
         f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x
         """)
-        st.markdown("- This is the **1st-order Taylor expansion**, which is the basis of **Gradient Descent**. It only uses the slope (gradient) to decide the direction to move.")
-
+        st.markdown("""
+        - This is the **first-order Taylor expansion**, forming the basis of **Gradient Descent**.  
+        - It uses only the **gradient (slope)** to determine the update direction.
+        """)
+        
         st.latex(r"""
         f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x + \frac{1}{2} \Delta x^T H(x) \Delta x
         """)
-        st.markdown("- This is the **2nd-order Taylor expansion**, used in **Newton's Method**. It adds the **Hessian** (curvature) to adjust the step size and improve convergence.")
-
-        st.markdown("### ✍️ Summary")
         st.markdown("""
-        You can imagine it like this:
-        - ✅ **1st-order**: Approximates with a **tangent line** (local slope).
-        - ✅ **2nd-order**: Approximates with a **parabola** (slope + curvature).
-
-        This helps students connect abstract equations with **optimizer logic**.
-                        
-        - **Gradient Descent** is a 1st-order method → uses slope only.
-        - **Newton's Method** is a 2nd-order method → uses slope and curvature.
-        - Understanding these expansions builds strong intuition about how optimizers move in the loss landscape.
+        - This is the **second-order Taylor expansion**, used in **Newton's Method**.  
+        - It incorporates the **Hessian matrix (curvature)** to adjust both direction and step size, often accelerating convergence.
+        """)
+        
+        st.markdown("### ✍️ Summary")
+        
+        st.markdown("""
+        Think of it visually:
+        
+        - ✅ **First-order**: Approximates the function using a **tangent line** (just the slope).
+        - ✅ **Second-order**: Approximates using a **parabola** (slope + curvature).
+        
+        These expansions reveal the underlying logic of optimizers:
+        
+        - **Gradient Descent** → uses **first-order** info (gradient only).
+        - **Newton’s Method** → uses **second-order** info (gradient + curvature).
+        
+        Understanding Taylor series helps you develop a deeper intuition about how optimizers explore the **loss landscape**.
         """)
 
         st.markdown("---")
@@ -156,19 +145,19 @@ if mode == "🌋 Optimization Playground":
     x_sym, y_sym, w_sym = sp.symbols("x y w")
 
     predefined_funcs = {
-        "Quadratic Bowl": (x**2 + y**2, [], "Convex bowl, global min at origin."),
+        "Quadratic Bowl": (x**2 + y**2, [], "Convex bowl with global minimum at origin."),
         "Saddle": (x**2 - y**2, [], "Saddle point at origin, non-convex."),
-        "Rosenbrock": ((1 - x)**2 + 100 * (y - x**2)**2, [], "Banana-shaped curved valley, classic test function."),
-        "Constrained Circle": (x * y, [x + y - 1], "Constrained optimization with line x + y = 1."),
-        "Double Constraint": (x**2 + y**2, [x + y - 1, x**2 + y**2 - 4], "Circular + linear intersection constraints."),
-        "Multi-Objective": (w * ((x - 1)**2 + (y - 2)**2) + (1 - w) * ((x + 2)**2 + (y + 1)**2), [], "Weighted sum of two loss terms."),
-        "Ackley": (-20*sp.exp(-0.2*sp.sqrt(0.5*(x**2 + y**2))) - sp.exp(0.5*(sp.cos(2*sp.pi*x) + sp.cos(2*sp.pi*y))) + sp.E + 20, [], "Multimodal non-convex function."),
-        "Rastrigin": (20 + x**2 - 10*sp.cos(2*sp.pi*x) + y**2 - 10*sp.cos(2*sp.pi*y), [], "Many local minima, non-convex."),
-        "Styblinski-Tang": (0.5*((x**4 - 16*x**2 + 5*x) + (y**4 - 16*y**2 + 5*y)), [], "Non-convex with multiple minima."),
-        "Sphere": (x**2 + y**2, [], "Simple convex function."),
-        "Himmelblau": ((x**2 + y - 11)**2 + (x + y**2 - 7)**2, [], "Multiple global minima, non-convex."),
-        "Booth": ((x + 2*y - 7)**2 + (2*x + y - 5)**2, [], "Simple convex function."),
-        "Beale": ((1.5 - x + x*y)**2 + (2.25 - x + x*y**2)**2 + (2.625 - x + x*y**3)**2, [], "Non-convex with multiple minima.")
+        "Rosenbrock": ((1 - x)**2 + 100 * (y - x**2)**2, [], "Banana-shaped curved valley; classic non-convex test function."),
+        "Constrained Circle": (x * y, [x + y - 1], "Constrained optimization with linear constraint x + y = 1."),
+        "Double Constraint": (x**2 + y**2, [x + y - 1, x**2 + y**2 - 4], "Intersection of circle and line constraints."),
+        "Multi-Objective": (w * ((x - 1)**2 + (y - 2)**2) + (1 - w) * ((x + 2)**2 + (y + 1)**2), [], "Weighted sum of two quadratic objectives."),
+        "Ackley": (-20*sp.exp(-0.2*sp.sqrt(0.5*(x**2 + y**2))) - sp.exp(0.5*(sp.cos(2*sp.pi*x) + sp.cos(2*sp.pi*y))) + sp.E + 20, [], "Highly multimodal, non-convex function."),
+        "Rastrigin": (20 + x**2 - 10*sp.cos(2*sp.pi*x) + y**2 - 10*sp.cos(2*sp.pi*y), [], "Non-convex with many local minima (periodic)."),
+        "Styblinski-Tang": (0.5*((x**4 - 16*x**2 + 5*x) + (y**4 - 16*y**2 + 5*y)), [], "Non-convex with many local minima."),
+        "Sphere": (x**2 + y**2, [], "Simple convex function; global minimum at origin."),
+        "Himmelblau": ((x**2 + y - 11)**2 + (x + y**2 - 7)**2, [], "Non-convex with four global minima."),
+        "Booth": ((x + 2*y - 7)**2 + (2*x + y - 5)**2, [], "Simple convex quadratic function."),
+        "Beale": ((1.5 - x + x*y)**2 + (2.25 - x + x*y**2)**2 + (2.625 - x + x*y**3)**2, [], "Non-convex with several valleys.")
 
     }
 
@@ -185,7 +174,6 @@ if mode == "🌋 Optimization Playground":
             optimizers = ["GradientDescent", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
             optimizer = st.selectbox("Optimizer", optimizers)
             
-
             options = {}
 
             if optimizer == "Newton's Method":
@@ -355,89 +343,6 @@ if mode == "🌋 Optimization Playground":
                     else:
                         st.info("Auto-tuning not yet triggered.")
 
-        #     if auto_tune:
-        #         # Use fresh sympy symbols to avoid conflict with Taylor's x
-        #         x_sym, y_sym, w_sym = sp.symbols("x y w")
-        #         symbolic_expr = predefined_funcs[func_name][0]
-
-        #         if func_name == "Multi-Objective" and w_val is not None:
-        #             symbolic_expr = symbolic_expr.subs(w_sym, w_val)
-
-        #         f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
-
-        #         best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
-        #         st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
-        #         default_lr, default_steps = best_lr, best_steps
-
-        #     # Set in session_state
-        #     # if 'params_set' not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
-        #     #     st.session_state.lr = default_lr
-        #     #     st.session_state.steps = default_steps
-        #     #     st.session_state.start_x = default_x
-        #     #     st.session_state.start_y = default_y
-        #     #     st.session_state.params_set = True
-
-        #     # Force update if auto_tune is just triggered
-        #     if auto_tune:
-        #         st.session_state.lr = default_lr
-        #         st.session_state.steps = default_steps
-        #         st.session_state.start_x = default_x
-        #         st.session_state.start_y = default_y
-        #         st.session_state.params_set = True
-        #     # Manual reset fallback
-        #     elif 'params_set' not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
-        #         st.session_state.lr = default_lr
-        #         st.session_state.steps = default_steps
-        #         st.session_state.start_x = default_x
-        #         st.session_state.start_y = default_y
-        #         st.session_state.params_set = True
-        #     # Final user inputs
-
-        #     # ✅ Only show lr and steps when not using backtracking or Newton
-        #     if not (
-        #         optimizer == "GradientDescent" and options.get("use_backtracking", False)
-        #     ) and optimizer != "Newton's Method":
-        #         lr = st.selectbox("Learning Rate", sorted(set([0.0001, 0.001, 0.005, 0.01, 0.02, 0.05, 0.1, default_lr])), index=0, key="lr")
-        #         steps = st.slider("Steps", 10, 100, value=st.session_state.get("steps", 50), key="steps")
-        #     elif optimizer == "Newton's Method":
-        #         lr = None
-        #         steps = None
-        #         st.info("📌 Newton’s Method computes its own step size using the Hessian inverse — learning rate is not needed.")
-        #     elif optimizer == "GradientDescent" and options.get("use_backtracking", False):
-        #         lr = None
-        #         steps = None
-        #         st.info("📌 Using Backtracking Line Search — no need to set learning rate or step count.")
-
-
-
-        #     # Ensure session_state values exist to avoid AttributeError
-        #     if "start_x" not in st.session_state:
-        #         st.session_state["start_x"] = -3.0
-        #     if "start_y" not in st.session_state:
-        #         st.session_state["start_y"] = 3.0
-
-
-        #     st.slider("Initial x", -5.0, 5.0, st.session_state.start_x, key="start_x")
-        #     st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
-        #     # st.checkbox("🎮 Animate Descent Steps")
-        #     show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
-
-        # if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
-        #     with col_right:
-        #         st.markdown("### 📊 Auto-Tuning Trial Log")
-        #         if "df_log" in st.session_state:
-        #             st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
-        #             st.markdown("""
-        #             **🧠 How to Read Score:**
-        #             - `score = final_loss + penalty × steps`
-        #             - ✅ Lower score is better (fast and accurate convergence).
-        #             """)
-        #         else:
-        #             st.info("Auto-tuning not yet triggered.")
-        #         #             st.info("Auto-tuning not yet triggered.")
-
-
-
 
         if mode == "Predefined":
             f_expr, constraints, description = predefined_funcs[func_name]
@@ -451,7 +356,6 @@ if mode == "🌋 Optimization Playground":
             except:
                 st.error("Invalid expression.")
                 st.stop()
-
 
 
         st.markdown(f"### 📘 Function Description:\n> {description}")
