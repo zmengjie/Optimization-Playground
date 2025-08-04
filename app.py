@@ -926,9 +926,9 @@ if mode == "🌋 Optimization Playground":
             st.pyplot(fig_comp)
 
             # Show summary table
-            st.markdown("#### 📋 Optimizer Summary Table")
-            df_summary = pd.DataFrame(summary_results)
-            st.dataframe(df_summary)
+            # st.markdown("#### 📋 Optimizer Summary Table")
+            # df_summary = pd.DataFrame(summary_results)
+            # st.dataframe(df_summary)
 
 
 
