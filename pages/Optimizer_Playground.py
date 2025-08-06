@@ -7,6 +7,7 @@ import streamlit.components.v1 as components
 import base64
 import tempfile
 import time
+import sympy as sp
 
 import pandas as pd
 import numpy as np
