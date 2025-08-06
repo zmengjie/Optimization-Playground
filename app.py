@@ -1042,7 +1042,6 @@ if mode == "🌋 Optimization Playground":
         st.markdown("#### ✅ KKT Conditions")
         for i, cond in enumerate(kkt_conditions):
             st.latex(fr"\text{{KKT}}_{{{i+1}}} = {sp.latex(cond)}")
-
         st.markdown("#### 🧮 Gradient & Hessian")
         grad = [sp.diff(f_expr, v) for v in (x_sym, y_sym)]
         # grad = [sp.diff(f_expr, v) for v in (x, y)]
@@ -1072,6 +1071,26 @@ if mode == "🌋 Optimization Playground":
             else:
                 st.success("✅ Hessian is suitable for Newton's Method descent.")
 
+
+        with st.expander("💡 Interpretation of Results", expanded=True):
+            st.markdown("""
+            **1. 🎯 Objective & Lagrangian**
+            - The **objective function** \\( f(x, y) \\) is what we are trying to **minimize or maximize**.
+            - The **Lagrangian** \\( \\mathcal{L}(x, y, \\lambda) \\) combines the objective and any constraints using Lagrange multipliers \\( \\lambda \\).
+        
+            **2. ✅ KKT Conditions**
+            - **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization.
+            - They are found by setting all partial derivatives of the Lagrangian to **zero** (stationary points).
+            - For unconstrained problems, they reduce to the gradient of \\( f(x, y) \\) being zero.
+        
+            **3. 🧮 Gradient & Hessian**
+            - **Gradient** \\( \\nabla f \\): Points in the direction of **steepest ascent**. At a stationary point, \\( \\nabla f = 0 \\).
+            - **Hessian** \\( \\nabla^2 f \\): Matrix of second derivatives that shows the **curvature** of the function.
+                - Positive definite → local minimum.
+                - Negative definite → local maximum.
+                - Mixed signs → saddle point.
+            """)
+    
 
 
 
