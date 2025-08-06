@@ -16,10 +16,8 @@ with st.sidebar:
         1. **Guide (this page)** – Introduction to optimization concepts and how to use the app.
         2. **Taylor Series** – Learn how first- and second-order Taylor expansions relate to optimizers.
         3. **Optimizer Playground** – Experiment interactively with different optimizers and functions.
-
-        Use the menu on the left to switch between sections.
         """)
-    
+
     with st.expander("Taylor Series"):
         st.write("""
         ### 📚 How Taylor Series Explains Optimizers
@@ -35,6 +33,9 @@ with st.sidebar:
         """)
 
 # Main content of the page
+st.title("📘 Optimization Playground Guide")
+
+# Section 1: Guide Page
 if 'option' not in st.session_state:
     st.session_state['option'] = 'Guide'
 
@@ -59,7 +60,7 @@ elif option == "Taylor Series":
     st.title("🧠 Taylor Series & Optimizer Foundations")
     st.markdown("""
     ### 📚 How Taylor Series Explains Optimizers
-    Many optimization algorithms are grounded in the **Taylor series expansion**, which provides a local approximation of a function using its derivatives.
+    Many optimization algorithms are grounded in the **Taylor series expansion**, which provides a local approximation of a function using its derivatives:
     - **First-order Taylor expansion**: Forms the basis of **Gradient Descent**.
     - **Second-order Taylor expansion**: Used in **Newton's Method** to accelerate convergence.
     """)
@@ -79,8 +80,6 @@ elif option == "Optimizer Playground":
 
     # Add interactivity for optimizer selection, function selection, etc. Here you can import and use your existing optimizer playground code.
 
-
-    
 
 
 
