@@ -12,23 +12,27 @@ This app is designed to help you explore and experiment with optimization techni
 Navigate through the sections below:
 """)
 
-st.sidebar.markdown("[Guide](#Guide)")
-st.sidebar.markdown("[Taylor Series](#Taylor-Series)")
-st.sidebar.markdown("[Optimizer Playground](#Optimizer-Playground)")
+# Buttons in sidebar for each section
+guide_button = st.sidebar.button("Guide")
+taylor_series_button = st.sidebar.button("Taylor Series")
+optimizer_playground_button = st.sidebar.button("Optimizer Playground")
 
-# Sections below
-st.markdown("## Guide")
-st.markdown("""
-### Introduction to optimization concepts and how to use the app.
-""")
+# Sections below based on button clicks
+if guide_button:
+    st.markdown("## Guide")
+    st.markdown("""
+    ### Introduction to optimization concepts and how to use the app.
+    """)
 
-st.markdown("## Taylor Series")
-st.markdown("""
-Learn how first- and second-order Taylor expansions relate to optimizers.
-""")
+elif taylor_series_button:
+    st.markdown("## Taylor Series")
+    st.markdown("""
+    Learn how first- and second-order Taylor expansions relate to optimizers.
+    """)
 
-st.markdown("## Optimizer Playground")
-st.markdown("""
-Experiment interactively with different optimizers and functions.
-""")
+elif optimizer_playground_button:
+    st.markdown("## Optimizer Playground")
+    st.markdown("""
+    Experiment interactively with different optimizers and functions.
+    """)
 
