@@ -65,7 +65,7 @@ if mode == "🌋 Optimization Playground":
 
 
     # 🪄 Optimizer Category Info Block (Outside main expander)
-    with st.expander("🧠 Optimizer Category Info & Usage Tips", expanded=False):
+    with st.expander("🔍 Optimizer Category Info & Usage Tips", expanded=False):
         st.markdown("""
         ### 🤖 Optimizer Categories
     
