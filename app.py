@@ -1035,6 +1035,36 @@ if mode == "🌋 Optimization Playground":
 
     # === Symbolic Analysis: KKT, Gradient & Hessian ===
     with st.expander("📐 Symbolic Analysis: KKT, Gradient & Hessian", expanded=False):
+        with st.expander("💡 Interpretation of Results", expanded=True):        
+            # 1. Objective & Lagrangian
+            st.subheader("1. 🎯 Objective & Lagrangian")
+            st.write("- The **objective function** is what we are trying to minimize or maximize:")
+            st.latex(r"f(x, y)")
+            st.write("- The **Lagrangian** combines the objective and any constraints using Lagrange multipliers:")
+            st.latex(r"\mathcal{L}(x, y, \lambda) = f(x, y) + \lambda \cdot g(x, y)")
+        
+            # 2. KKT Conditions
+            st.subheader("2. ✅ KKT Conditions")
+            st.write("- **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization.")
+            st.write("- They are found by setting all partial derivatives of the Lagrangian to zero (stationary points):")
+            st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
+            st.write("- For unconstrained problems, they reduce to the gradient of the objective being zero:")
+            st.latex(r"\nabla f(x, y) = 0")
+        
+            # 3. Gradient & Hessian
+            st.subheader("3. 🧮 Gradient & Hessian")
+            st.write("- **Gradient** points in the direction of steepest ascent. At a stationary point, the gradient is zero:")
+            st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\ \frac{\partial f}{\partial y} \end{bmatrix}")
+            st.write("- **Hessian** is the matrix of second derivatives, showing curvature of the function:")
+            st.latex(r"\nabla^2 f(x, y) = \begin{bmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\ \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} \end{bmatrix}")
+        
+            st.write("Interpretation:")
+            st.markdown("""
+            - Positive definite → Local minimum  
+            - Negative definite → Local maximum  
+            - Mixed signs → Saddle point  
+            """)
+
         st.markdown("#### 🎯 Objective & Lagrangian")
         st.latex(r"f(x, y) = " + sp.latex(f_expr))
         st.latex(r"\mathcal{L}(x, y, \lambda) = " + sp.latex(L_expr))
@@ -1072,35 +1102,7 @@ if mode == "🌋 Optimization Playground":
                 st.success("✅ Hessian is suitable for Newton's Method descent.")
 
 
-        with st.expander("💡 Interpretation of Results", expanded=True):        
-            # 1. Objective & Lagrangian
-            st.subheader("1. 🎯 Objective & Lagrangian")
-            st.write("- The **objective function** is what we are trying to minimize or maximize:")
-            st.latex(r"f(x, y)")
-            st.write("- The **Lagrangian** combines the objective and any constraints using Lagrange multipliers:")
-            st.latex(r"\mathcal{L}(x, y, \lambda) = f(x, y) + \lambda \cdot g(x, y)")
-        
-            # 2. KKT Conditions
-            st.subheader("2. ✅ KKT Conditions")
-            st.write("- **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization.")
-            st.write("- They are found by setting all partial derivatives of the Lagrangian to zero (stationary points):")
-            st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
-            st.write("- For unconstrained problems, they reduce to the gradient of the objective being zero:")
-            st.latex(r"\nabla f(x, y) = 0")
-        
-            # 3. Gradient & Hessian
-            st.subheader("3. 🧮 Gradient & Hessian")
-            st.write("- **Gradient** points in the direction of steepest ascent. At a stationary point, the gradient is zero:")
-            st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\ \frac{\partial f}{\partial y} \end{bmatrix}")
-            st.write("- **Hessian** is the matrix of second derivatives, showing curvature of the function:")
-            st.latex(r"\nabla^2 f(x, y) = \begin{bmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\ \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} \end{bmatrix}")
-        
-            st.write("Interpretation:")
-            st.markdown("""
-            - Positive definite → Local minimum  
-            - Negative definite → Local maximum  
-            - Mixed signs → Saddle point  
-            """)
+
 
     
 
