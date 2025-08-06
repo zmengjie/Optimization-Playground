@@ -1072,24 +1072,36 @@ if mode == "🌋 Optimization Playground":
                 st.success("✅ Hessian is suitable for Newton's Method descent.")
 
 
-        with st.expander("💡 Interpretation of Results", expanded=True):
+        with st.expander("💡 Interpretation of Results", expanded=True):        
+            # 1. Objective & Lagrangian
+            st.subheader("1. 🎯 Objective & Lagrangian")
+            st.write("- The **objective function** is what we are trying to minimize or maximize:")
+            st.latex(r"f(x, y)")
+            st.write("- The **Lagrangian** combines the objective and any constraints using Lagrange multipliers:")
+            st.latex(r"\mathcal{L}(x, y, \lambda) = f(x, y) + \lambda \cdot g(x, y)")
+        
+            # 2. KKT Conditions
+            st.subheader("2. ✅ KKT Conditions")
+            st.write("- **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization.")
+            st.write("- They are found by setting all partial derivatives of the Lagrangian to zero (stationary points):")
+            st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
+            st.write("- For unconstrained problems, they reduce to the gradient of the objective being zero:")
+            st.latex(r"\nabla f(x, y) = 0")
+        
+            # 3. Gradient & Hessian
+            st.subheader("3. 🧮 Gradient & Hessian")
+            st.write("- **Gradient** points in the direction of steepest ascent. At a stationary point, the gradient is zero:")
+            st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\ \frac{\partial f}{\partial y} \end{bmatrix}")
+            st.write("- **Hessian** is the matrix of second derivatives, showing curvature of the function:")
+            st.latex(r"\nabla^2 f(x, y) = \begin{bmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\ \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} \end{bmatrix}")
+        
+            st.write("Interpretation:")
             st.markdown("""
-            **1. 🎯 Objective & Lagrangian**
-            - The **objective function** \\( f(x, y) \\) is what we are trying to **minimize or maximize**.
-            - The **Lagrangian** \\( \\mathcal{L}(x, y, \\lambda) \\) combines the objective and any constraints using Lagrange multipliers \\( \\lambda \\).
-        
-            **2. ✅ KKT Conditions**
-            - **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization.
-            - They are found by setting all partial derivatives of the Lagrangian to **zero** (stationary points).
-            - For unconstrained problems, they reduce to the gradient of \\( f(x, y) \\) being zero.
-        
-            **3. 🧮 Gradient & Hessian**
-            - **Gradient** \\( \\nabla f \\): Points in the direction of **steepest ascent**. At a stationary point, \\( \\nabla f = 0 \\).
-            - **Hessian** \\( \\nabla^2 f \\): Matrix of second derivatives that shows the **curvature** of the function.
-                - Positive definite → local minimum.
-                - Negative definite → local maximum.
-                - Mixed signs → saddle point.
+            - Positive definite → Local minimum  
+            - Negative definite → Local maximum  
+            - Mixed signs → Saddle point  
             """)
+
     
 
 
