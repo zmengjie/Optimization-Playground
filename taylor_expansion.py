@@ -74,7 +74,7 @@ def show_univariate_taylor():
         ax.legend(); ax.grid(True)
         st.pyplot(fig)
 
-        # === Optional Animation ===
+
         # === Optional Animation ===
         if st.checkbox("🎬 Animate 1st & 2nd-order Approximation"):
             st.markdown("### 🎬 Animation: 1st & 2nd-Order Taylor Approximation")
@@ -245,16 +245,21 @@ def show_univariate_taylor():
 
     st.markdown("---")  # separator
 
-    st.markdown(
-        r"""
-        ℹ️ **Note**: The 2nd-order Taylor expansion approximates the function locally around \( (a, b) \).  
-        It uses gradient and Hessian values at that point.  
-        For smooth functions like \( \sin(x)\cos(y) \), the approximation is accurate near \( (a, b) \),  
-        but may diverge further away.  
-        For quadratic functions like \( x^2 + y^2 \), the 2nd-order Taylor expansion exactly matches the function,  
-        because the function itself is already a polynomial of degree 2.
-        """
-    )
+    with st.expander("ℹ️ Note on 2nd-order Taylor Expansion", expanded=True):
+        st.write("**Note:** The 2nd-order Taylor expansion approximates the function locally around:")
+        st.latex(r"(a, b)")
+    
+        st.write("It uses gradient and Hessian values at that point.")
+    
+        st.write("For smooth functions like:")
+        st.latex(r"\sin(x)\cos(y)")
+        st.write("the approximation is accurate near (a, b), but may diverge further away.")
+    
+        st.write("For quadratic functions like:")
+        st.latex(r"x^2 + y^2")
+        st.write("the 2nd-order Taylor expansion exactly matches the function, "
+                 "because the function itself is already a polynomial of degree 2.")
+    
 
 
     # --- Animation ---
