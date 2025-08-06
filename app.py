@@ -1,9 +1,11 @@
 import streamlit as st
 
-# Set page config
-st.set_page_config(page_title="Optimization Playground", layout="wide")
+# Sidebar configuration
+st.sidebar.title("Navigation")
+st.sidebar.markdown("Navigate through the pages:")
 
-# Sidebar greeting message
-st.sidebar.markdown("## Hello")
-st.sidebar.markdown("Welcome to the **Optimization Playground**!")
-st.sidebar.markdown("Explore different optimization techniques interactively.")
+# Automatically load pages from the `pages/` folder
+from pages.taylor_series import run as taylor_series_run
+
+# Call the run() function of the selected page
+taylor_series_run()
