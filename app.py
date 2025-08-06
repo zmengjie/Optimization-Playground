@@ -3,36 +3,24 @@ import streamlit as st
 # Set page config
 st.set_page_config(page_title="Optimization Playground", layout="wide")
 
-# Sidebar - No section select box needed
+# Sidebar - simple Hello and sections
 st.sidebar.markdown("## Hello")
 st.sidebar.markdown("Welcome to the **Optimization Playground**!")
-st.sidebar.markdown("""
-This app is designed to help you explore and experiment with optimization techniques and understand their foundations.
 
-Navigate through the sections below:
-""")
+# Use buttons or radio buttons instead of links for cleaner section navigation
+sections = ["Guide", "Taylor Series", "Optimizer Playground"]
+section = st.sidebar.radio("Navigate through the sections:", sections)
 
-# Buttons in sidebar for each section
-guide_button = st.sidebar.button("Guide")
-taylor_series_button = st.sidebar.button("Taylor Series")
-optimizer_playground_button = st.sidebar.button("Optimizer Playground")
-
-# Sections below based on button clicks
-if guide_button:
+# Sections below (for content display on the main page)
+if section == "Guide":
     st.markdown("## Guide")
-    st.markdown("""
-    ### Introduction to optimization concepts and how to use the app.
-    """)
+    st.markdown("Introduction to optimization concepts and how to use the app.")
 
-elif taylor_series_button:
+elif section == "Taylor Series":
     st.markdown("## Taylor Series")
-    st.markdown("""
-    Learn how first- and second-order Taylor expansions relate to optimizers.
-    """)
+    st.markdown("Learn how first- and second-order Taylor expansions relate to optimizers.")
 
-elif optimizer_playground_button:
+elif section == "Optimizer Playground":
     st.markdown("## Optimizer Playground")
-    st.markdown("""
-    Experiment interactively with different optimizers and functions.
-    """)
+    st.markdown("Experiment interactively with different optimizers and functions.")
 
