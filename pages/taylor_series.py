@@ -2,54 +2,54 @@ import streamlit as st
 from taylor_expansion import show_univariate_taylor
 
 # Define the run function for this page
-def run():
-    st.title("📐 Taylor Series & Optimizer Foundations")
 
-    # Section 1: Explaining Taylor Series
-    st.markdown("### 📚 How Taylor Series Explains Optimizers")
-    st.markdown("""
-    Many optimization algorithms are grounded in the **Taylor series expansion**, 
-    which provides a local approximation of a function using its derivatives:
-    """)
+st.title("📐 Taylor Series & Optimizer Foundations")
 
-    # First-order Taylor expansion formula
-    st.latex(r"""
-    f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x
-    """)
-    st.markdown("""
-    - This is the **first-order Taylor expansion**, forming the basis of **Gradient Descent**.  
-    - It uses only the **gradient (slope)** to determine the update direction.
-    """)
+# Section 1: Explaining Taylor Series
+st.markdown("### 📚 How Taylor Series Explains Optimizers")
+st.markdown("""
+Many optimization algorithms are grounded in the **Taylor series expansion**, 
+which provides a local approximation of a function using its derivatives:
+""")
 
-    # Second-order Taylor expansion formula
-    st.latex(r"""
-    f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x + \frac{1}{2} \Delta x^T H(x) \Delta x
-    """)
-    st.markdown("""
-    - This is the **second-order Taylor expansion**, used in **Newton's Method**.  
-    - It incorporates the **Hessian matrix (curvature)** to adjust both direction and step size, often accelerating convergence.
-    """)
+# First-order Taylor expansion formula
+st.latex(r"""
+f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x
+""")
+st.markdown("""
+- This is the **first-order Taylor expansion**, forming the basis of **Gradient Descent**.  
+- It uses only the **gradient (slope)** to determine the update direction.
+""")
 
-    # Section 2: Visual Summary
-    st.markdown("### ✍️ Summary")
-    st.markdown("""
-    Think of it visually:
+# Second-order Taylor expansion formula
+st.latex(r"""
+f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x + \frac{1}{2} \Delta x^T H(x) \Delta x
+""")
+st.markdown("""
+- This is the **second-order Taylor expansion**, used in **Newton's Method**.  
+- It incorporates the **Hessian matrix (curvature)** to adjust both direction and step size, often accelerating convergence.
+""")
 
-    - ✅ **First-order**: Approximates the function using a **tangent line** (just the slope).
-    - ✅ **Second-order**: Approximates using a **parabola** (slope + curvature).
+# Section 2: Visual Summary
+st.markdown("### ✍️ Summary")
+st.markdown("""
+Think of it visually:
 
-    These expansions reveal the underlying logic of optimizers:
+- ✅ **First-order**: Approximates the function using a **tangent line** (just the slope).
+- ✅ **Second-order**: Approximates using a **parabola** (slope + curvature).
 
-    - **Gradient Descent** → uses **first-order** info (gradient only).
-    - **Newton’s Method** → uses **second-order** info (gradient + curvature).
+These expansions reveal the underlying logic of optimizers:
 
-    Understanding Taylor series helps you develop a deeper intuition about how optimizers explore the **loss landscape**.
-    """)
+- **Gradient Descent** → uses **first-order** info (gradient only).
+- **Newton’s Method** → uses **second-order** info (gradient + curvature).
 
-    st.markdown("---")
+Understanding Taylor series helps you develop a deeper intuition about how optimizers explore the **loss landscape**.
+""")
 
-    # Section 3: Interactive Visualization
-    # Display the univariate Taylor series visualizer interactively
-    show_univariate_taylor()
+st.markdown("---")
+
+# Section 3: Interactive Visualization
+# Display the univariate Taylor series visualizer interactively
+show_univariate_taylor()
 
 
