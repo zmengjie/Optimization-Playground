@@ -209,8 +209,10 @@ def show_univariate_taylor(
             fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
-            line_taylor, = ax_anim.plot([], [], '--', label="Taylor Approx.", color='red')
+            line_1st, = ax_anim.plot([], [], '--', label="1st-order", color='red')
+            line_2nd, = ax_anim.plot([], [], '--', label="2nd-order", color='orange')
             point, = ax_anim.plot([], [], 'ko')
+
 
             ax_anim.set_xlim(xmin, xmax)
             y_vals = f_np(x)
@@ -218,7 +220,7 @@ def show_univariate_taylor(
             ax_anim.set_ylim(np.min(y_vals) - buffer, np.max(y_vals) + buffer)
             ax_anim.axhline(0, color='gray', lw=0.5)
             ax_anim.grid(True)
-            ax_anim.legend()
+            ax_anim.legend(loc='upper right')
 
             a_vals = np.linspace(xmin + 0.1, xmax - 0.1, 60)
 
@@ -226,22 +228,18 @@ def show_univariate_taylor(
                 a_val = a_vals[frame]
                 f_a_val = f_np(a_val)
 
-                terms = [f_a_val * np.ones_like(x)]
+                # Compute 1st-order term
+                first_order = f_a_val + derivs_np[0](a_val) * (x - a_val)
+                # Compute 2nd-order term
+                second_order = first_order + (derivs_np[1](a_val) * (x - a_val)**2) / math.factorial(2)
 
-                if "1st" in order_to_animate and len(derivs_np) >= 1:
-                    terms.append((derivs_np[0](a_val) * (x - a_val)) / math.factorial(1))
-                if "2nd" in order_to_animate and len(derivs_np) >= 2:
-                    terms.append((derivs_np[1](a_val) * (x - a_val)**2) / math.factorial(2))
-                if show_3rd_4th and len(derivs_np) >= 3:
-                    terms.append((derivs_np[2](a_val) * (x - a_val)**3) / math.factorial(3))
-                if show_3rd_4th and len(derivs_np) >= 4:
-                    terms.append((derivs_np[3](a_val) * (x - a_val)**4) / math.factorial(4))
-
-                taylor_curve = np.sum(terms, axis=0)
-                line_taylor.set_data(x, taylor_curve)
+                # Update both lines
+                line_1st.set_data(x, first_order)
+                line_2nd.set_data(x, second_order)
                 point.set_data([a_val], [f_np(a_val)])
                 ax_anim.set_title(f"Taylor Approximation at a = {a_val:.2f}")
-                return line_taylor, point
+                return line_1st, line_2nd, point
+
 
             ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
 
