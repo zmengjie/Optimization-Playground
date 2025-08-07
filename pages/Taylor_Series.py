@@ -71,7 +71,6 @@ with tab1:
 
 st.markdown("---")
 
-
     # st.markdown("### 📈 Univariate Taylor Expansion Visualizer")
 with tab2:
     # Sidebar config
