@@ -294,27 +294,6 @@ def show_multivariable_taylor():
 
     st.markdown("### 🌐 Multivariable Taylor Expansion (2D Preview)")
 
-    multi_func = st.selectbox("Choose function:", ["Quadratic Bowl", "Rosenbrock", "sin(x)cos(y)", "exp(-x² - y²)"])
-
-    x, y = sp.symbols('x y')
-    a, b = sp.symbols('a b')
-
-    if multi_func == "Quadratic Bowl":
-        fxy = x**2 + y**2
-    elif multi_func == "Rosenbrock":
-        fxy = (1 - x)**2 + 100 * (y - x**2)**2
-    elif multi_func == "sin(x)cos(y)":
-        fxy = sp.sin(x) * sp.cos(y)
-    elif multi_func == "exp(-x² - y²)":
-        fxy = sp.exp(-(x**2 + y**2))
-
-    # UI-controlled values
-    a_input = st.slider("Center a (x)", -5.0, 5.0, 0.0)
-    b_input = st.slider("Center b (y)", -5.0, 5.0, 0.0)
-
-    zoom_in = st.checkbox("🔍 Zoom into local neighborhood", value=False)
-    xlim = (a_input - 1, a_input + 1) if zoom_in else (-5, 5)
-    ylim = (b_input - 1, b_input + 1) if zoom_in else (-5, 5)
 
     # Derivatives
     grad = [sp.diff(fxy, v) for v in (x, y)]
