@@ -459,7 +459,10 @@ else:
 
 f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
 
-grad_f_expr = [sp.diff(f_expr, v) for v in (x_sym, y_sym)]
+grad_f = lambda x0, y0: np.array([
+    (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
+    (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
+])
 
 def hessian_f(x0, y0):
     hess_expr = sp.hessian(f_expr, (x, y))
