@@ -284,30 +284,32 @@ with tab1:
     st.title("📘 Optimization Guide")
 
     # 1. Optimization Overview
-    st.subheader("1. 🛠️ Optimization Methods")
-    st.write("""
-    Optimization methods aim to **find the minimum (or maximum)** of a function.  
+    st.header("1. 🛠️ Optimization Methods")
+    st.markdown("""
+    Optimization methods aim to **find the minimum (or maximum)** of a function.
+    
     There are two major types:
     - **Unconstrained**: No restrictions on variable values.
     - **Constrained**: Variables must satisfy conditions (e.g., \( g(x, y) = 0 \)).
 
     Common methods include:
-    - **Gradient Descent**: Follows the negative gradient to reduce the loss.
-    - **Newton's Method**: Uses second-order curvature to accelerate convergence.
-    - **Quasi-Newton (e.g., BFGS)**: Approximates Hessians, great for large-scale problems.
+    - **Gradient Descent**  
+    - **Newton's Method**  
+    - **Quasi-Newton (e.g., BFGS)**
     """)
+    st.markdown("---")
 
     # 2. Taylor Series
-    st.subheader("2. 🔎 Taylor Series in Optimization")
-    st.write("Used to approximate functions near a point using derivatives.")
+    st.header("2. 🔎 Taylor Series in Optimization")
     st.latex(r"f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x + \frac{1}{2} \Delta x^T \nabla^2 f(x) \Delta x")
     st.markdown("""
-    - The **first-order term** gives a linear approximation (used in Gradient Descent).  
-    - The **second-order term** adds curvature information (used in Newton's Method).
+    - **1st-order**: Linear approximation  
+    - **2nd-order**: Adds curvature (Newton's Method)
     """)
+    st.markdown("---")
 
     # 3. KKT Conditions
-    st.subheader("3. 🚦 KKT Conditions & Derivatives")
+    st.header("3. 🚦 KKT Conditions & Derivatives")
 
     # 3.1 Objective & Lagrangian
     st.markdown("### 1. 🎯 Objective & Lagrangian")
@@ -315,46 +317,56 @@ with tab1:
     st.latex(r"f(x, y)")
     st.write("The **Lagrangian** incorporates the objective and any constraints using Lagrange multipliers:")
     st.latex(r"\mathcal{L}(x, y, \lambda) = f(x, y) + \lambda \cdot g(x, y)")
+    st.markdown("---")
 
     # 3.2 KKT Conditions
     st.markdown("### 2. ✅ KKT Conditions")
     st.write("The **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization problems.")
-    st.write("They require that the gradient of the Lagrangian with respect to all variables equals zero:")
+    st.write("They state that the gradient of the Lagrangian must vanish at the optimal point (stationarity condition):")
     st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
-    st.write("In the case of unconstrained optimization, this reduces to:")
+    st.write("For unconstrained problems, this reduces to the gradient of the objective function being zero:")
     st.latex(r"\nabla f(x, y) = 0")
+    st.markdown("---")
 
     # 3.3 Gradient & Hessian
     st.markdown("### 3. 🧮 Gradient & Hessian")
-    st.write("The **gradient** vector points in the direction of steepest ascent. At optimal points, it becomes zero:")
+    st.write("The **gradient** vector points in the direction of steepest ascent or descent. At optimality, it becomes zero:")
     st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\\\ \frac{\partial f}{\partial y} \end{bmatrix}")
-    st.write("The **Hessian matrix** captures second-order curvature information of the objective function:")
-    st.latex(r"\nabla^2 f(x, y) = \begin{bmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\\\ \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} \end{bmatrix}")
-
+    st.write("The **Hessian matrix** captures second-order curvature (concavity/convexity) of the function:")
+    st.latex(r"""
+    \nabla^2 f(x, y) = \begin{bmatrix} 
+    \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\\\
+    \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} 
+    \end{bmatrix}
+    """)
     st.markdown("**Interpretation of the Hessian:**")
     st.markdown("""
     - **Positive definite** → Local **minimum**  
     - **Negative definite** → Local **maximum**  
     - **Indefinite** → **Saddle point**
     """)
+    st.markdown("---")
 
-    # 4. Function description (dynamic)
+    # 4. Newton Variants
+    st.header("4. 🔁 Newton Variants & Quasi-Newton")
 
     st.markdown("### 📘 Classic Newton vs. Numerical vs. Quasi-Newton")
     st.markdown("Newton's Method is a powerful optimization technique that uses **second-order derivatives** or their approximations to accelerate convergence.")
-
+    
     st.markdown("#### 🧮 Classic Newton (Symbolic)")
     st.markdown("- Uses the **symbolic Hessian matrix** from calculus:")
     st.latex(r"\nabla^2 f(x, y)")
     st.markdown("- ✅ Very efficient and accurate for simple analytic functions (e.g., quadratic, convex).")
     st.markdown("- ⚠️ Can fail or be unstable if the Hessian is singular or badly conditioned.")
-
+    st.markdown("---")
+    
     st.markdown("#### 🔢 Numerical Newton")
     st.markdown("- Uses **finite differences** to approximate the Hessian.")
     st.markdown("- No need for symbolic derivatives.")
     st.markdown("- ✅ More robust for complex or unknown functions.")
     st.markdown("- 🐢 Slightly slower due to extra evaluations.")
-
+    st.markdown("---")
+    
     st.markdown("#### 🔁 BFGS / L-BFGS (Quasi-Newton)")
     st.markdown("- ✅ Avoids computing the full Hessian.")
     st.markdown("- Builds curvature estimate using gradients:")
@@ -367,12 +379,14 @@ with tab1:
     st.markdown("- 🧠 **BFGS**: High accuracy, stores full matrix.")
     st.markdown("- 🪶 **L-BFGS**: Stores only a few recent updates — ideal for high-dimensional problems.")
     st.markdown("💡 Quasi-Newton methods **approximate** curvature and still converge fast — especially useful for functions like Rosenbrock!")
-
     st.markdown("---")
-    st.markdown("### ✏️ Why No Learning Rate?")
+
+    # 5. Learning Rate Insight
+    st.header("5. ✏️ Why No Learning Rate in Newton's Method?")
     st.markdown("Newton’s Method computes:")
     st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
     st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
+    st.markdown("---")
 
 
 
