@@ -26,7 +26,214 @@ from collections import OrderedDict
 from visualizer import plot_3d_descent, plot_2d_contour
 
 
+# === Auto-Tuning Simulation Function ===
+def run_auto_tuning_simulation(f_func, optimizer, x0, y0):
+    lr_grid = list(np.logspace(-4, -1, 6))
+    step_grid = [20, 30, 40, 50, 60, 80]
+    best_score = float("inf")
+    best_lr, best_steps = lr_grid[0], step_grid[0]
+    logs = []
 
+    for lr in lr_grid:
+        for steps in step_grid:
+            x_t, y_t = x0, y0
+            m, v = np.zeros(2), np.zeros(2)
+            beta1, beta2, eps = 0.9, 0.999, 1e-8
+            for t in range(1, steps + 1):
+                dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
+                dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
+                grad = np.array([dx, dy])
+                if np.linalg.norm(grad) < 1e-3:
+                    break
+                if optimizer == "Adam":
+                    m = beta1 * m + (1 - beta1) * grad
+                    v = beta2 * v + (1 - beta2) * (grad ** 2)
+                    m_hat = m / (1 - beta1 ** t)
+                    v_hat = v / (1 - beta2 ** t)
+                    update = lr * m_hat / (np.sqrt(v_hat) + eps)
+                elif optimizer == "RMSProp":
+                    v = beta2 * v + (1 - beta2) * (grad ** 2)
+                    update = lr * grad / (np.sqrt(v) + eps)
+                else:
+                    update = lr * grad
+                x_t -= update[0]
+                y_t -= update[1]
+            loss = f_func(x_t, y_t)
+            score = loss + 0.01 * steps
+            logs.append({"lr": lr, "steps": steps, "loss": loss, "score": score})
+            if score < best_score:
+                best_score, best_lr, best_steps = score, lr, steps
+    st.session_state.df_log = pd.DataFrame(logs)
+    return best_lr, best_steps
+
+
+def optimize_path(x0, y0, optimizer, lr, steps, f_func, grad_f=None, hessian_f=None, options=None):
+    path = [(x0, y0)]
+    options = options or {}
+    meta = {} 
+
+    # --- Special Cases: Return early ---
+    if optimizer == "GradientDescent" and options.get("use_backtracking", False):
+        grad_f_expr = [sp.diff(f_expr, v) for v in (x_sym, y_sym)]
+        path, alphas = backtracking_line_search_sym(f_expr, grad_f_expr, x0, y0)
+        meta["callback_steps"] = len(path)
+        return path, alphas, meta
+
+
+    if optimizer == "Newton's Method" and options.get("newton_variant") in ["BFGS", "L-BFGS"]:
+        from scipy.optimize import minimize
+
+        path_coords = []
+        losses = []
+
+        def loss_vec(v):
+            return f_func(v[0], v[1])
+
+        def grad_vec(v):
+            return np.atleast_1d(grad_f(v[0], v[1]))
+
+        def callback(vk):
+            path_coords.append((vk[0], vk[1]))
+            losses.append(f_func(vk[0], vk[1]))
+
+        x0_vec = np.array([x0, y0])
+        method = "L-BFGS-B" if options["newton_variant"] == "L-BFGS" else "BFGS"
+
+        res = minimize(loss_vec, x0_vec, method=method, jac=grad_vec, callback=callback, options={"maxiter": steps})
+
+        # Fallback if callback was never triggered (e.g., early convergence)
+        if not path_coords:
+            path_coords = [tuple(res.x)]
+            losses = [f_func(*res.x)]
+
+        meta["res_nit"] = res.nit
+        meta["callback_steps"] = len(path_coords)
+        return path_coords, losses, meta
+
+
+    if optimizer == "Simulated Annealing":
+        T, cooling = options.get("T", 2.0), options.get("cooling", 0.95)
+        current = f_func(x0, y0)
+        for _ in range(steps):
+            xn, yn = x0 + np.random.randn(), y0 + np.random.randn()
+            candidate = f_func(xn, yn)
+            if candidate < current or np.random.rand() < np.exp(-(candidate - current)/T):
+                x0, y0 = xn, yn
+                current = candidate
+                path.append((x0, y0))
+            T *= cooling
+        meta["callback_steps"] = len(path)
+        return path, None, meta
+    
+    if optimizer == "Genetic Algorithm":
+        pop_size = options.get("pop_size", 20)
+        mutation_std = options.get("mutation_std", 0.3)
+        pop = [np.random.uniform(-5, 5, 2) for _ in range(pop_size)]
+        for _ in range(steps // 2):
+            pop = sorted(pop, key=lambda p: f_func(p[0], p[1]))[:pop_size // 2]
+            children = [np.mean([pop[i], pop[j]], axis=0) + np.random.normal(0, mutation_std, 2)
+                        for i in range(len(pop)) for j in range(i+1, len(pop))][:pop_size // 2]
+            pop += children
+        best = sorted(pop, key=lambda p: f_func(p[0], p[1]))[0]
+        path = [tuple(best)]
+        meta["callback_steps"] = len(path)
+        return path, None, meta
+
+    # --- Standard Optimizer Loop ---
+    m, v = np.zeros(2), np.zeros(2)
+    beta1, beta2, eps = 0.9, 0.999, 1e-8
+
+    for t in range(1, steps + 1):
+        x_t, y_t = path[-1]
+        grad = grad_f(x_t, y_t)
+
+        if optimizer == "Adam":
+            m = beta1 * m + (1 - beta1) * grad
+            v = beta2 * v + (1 - beta2) * (grad ** 2)
+            m_hat = m / (1 - beta1 ** t)
+            v_hat = v / (1 - beta2 ** t)
+            update = lr * m_hat / (np.sqrt(v_hat) + eps)
+
+        elif optimizer == "RMSProp":
+            v = beta2 * v + (1 - beta2) * (grad ** 2)
+            update = lr * grad / (np.sqrt(v) + eps)
+
+        elif optimizer == "Newton's Method":
+            variant = options.get("newton_variant", "Classic Newton")
+            if variant == "Classic Newton":
+                try:
+                    H = hessian_f(x_t, y_t)
+                    H_inv = np.linalg.inv(H)
+                    update = H_inv @ grad
+                except:
+                    update = grad
+            elif variant == "Numerical Newton":
+                eps_num = 1e-4
+                def fx(x_, y_): return f_func(x_, y_)
+                def second_partial(f, x, y, i, j):
+                    h = eps_num
+                    if i == 0 and j == 0:
+                        return (f(x + h, y) - 2 * f(x, y) + f(x - h, y)) / h**2
+                    elif i == 1 and j == 1:
+                        return (f(x, y + h) - 2 * f(x, y) + f(x, y - h)) / h**2
+                    else:
+                        return (f(x + h, y + h) - f(x + h, y - h) - f(x - h, y + h) + f(x - h, y - h)) / (4 * h**2)
+                H = np.array([
+                    [second_partial(fx, x_t, y_t, 0, 0), second_partial(fx, x_t, y_t, 0, 1)],
+                    [second_partial(fx, x_t, y_t, 1, 0), second_partial(fx, x_t, y_t, 1, 1)]
+                ])
+                try:
+                    update = np.linalg.inv(H) @ grad
+                except:
+                    update = grad
+
+        else:  # Default: GradientDescent
+            update = lr * grad
+
+        update = np.asarray(update)
+        new_x, new_y = x_t - update[0], y_t - update[1]
+        path.append((new_x, new_y))
+
+    meta["callback_steps"] = len(path)
+    return path, None, meta
+
+def backtracking_line_search_sym(f_sym, grad_f_sym, x0, y0, alpha0=1.0, beta=0.5, c=1e-4, max_iters=100):
+    # Declare standard symbols for lambdify
+    x, y = sp.symbols("x y")
+
+    # Ensure all expressions use x, y (not x_sym, y_sym)
+    f_sym = f_sym.subs({sp.Symbol("x"): x, sp.Symbol("y"): y})
+    grad_f_sym = [g.subs({sp.Symbol("x"): x, sp.Symbol("y"): y}) for g in grad_f_sym]
+
+    f_lambd = sp.lambdify((x, y), f_sym, modules='numpy')
+    grad_f_lambd = [sp.lambdify((x, y), g, modules='numpy') for g in grad_f_sym]
+
+    xk, yk = x0, y0
+    path = [(xk, yk)]
+    alphas = []
+
+    for _ in range(max_iters):
+        gx, gy = grad_f_lambd[0](xk, yk), grad_f_lambd[1](xk, yk)
+        grad_norm = gx**2 + gy**2
+
+        if grad_norm < 1e-10:
+            break
+
+        alpha = alpha0
+        while True:
+            x_new = xk - alpha * gx
+            y_new = yk - alpha * gy
+            lhs = f_lambd(x_new, y_new)
+            rhs = f_lambd(xk, yk) - c * alpha * grad_norm
+            if lhs <= rhs or alpha < 1e-8:
+                break
+            alpha *= beta
+
+        xk, yk = xk - alpha * gx, yk - alpha * gy
+        path.append((xk, yk))
+        alphas.append(alpha)
+
+    return path, alphas
 
     # === Main Area: Title & Playground ===
 st.title("🚀 Optimizer Visual Playground")
@@ -110,44 +317,6 @@ with col_left:
     default_lr = 0.005
     default_steps = 50
 
-    def run_auto_tuning_simulation(f_func, optimizer, x0, y0):
-        lr_grid = list(np.logspace(-4, -1, 6))
-        step_grid = [20, 30, 40, 50, 60, 80]
-        best_score = float("inf")
-        best_lr, best_steps = lr_grid[0], step_grid[0]
-        logs = []
-
-        for lr in lr_grid:
-            for steps in step_grid:
-                x_t, y_t = x0, y0
-                m, v = np.zeros(2), np.zeros(2)
-                beta1, beta2, eps = 0.9, 0.999, 1e-8
-                for t in range(1, steps + 1):
-                    dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
-                    dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
-                    grad = np.array([dx, dy])
-                    if np.linalg.norm(grad) < 1e-3:
-                        break
-                    if optimizer == "Adam":
-                        m = beta1 * m + (1 - beta1) * grad
-                        v = beta2 * v + (1 - beta2) * (grad ** 2)
-                        m_hat = m / (1 - beta1 ** t)
-                        v_hat = v / (1 - beta2 ** t)
-                        update = lr * m_hat / (np.sqrt(v_hat) + eps)
-                    elif optimizer == "RMSProp":
-                        v = beta2 * v + (1 - beta2) * (grad ** 2)
-                        update = lr * grad / (np.sqrt(v) + eps)
-                    else:
-                        update = lr * grad
-                    x_t -= update[0]
-                    y_t -= update[1]
-                loss = f_func(x_t, y_t)
-                score = loss + 0.01 * steps
-                logs.append({"lr": lr, "steps": steps, "loss": loss, "score": score})
-                if score < best_score:
-                    best_score, best_lr, best_steps = score, lr, steps
-        st.session_state.df_log = pd.DataFrame(logs)
-        return best_lr, best_steps
 
     # Make sure this is properly initialized before calling the function
     if auto_tune:
@@ -253,175 +422,6 @@ else:
     # grad_L = [sp.diff(L_expr, v) for v in (x, y)]
     grad_L = [sp.diff(L_expr, v) for v in (x_sym, y_sym)]
     kkt_conditions = grad_L + constraints
-
-    def backtracking_line_search_sym(f_sym, grad_f_sym, x0, y0, alpha0=1.0, beta=0.5, c=1e-4, max_iters=100):
-        # Declare standard symbols for lambdify
-        x, y = sp.symbols("x y")
-
-        # Ensure all expressions use x, y (not x_sym, y_sym)
-        f_sym = f_sym.subs({sp.Symbol("x"): x, sp.Symbol("y"): y})
-        grad_f_sym = [g.subs({sp.Symbol("x"): x, sp.Symbol("y"): y}) for g in grad_f_sym]
-
-        f_lambd = sp.lambdify((x, y), f_sym, modules='numpy')
-        grad_f_lambd = [sp.lambdify((x, y), g, modules='numpy') for g in grad_f_sym]
-
-        xk, yk = x0, y0
-        path = [(xk, yk)]
-        alphas = []
-
-        for _ in range(max_iters):
-            gx, gy = grad_f_lambd[0](xk, yk), grad_f_lambd[1](xk, yk)
-            grad_norm = gx**2 + gy**2
-
-            if grad_norm < 1e-10:
-                break
-
-            alpha = alpha0
-            while True:
-                x_new = xk - alpha * gx
-                y_new = yk - alpha * gy
-                lhs = f_lambd(x_new, y_new)
-                rhs = f_lambd(xk, yk) - c * alpha * grad_norm
-                if lhs <= rhs or alpha < 1e-8:
-                    break
-                alpha *= beta
-
-            xk, yk = xk - alpha * gx, yk - alpha * gy
-            path.append((xk, yk))
-            alphas.append(alpha)
-
-        return path, alphas
-
-
-    def optimize_path(x0, y0, optimizer, lr, steps, f_func, grad_f=None, hessian_f=None, options=None):
-        path = [(x0, y0)]
-        options = options or {}
-        meta = {} 
-
-        # --- Special Cases: Return early ---
-        if optimizer == "GradientDescent" and options.get("use_backtracking", False):
-            grad_f_expr = [sp.diff(f_expr, v) for v in (x_sym, y_sym)]
-            path, alphas = backtracking_line_search_sym(f_expr, grad_f_expr, x0, y0)
-            meta["callback_steps"] = len(path)
-            return path, alphas, meta
-
-
-        if optimizer == "Newton's Method" and options.get("newton_variant") in ["BFGS", "L-BFGS"]:
-            from scipy.optimize import minimize
-
-            path_coords = []
-            losses = []
-
-            def loss_vec(v):
-                return f_func(v[0], v[1])
-
-            def grad_vec(v):
-                return np.atleast_1d(grad_f(v[0], v[1]))
-
-            def callback(vk):
-                path_coords.append((vk[0], vk[1]))
-                losses.append(f_func(vk[0], vk[1]))
-
-            x0_vec = np.array([x0, y0])
-            method = "L-BFGS-B" if options["newton_variant"] == "L-BFGS" else "BFGS"
-
-            res = minimize(loss_vec, x0_vec, method=method, jac=grad_vec, callback=callback, options={"maxiter": steps})
-
-            # Fallback if callback was never triggered (e.g., early convergence)
-            if not path_coords:
-                path_coords = [tuple(res.x)]
-                losses = [f_func(*res.x)]
-
-            meta["res_nit"] = res.nit
-            meta["callback_steps"] = len(path_coords)
-            return path_coords, losses, meta
-
-
-        if optimizer == "Simulated Annealing":
-            T, cooling = options.get("T", 2.0), options.get("cooling", 0.95)
-            current = f_func(x0, y0)
-            for _ in range(steps):
-                xn, yn = x0 + np.random.randn(), y0 + np.random.randn()
-                candidate = f_func(xn, yn)
-                if candidate < current or np.random.rand() < np.exp(-(candidate - current)/T):
-                    x0, y0 = xn, yn
-                    current = candidate
-                    path.append((x0, y0))
-                T *= cooling
-            meta["callback_steps"] = len(path)
-            return path, None, meta
-        
-        if optimizer == "Genetic Algorithm":
-            pop_size = options.get("pop_size", 20)
-            mutation_std = options.get("mutation_std", 0.3)
-            pop = [np.random.uniform(-5, 5, 2) for _ in range(pop_size)]
-            for _ in range(steps // 2):
-                pop = sorted(pop, key=lambda p: f_func(p[0], p[1]))[:pop_size // 2]
-                children = [np.mean([pop[i], pop[j]], axis=0) + np.random.normal(0, mutation_std, 2)
-                            for i in range(len(pop)) for j in range(i+1, len(pop))][:pop_size // 2]
-                pop += children
-            best = sorted(pop, key=lambda p: f_func(p[0], p[1]))[0]
-            path = [tuple(best)]
-            meta["callback_steps"] = len(path)
-            return path, None, meta
-
-        # --- Standard Optimizer Loop ---
-        m, v = np.zeros(2), np.zeros(2)
-        beta1, beta2, eps = 0.9, 0.999, 1e-8
-
-        for t in range(1, steps + 1):
-            x_t, y_t = path[-1]
-            grad = grad_f(x_t, y_t)
-
-            if optimizer == "Adam":
-                m = beta1 * m + (1 - beta1) * grad
-                v = beta2 * v + (1 - beta2) * (grad ** 2)
-                m_hat = m / (1 - beta1 ** t)
-                v_hat = v / (1 - beta2 ** t)
-                update = lr * m_hat / (np.sqrt(v_hat) + eps)
-
-            elif optimizer == "RMSProp":
-                v = beta2 * v + (1 - beta2) * (grad ** 2)
-                update = lr * grad / (np.sqrt(v) + eps)
-
-            elif optimizer == "Newton's Method":
-                variant = options.get("newton_variant", "Classic Newton")
-                if variant == "Classic Newton":
-                    try:
-                        H = hessian_f(x_t, y_t)
-                        H_inv = np.linalg.inv(H)
-                        update = H_inv @ grad
-                    except:
-                        update = grad
-                elif variant == "Numerical Newton":
-                    eps_num = 1e-4
-                    def fx(x_, y_): return f_func(x_, y_)
-                    def second_partial(f, x, y, i, j):
-                        h = eps_num
-                        if i == 0 and j == 0:
-                            return (f(x + h, y) - 2 * f(x, y) + f(x - h, y)) / h**2
-                        elif i == 1 and j == 1:
-                            return (f(x, y + h) - 2 * f(x, y) + f(x, y - h)) / h**2
-                        else:
-                            return (f(x + h, y + h) - f(x + h, y - h) - f(x - h, y + h) + f(x - h, y - h)) / (4 * h**2)
-                    H = np.array([
-                        [second_partial(fx, x_t, y_t, 0, 0), second_partial(fx, x_t, y_t, 0, 1)],
-                        [second_partial(fx, x_t, y_t, 1, 0), second_partial(fx, x_t, y_t, 1, 1)]
-                    ])
-                    try:
-                        update = np.linalg.inv(H) @ grad
-                    except:
-                        update = grad
-
-            else:  # Default: GradientDescent
-                update = lr * grad
-
-            update = np.asarray(update)
-            new_x, new_y = x_t - update[0], y_t - update[1]
-            path.append((new_x, new_y))
-
-        meta["callback_steps"] = len(path)
-        return path, None, meta
 
 
     if optimizer == "Newton's Method":
