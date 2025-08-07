@@ -106,9 +106,10 @@ with tab2:
         a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
 
         if animate:
-            order_to_animate = st.radio("Which order to animate?", ["1st", "2nd", "3rd", "4th"])
+            animate_orders = ["1st", "2nd"]  # Always animate both
         else:
-            order_to_animate = None
+            animate_orders = []
+
 
     # Main content: plot + animation
     show_univariate_taylor(
@@ -120,8 +121,9 @@ with tab2:
         show_2nd=show_parabola,
         show_3rd_4th=show_3rd_4th,
         animate=animate,
-        order_to_animate=order_to_animate
+        order_to_animate=animate_orders  # Pass list instead of string
     )
+
 
 
 
