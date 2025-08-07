@@ -26,48 +26,7 @@ from collections import OrderedDict
 from visualizer import plot_3d_descent, plot_2d_contour
 
 
-# === Shared simulation function ===
-def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
-    f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-    # f_func = sp.lambdify((x, y), f_expr, modules="numpy")
-    x0, y0 = -3, 3
-    path = [(x0, y0)]
-    m, v = 0, 0
-    for t in range(1, steps + 1):
-        x_t, y_t = path[-1]
-        dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
-        dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
-        g = np.array([dx, dy])
-        if opt_name == "Adam":
-            m = 0.9 * m + 0.1 * g
-            v = 0.999 * v + 0.001 * (g ** 2)
-            m_hat = m / (1 - 0.9 ** t)
-            v_hat = v / (1 - 0.999 ** t)
-            update = lr * m_hat / (np.sqrt(v_hat) + 1e-8)
-        elif opt_name == "RMSProp":
-            v = 0.999 * v + 0.001 * (g ** 2)
-            update = lr * g / (np.sqrt(v) + 1e-8)
-        elif opt_name == "Newton's Method":
-            hess = sp.hessian(f_expr, (x, y))
-            hess_func = sp.lambdify((x, y), hess, modules="numpy")
-            try:
-                H = np.array(hess_func(x_t, y_t))
-                H_inv = np.linalg.inv(H)
-                update = H_inv @ g
-            except:
-                update = g
-        else:
-            update = lr * g
-        x_new, y_new = x_t - update[0], y_t - update[1]
-        path.append((x_new, y_new))
-    final_x, final_y = path[-1]
-    grad_norm = np.linalg.norm(g)
-    return {
-        "Optimizer": opt_name,
-        "Final Value": round(f_func(final_x, final_y), 4),
-        "Gradient Norm": round(grad_norm, 4),
-        "Steps": len(path) - 1
-    }
+
 
 # === Auto-Tuning Simulation Function ===
 def run_auto_tuning_simulation(f_func, optimizer, x0, y0):
@@ -516,250 +475,291 @@ if optimizer == "Newton's Method":
         st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
 
 
-    g_funcs = [sp.lambdify((x_sym, y_sym), g, modules=["numpy"]) for g in constraints]  
-    # g_funcs = [sp.lambdify((x, y), g, modules=["numpy"]) for g in constraints]
+def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
     f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-    # f_func = sp.lambdify((x, y), f_expr, modules=["numpy"])
-    grad_f = lambda x0, y0: np.array([
-        (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
-        (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
-    ])
+    # f_func = sp.lambdify((x, y), f_expr, modules="numpy")
+    x0, y0 = -3, 3
+    path = [(x0, y0)]
+    m, v = 0, 0
+    for t in range(1, steps + 1):
+        x_t, y_t = path[-1]
+        dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
+        dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
+        g = np.array([dx, dy])
+        if opt_name == "Adam":
+            m = 0.9 * m + 0.1 * g
+            v = 0.999 * v + 0.001 * (g ** 2)
+            m_hat = m / (1 - 0.9 ** t)
+            v_hat = v / (1 - 0.999 ** t)
+            update = lr * m_hat / (np.sqrt(v_hat) + 1e-8)
+        elif opt_name == "RMSProp":
+            v = 0.999 * v + 0.001 * (g ** 2)
+            update = lr * g / (np.sqrt(v) + 1e-8)
+        elif opt_name == "Newton's Method":
+            hess = sp.hessian(f_expr, (x, y))
+            hess_func = sp.lambdify((x, y), hess, modules="numpy")
+            try:
+                H = np.array(hess_func(x_t, y_t))
+                H_inv = np.linalg.inv(H)
+                update = H_inv @ g
+            except:
+                update = g
+        else:
+            update = lr * g
+        x_new, y_new = x_t - update[0], y_t - update[1]
+        path.append((x_new, y_new))
+    final_x, final_y = path[-1]
+    grad_norm = np.linalg.norm(g)
+    return {
+        "Optimizer": opt_name,
+        "Final Value": round(f_func(final_x, final_y), 4),
+        "Gradient Norm": round(grad_norm, 4),
+        "Steps": len(path) - 1
+    }
+g_funcs = [sp.lambdify((x_sym, y_sym), g, modules=["numpy"]) for g in constraints]  
+# g_funcs = [sp.lambdify((x, y), g, modules=["numpy"]) for g in constraints]
+f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
+# f_func = sp.lambdify((x, y), f_expr, modules=["numpy"])
+grad_f = lambda x0, y0: np.array([
+    (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
+    (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
+])
 
-    def hessian_f(x0, y0):
-        hess_expr = sp.hessian(f_expr, (x, y))
-        hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
-        return np.array(hess_func(x0, y0))
+def hessian_f(x0, y0):
+    hess_expr = sp.hessian(f_expr, (x, y))
+    hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
+    return np.array(hess_func(x0, y0))
 
-    # === Pull final values from session_state
-    start_x = st.session_state.get("start_x", -3.0)
-    start_y = st.session_state.get("start_y", 3.0)
-    lr = st.session_state.get("lr", 0.01)
-    steps = st.session_state.get("steps", 50)
+# === Pull final values from session_state
+start_x = st.session_state.get("start_x", -3.0)
+start_y = st.session_state.get("start_y", 3.0)
+lr = st.session_state.get("lr", 0.01)
+steps = st.session_state.get("steps", 50)
 
 
-    path, alpha_log, meta = optimize_path(
-        start_x, start_y,
-        optimizer=optimizer,
-        lr=lr,
-        steps=steps,
-        f_func=f_func,
-        grad_f=grad_f,
-        hessian_f=hessian_f,
-        options=options
-    )
+path, alpha_log, meta = optimize_path(
+    start_x, start_y,
+    optimizer=optimizer,
+    lr=lr,
+    steps=steps,
+    f_func=f_func,
+    grad_f=grad_f,
+    hessian_f=hessian_f,
+    options=options
+)
 
-    xs, ys = zip(*path)
-    Z_path = [f_func(xp, yp) for xp, yp in path]
+xs, ys = zip(*path)
+Z_path = [f_func(xp, yp) for xp, yp in path]
 
-    x_vals = np.linspace(-5, 5, 200)
-    y_vals = np.linspace(-5, 5, 200)
-    X, Y = np.meshgrid(x_vals, y_vals)
-    Z = f_func(X, Y)
+x_vals = np.linspace(-5, 5, 200)
+y_vals = np.linspace(-5, 5, 200)
+X, Y = np.meshgrid(x_vals, y_vals)
+Z = f_func(X, Y)
 
-    # --- Taylor Expansion Toggle ---
+# --- Taylor Expansion Toggle ---
 
-    show_taylor = st.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
+show_taylor = st.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
 
-    show_2nd = False
-    Z_t1 = None
-    Z_t2 = None
+show_2nd = False
+Z_t1 = None
+Z_t2 = None
 
-    a_val, b_val = None, None  # set early to avoid NameError
-    expansion_point = None
+a_val, b_val = None, None  # set early to avoid NameError
+expansion_point = None
 
-    # expansion_point = (a_val, b_val) if show_taylor else None
+# expansion_point = (a_val, b_val) if show_taylor else None
 
-    if show_taylor:
-        st.markdown("**Taylor Expansion Center (a, b)**")
+if show_taylor:
+    st.markdown("**Taylor Expansion Center (a, b)**")
 
-        # --- Initialize session state on first run ---
-        if "a_val" not in st.session_state or "b_val" not in st.session_state:
-            if float(start_x) == 0.0 and float(start_y) == 0.0 and func_name != "Quadratic Bowl":
-                st.session_state.a_val = 0.1
-                st.session_state.b_val = 0.1
-                st.info("🔁 Auto-shifted expansion point from (0,0) → (0.1, 0.1)")
-            else:
-                st.session_state.a_val = float(start_x)
-                st.session_state.b_val = float(start_y)
-
-        # --- Sliders using session state ---
-        a_val = st.slider("a (expansion x)", -5.0, 5.0, value=st.session_state.a_val, step=0.1, key="a_val")
-        b_val = st.slider("b (expansion y)", -5.0, 5.0, value=st.session_state.b_val, step=0.1, key="b_val")
-
-        # --- Prevent user from going back to (0,0) if it's not allowed ---
-        if a_val == 0.0 and b_val == 0.0 and func_name != "Quadratic Bowl":
-            st.warning("🚫 (0,0) is a singular point. Auto-shifting again to (0.1, 0.1)")
-            a_val = 0.1
-            b_val = 0.1
+    # --- Initialize session state on first run ---
+    if "a_val" not in st.session_state or "b_val" not in st.session_state:
+        if float(start_x) == 0.0 and float(start_y) == 0.0 and func_name != "Quadratic Bowl":
             st.session_state.a_val = 0.1
             st.session_state.b_val = 0.1
+            st.info("🔁 Auto-shifted expansion point from (0,0) → (0.1, 0.1)")
+        else:
+            st.session_state.a_val = float(start_x)
+            st.session_state.b_val = float(start_y)
 
-        expansion_point = (a_val, b_val)
-        show_2nd = st.checkbox("Include 2nd-order terms", value=True)
+    # --- Sliders using session state ---
+    a_val = st.slider("a (expansion x)", -5.0, 5.0, value=st.session_state.a_val, step=0.1, key="a_val")
+    b_val = st.slider("b (expansion y)", -5.0, 5.0, value=st.session_state.b_val, step=0.1, key="b_val")
 
+    # --- Prevent user from going back to (0,0) if it's not allowed ---
+    if a_val == 0.0 and b_val == 0.0 and func_name != "Quadratic Bowl":
+        st.warning("🚫 (0,0) is a singular point. Auto-shifting again to (0.1, 0.1)")
+        a_val = 0.1
+        b_val = 0.1
+        st.session_state.a_val = 0.1
+        st.session_state.b_val = 0.1
 
-        # --- Symbolic derivatives ---
-        grad_fx = [sp.diff(f_expr, var) for var in (x_sym, y_sym)]
-        hess_fx = sp.hessian(f_expr, (x_sym, y_sym))
-
-        subs = {x_sym: a_val, y_sym: b_val}
-        st.text(f"📌 Taylor center used: (a={a_val:.3f}, b={b_val:.3f})")
-
-        f_ab = float(f_expr.subs(subs))
-        grad_vals = [float(g.subs(subs)) for g in grad_fx]
-        hess_vals = hess_fx.subs(subs)
-        Hxx = float(hess_vals[0, 0])
-        Hxy = float(hess_vals[0, 1])
-        Hyy = float(hess_vals[1, 1])
-
-        # dx, dy remain symbolic
-        dx, dy = x_sym - a_val, y_sym - b_val
-
-        # Fully numeric constants in expression
-        T1_expr = f_ab + grad_vals[0]*dx + grad_vals[1]*dy
-        T2_expr = T1_expr + 0.5 * (Hxx*dx**2 + 2*Hxy*dx*dy + Hyy*dy**2)
-
-        # Numerical evaluation for plotting
-        t1_np = sp.lambdify((x_sym, y_sym), T1_expr, "numpy")
-        t2_np = sp.lambdify((x_sym, y_sym), T2_expr, "numpy") if show_2nd else None
-        Z_t1 = t1_np(X, Y)
+    expansion_point = (a_val, b_val)
+    show_2nd = st.checkbox("Include 2nd-order terms", value=True)
 
 
-        if show_2nd:
-            try:
-                Z_t2 = t2_np(X, Y)
+    # --- Symbolic derivatives ---
+    grad_fx = [sp.diff(f_expr, var) for var in (x_sym, y_sym)]
+    hess_fx = sp.hessian(f_expr, (x_sym, y_sym))
 
-                # --- Safety checks ---
-                if isinstance(Z_t2, (int, float, np.number)):
-                    st.warning(f"❌ Z_t2 is scalar: {Z_t2}. Skipping.")
-                    Z_t2 = None
-                else:
-                    Z_t2 = np.array(Z_t2, dtype=np.float64)
+    subs = {x_sym: a_val, y_sym: b_val}
+    st.text(f"📌 Taylor center used: (a={a_val:.3f}, b={b_val:.3f})")
 
-                    if Z_t2.ndim != 2:
-                        st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
-                        Z_t2 = None
-                    elif Z_t2.shape != (len(y_vals), len(x_vals)):
-                        if Z_t2.shape == (len(x_vals), len(y_vals)):
-                            Z_t2 = Z_t2.T
-                        else:
-                            st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape}")
-                            Z_t2 = None
-                    elif np.isnan(Z_t2).any():
-                        st.warning("❌ Z_t2 contains NaNs.")
-                        Z_t2 = None
+    f_ab = float(f_expr.subs(subs))
+    grad_vals = [float(g.subs(subs)) for g in grad_fx]
+    hess_vals = hess_fx.subs(subs)
+    Hxx = float(hess_vals[0, 0])
+    Hxy = float(hess_vals[0, 1])
+    Hyy = float(hess_vals[1, 1])
 
-            except Exception as e:
-                st.warning(f"⚠️ Failed to evaluate 2nd-order Taylor surface: {e}")
-                Z_t2 = None
+    # dx, dy remain symbolic
+    dx, dy = x_sym - a_val, y_sym - b_val
 
-        # Z_t2 = t2_np(X, Y) if show_2nd else None
+    # Fully numeric constants in expression
+    T1_expr = f_ab + grad_vals[0]*dx + grad_vals[1]*dy
+    T2_expr = T1_expr + 0.5 * (Hxx*dx**2 + 2*Hxy*dx*dy + Hyy*dy**2)
 
-        # ✅ Display symbolic formula as LaTeX
-        st.markdown("### ✏️ Taylor Approximation Formula at \\( (a, b) = ({:.1f}, {:.1f}) \\)".format(a_val, b_val))
+    # Numerical evaluation for plotting
+    t1_np = sp.lambdify((x_sym, y_sym), T1_expr, "numpy")
+    t2_np = sp.lambdify((x_sym, y_sym), T2_expr, "numpy") if show_2nd else None
+    Z_t1 = t1_np(X, Y)
 
-        fx, fy = grad_vals
-        Hxx, Hxy, Hyy = hess_vals[0, 0], hess_vals[0, 1], hess_vals[1, 1]
-
-        T1_latex = f"f(x, y) \\approx {f_ab:.3f} + ({fx}) (x - {a_val}) + ({fy}) (y - {b_val})"
-        T2_latex = (
-            f"{T1_latex} + \\frac{{1}}{{2}}({Hxx}) (x - {a_val})^2 + "
-            f"{Hxy} (x - {a_val})(y - {b_val}) + "
-            f"\\frac{{1}}{{2}}({Hyy}) (y - {b_val})^2"
-        )
-
-        st.latex(T1_latex)
-        if show_2nd:
-            st.latex(T2_latex)
-
-
-    st.markdown("### 📈 3D View")
 
     if show_2nd:
         try:
-            if Z_t2 is not None:
-                # ❗ Reject raw scalar values
-                if isinstance(Z_t2, (int, float)):
-                    st.warning(f"❌ Z_t2 is a scalar ({Z_t2}), not an array.")
-                    Z_t2 = None
+            Z_t2 = t2_np(X, Y)
 
+            # --- Safety checks ---
+            if isinstance(Z_t2, (int, float, np.number)):
+                st.warning(f"❌ Z_t2 is scalar: {Z_t2}. Skipping.")
+                Z_t2 = None
+            else:
                 Z_t2 = np.array(Z_t2, dtype=np.float64)
 
                 if Z_t2.ndim != 2:
                     st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
                     Z_t2 = None
-                elif np.isnan(Z_t2).any():
-                    st.warning("❌ Z_t2 contains NaNs.")
-                    Z_t2 = None
                 elif Z_t2.shape != (len(y_vals), len(x_vals)):
                     if Z_t2.shape == (len(x_vals), len(y_vals)):
                         Z_t2 = Z_t2.T
                     else:
-                        st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape} vs mesh ({len(y_vals)}, {len(x_vals)})")
+                        st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape}")
                         Z_t2 = None
+                elif np.isnan(Z_t2).any():
+                    st.warning("❌ Z_t2 contains NaNs.")
+                    Z_t2 = None
+
         except Exception as e:
-            st.warning(f"❌ Error processing Z_t2: {e}")
+            st.warning(f"⚠️ Failed to evaluate 2nd-order Taylor surface: {e}")
             Z_t2 = None
 
-            
-    plot_3d_descent(
-        x_vals=x_vals,
-        y_vals=y_vals,
-        Z=Z,
-        path=path,
-        Z_path=Z_path,
-        Z_t1=Z_t1,
-        Z_t2=Z_t2,
-        show_taylor=show_taylor,
-        show_2nd=show_2nd,
-        expansion_point=expansion_point,
-        f_func=f_func
+    # Z_t2 = t2_np(X, Y) if show_2nd else None
+
+    # ✅ Display symbolic formula as LaTeX
+    st.markdown("### ✏️ Taylor Approximation Formula at \\( (a, b) = ({:.1f}, {:.1f}) \\)".format(a_val, b_val))
+
+    fx, fy = grad_vals
+    Hxx, Hxy, Hyy = hess_vals[0, 0], hess_vals[0, 1], hess_vals[1, 1]
+
+    T1_latex = f"f(x, y) \\approx {f_ab:.3f} + ({fx}) (x - {a_val}) + ({fy}) (y - {b_val})"
+    T2_latex = (
+        f"{T1_latex} + \\frac{{1}}{{2}}({Hxx}) (x - {a_val})^2 + "
+        f"{Hxy} (x - {a_val})(y - {b_val}) + "
+        f"\\frac{{1}}{{2}}({Hyy}) (y - {b_val})^2"
     )
 
+    st.latex(T1_latex)
+    if show_2nd:
+        st.latex(T2_latex)
 
-    st.markdown("### 🗺️ 2D View")
-    plot_2d_contour(
-        x_vals=x_vals,
-        y_vals=y_vals,
-        Z=Z,
-        path=path,
-        g_funcs=g_funcs if constraints else None,
-        X=X, Y=Y,
-        Z_t2=Z_t2,
-        show_2nd=show_2nd,
-        expansion_point=expansion_point
+
+st.markdown("### 📈 3D View")
+
+if show_2nd:
+    try:
+        if Z_t2 is not None:
+            # ❗ Reject raw scalar values
+            if isinstance(Z_t2, (int, float)):
+                st.warning(f"❌ Z_t2 is a scalar ({Z_t2}), not an array.")
+                Z_t2 = None
+
+            Z_t2 = np.array(Z_t2, dtype=np.float64)
+
+            if Z_t2.ndim != 2:
+                st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
+                Z_t2 = None
+            elif np.isnan(Z_t2).any():
+                st.warning("❌ Z_t2 contains NaNs.")
+                Z_t2 = None
+            elif Z_t2.shape != (len(y_vals), len(x_vals)):
+                if Z_t2.shape == (len(x_vals), len(y_vals)):
+                    Z_t2 = Z_t2.T
+                else:
+                    st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape} vs mesh ({len(y_vals)}, {len(x_vals)})")
+                    Z_t2 = None
+    except Exception as e:
+        st.warning(f"❌ Error processing Z_t2: {e}")
+        Z_t2 = None
+
+        
+plot_3d_descent(
+    x_vals=x_vals,
+    y_vals=y_vals,
+    Z=Z,
+    path=path,
+    Z_path=Z_path,
+    Z_t1=Z_t1,
+    Z_t2=Z_t2,
+    show_taylor=show_taylor,
+    show_2nd=show_2nd,
+    expansion_point=expansion_point,
+    f_func=f_func
+)
+
+
+st.markdown("### 🗺️ 2D View")
+plot_2d_contour(
+    x_vals=x_vals,
+    y_vals=y_vals,
+    Z=Z,
+    path=path,
+    g_funcs=g_funcs if constraints else None,
+    X=X, Y=Y,
+    Z_t2=Z_t2,
+    show_2nd=show_2nd,
+    expansion_point=expansion_point
+)
+
+
+
+if show_taylor:
+    st.caption("🔺 Red = 1st-order Taylor, 🔷 Blue = 2nd-order Taylor, 🟢 Green = true surface")
+
+if show_animation:
+    frames = []
+    fig_anim, ax_anim = plt.subplots(figsize=(5, 4))
+
+    for i in range(1, len(path) + 1):
+        ax_anim.clear()
+        ax_anim.contour(X, Y, Z, levels=30, cmap="viridis")
+        ax_anim.plot(*zip(*path[:i]), 'r*-')
+        ax_anim.set_xlim([-5, 5])
+        ax_anim.set_ylim([-5, 5])
+        ax_anim.set_title(f"Step {i}/{len(path)-1}")
+
+        buf = BytesIO()
+        fig_anim.savefig(buf, format='png', dpi=100)  # optional: set dpi
+        buf.seek(0)
+        frames.append(Image.open(buf).convert("P"))  # convert to palette for GIF efficiency
+        buf.close()
+
+    gif_buf = BytesIO()
+    frames[0].save(
+        gif_buf, format="GIF", save_all=True,
+        append_images=frames[1:], duration=300, loop=0
     )
-
-
-
-    if show_taylor:
-        st.caption("🔺 Red = 1st-order Taylor, 🔷 Blue = 2nd-order Taylor, 🟢 Green = true surface")
-
-    if show_animation:
-        frames = []
-        fig_anim, ax_anim = plt.subplots(figsize=(5, 4))
-
-        for i in range(1, len(path) + 1):
-            ax_anim.clear()
-            ax_anim.contour(X, Y, Z, levels=30, cmap="viridis")
-            ax_anim.plot(*zip(*path[:i]), 'r*-')
-            ax_anim.set_xlim([-5, 5])
-            ax_anim.set_ylim([-5, 5])
-            ax_anim.set_title(f"Step {i}/{len(path)-1}")
-
-            buf = BytesIO()
-            fig_anim.savefig(buf, format='png', dpi=100)  # optional: set dpi
-            buf.seek(0)
-            frames.append(Image.open(buf).convert("P"))  # convert to palette for GIF efficiency
-            buf.close()
-
-        gif_buf = BytesIO()
-        frames[0].save(
-            gif_buf, format="GIF", save_all=True,
-            append_images=frames[1:], duration=300, loop=0
-        )
-        gif_buf.seek(0)
-        st.image(gif_buf, caption="📽️ Animated Descent Path", use_container_width=True)
+    gif_buf.seek(0)
+    st.image(gif_buf, caption="📽️ Animated Descent Path", use_container_width=True)
 
 
 
