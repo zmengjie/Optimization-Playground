@@ -211,11 +211,29 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
             def update(frame):
                 a_val = a_vals[frame]
                 f_a = f_np(a_val)
-                terms = [f_a * np.ones_like(x)]
-                for i, f_deriv in enumerate(derivs):
-                    order = i + 1
-                    term = (f_deriv(a_val) * (x - a_val) ** order) / math.factorial(order)
-                    terms.append(term)
+                # terms = [f_a * np.ones_like(x)]
+                # for i, f_deriv in enumerate(derivs):
+                #     order = i + 1
+                #     term = (f_deriv(a_val) * (x - a_val) ** order) / math.factorial(order)
+                #     terms.append(term)
+
+                terms = []
+                if show_linear:
+                    terms.append(f_a * np.ones_like(x))
+                if show_2nd and len(derivs) >= 1:
+                    term1 = (derivs[0](a_val) * (x - a_val)) / math.factorial(1)
+                    terms.append(term1)
+                if show_3rd_4th and len(derivs) >= 2:
+                    term2 = (derivs[1](a_val) * (x - a_val)**2) / math.factorial(2)
+                    terms.append(term2)
+                if show_3rd_4th and len(derivs) >= 3:
+                    term3 = (derivs[2](a_val) * (x - a_val)**3) / math.factorial(3)
+                    terms.append(term3)
+                if show_3rd_4th and len(derivs) >= 4:
+                    term4 = (derivs[3](a_val) * (x - a_val)**4) / math.factorial(4)
+                    terms.append(term4)
+
+                    
                 taylor_curve = np.sum(terms, axis=0)
                 line_taylor.set_data(x, taylor_curve)
                 point.set_data([a_val], [f_np(a_val)])
