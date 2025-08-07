@@ -75,7 +75,7 @@ with tab2:
     # st.markdown("### 📈 Univariate Taylor Expansion Visualizer")
     with st.sidebar:
         st.markdown("### 📈 Univariate Settings")
-    show_univariate_taylor()  # Includes plot + animation in center
+        show_univariate_taylor()  # Includes plot + animation in center
 
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
