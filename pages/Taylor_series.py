@@ -1,6 +1,18 @@
 import streamlit as st
 from taylor_expansion import show_univariate_taylor
 
+st.markdown(
+    """
+    <style>
+        .main .block-container {
+            max-width: 100%;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 # Define the run function for this page
 
 st.title("📐 Taylor Series & Optimizer Foundations")
