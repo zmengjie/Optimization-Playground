@@ -11,6 +11,7 @@ import streamlit.components.v1 as components
 from PIL import Image
 import plotly.graph_objects as go
 
+
 def show_univariate_taylor():
     st.markdown("### 🔍 Univariate Taylor Expansion (1D Preview)")
 
@@ -124,6 +125,7 @@ def show_univariate_taylor():
 
     except Exception as e:
         st.error(f"Rendering error: {e}")
+
 
 
 # --- SECTION: Multivariable Taylor Expansion (2D Preview) ---
