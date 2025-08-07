@@ -522,18 +522,18 @@ with tab2:
         show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
 
         # Display auto-tuning trial log if available
-        if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
-            with col_right:
-                st.markdown("### 📊 Auto-Tuning Trial Log")
-                if "df_log" in st.session_state:
-                    st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
-                    st.markdown("""
-                    **🧠 How to Read Score:**
-                    - `score = final_loss + penalty × steps`
-                    - ✅ Lower score is better (fast and accurate convergence).
-                    """)
-                else:
-                    st.info("Auto-tuning not yet triggered.")
+        # if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
+        #     with col_right:
+        #         st.markdown("### 📊 Auto-Tuning Trial Log")
+        #         if "df_log" in st.session_state:
+        #             st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
+        #             st.markdown("""
+        #             **🧠 How to Read Score:**
+        #             - `score = final_loss + penalty × steps`
+        #             - ✅ Lower score is better (fast and accurate convergence).
+        #             """)
+        #         else:
+        #             st.info("Auto-tuning not yet triggered.")
 
 
     if mode == "Predefined":
