@@ -459,6 +459,14 @@ else:
 
 f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
 
+grad_f_expr = [sp.diff(f_expr, v) for v in (x_sym, y_sym)]
+
+def hessian_f(x0, y0):
+    hess_expr = sp.hessian(f_expr, (x, y))
+    hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
+    return np.array(hess_func(x0, y0))
+
+
 st.markdown(f"### 📘 Function Description:\n> {description}")
 
 # Setup for symbolic Lagrangian and KKT (if needed)
