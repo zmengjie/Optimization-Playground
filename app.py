@@ -23,5 +23,13 @@ st.markdown(
 st.set_page_config(page_title="Optimization Playground", layout="wide")
 
 
-st.title("Welcome to the Optimization Playground")
-st.write("Select a page from the left to get started.")
+st.title("🎯 Welcome to the Optimization Playground")
+st.markdown("""
+This interactive app lets you explore:
+
+- 📘 **Key optimization concepts** like gradient, Hessian, KKT conditions  
+- 🧪 **Playground** for experimenting with optimizers on custom functions  
+- 📐 **Symbolic tools** for visualizing Taylor expansions, curvature, and more  
+
+👉 Use the sidebar to dive into each section.
+""")
