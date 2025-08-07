@@ -25,7 +25,24 @@ from mpl_toolkits.mplot3d import Axes3D
 from collections import OrderedDict
 from visualizer import plot_3d_descent, plot_2d_contour
 
+st.markdown(
+    """
+    <style>
+    /* Make the content container full-width */
+    .block-container {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        max-width: 100% !important;
+    }
 
+    /* Optional: Make the page background wider as well */
+    .main {
+        max-width: 100vw !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 
 # === Auto-Tuning Simulation Function ===
