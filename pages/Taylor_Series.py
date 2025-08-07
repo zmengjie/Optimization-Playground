@@ -71,11 +71,21 @@ with tab1:
 
 st.markdown("---")
 
-with tab2:
+
     # st.markdown("### 📈 Univariate Taylor Expansion Visualizer")
+with tab2:
+    # Sidebar config
     with st.sidebar:
         st.markdown("### 📈 Univariate Settings")
-        show_univariate_taylor()  # Includes plot + animation in center
+        # Only place settings here
+        f_expr = st.text_input("Enter function f(x)", value="sin(x)")
+        xmin, xmax = st.slider("Domain range", -10.0, 10.0, (-5.0, 5.0))
+        a = st.slider("Expansion point a", -10.0, 10.0, 0.0)
+        show_2nd = st.checkbox("Show 2nd-order", value=True)
+        animate = st.checkbox("🎬 Animate 1st & 2nd-order Approximation")
+
+    # Main visualization
+    show_univariate_taylor(f_expr, xmin, xmax, a, show_2nd, animate)
 
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
