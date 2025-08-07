@@ -26,6 +26,49 @@ from collections import OrderedDict
 from visualizer import plot_3d_descent, plot_2d_contour
 
 
+# === Shared simulation function ===
+def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
+    f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
+    # f_func = sp.lambdify((x, y), f_expr, modules="numpy")
+    x0, y0 = -3, 3
+    path = [(x0, y0)]
+    m, v = 0, 0
+    for t in range(1, steps + 1):
+        x_t, y_t = path[-1]
+        dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
+        dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
+        g = np.array([dx, dy])
+        if opt_name == "Adam":
+            m = 0.9 * m + 0.1 * g
+            v = 0.999 * v + 0.001 * (g ** 2)
+            m_hat = m / (1 - 0.9 ** t)
+            v_hat = v / (1 - 0.999 ** t)
+            update = lr * m_hat / (np.sqrt(v_hat) + 1e-8)
+        elif opt_name == "RMSProp":
+            v = 0.999 * v + 0.001 * (g ** 2)
+            update = lr * g / (np.sqrt(v) + 1e-8)
+        elif opt_name == "Newton's Method":
+            hess = sp.hessian(f_expr, (x, y))
+            hess_func = sp.lambdify((x, y), hess, modules="numpy")
+            try:
+                H = np.array(hess_func(x_t, y_t))
+                H_inv = np.linalg.inv(H)
+                update = H_inv @ g
+            except:
+                update = g
+        else:
+            update = lr * g
+        x_new, y_new = x_t - update[0], y_t - update[1]
+        path.append((x_new, y_new))
+    final_x, final_y = path[-1]
+    grad_norm = np.linalg.norm(g)
+    return {
+        "Optimizer": opt_name,
+        "Final Value": round(f_func(final_x, final_y), 4),
+        "Gradient Norm": round(grad_norm, 4),
+        "Steps": len(path) - 1
+    }
+
 # === Auto-Tuning Simulation Function ===
 def run_auto_tuning_simulation(f_func, optimizer, x0, y0):
     lr_grid = list(np.logspace(-4, -1, 6))
@@ -460,48 +503,7 @@ else:
             st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
             st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
 
-    # === Shared simulation function ===
-    def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
-        f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-        # f_func = sp.lambdify((x, y), f_expr, modules="numpy")
-        x0, y0 = -3, 3
-        path = [(x0, y0)]
-        m, v = 0, 0
-        for t in range(1, steps + 1):
-            x_t, y_t = path[-1]
-            dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
-            dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
-            g = np.array([dx, dy])
-            if opt_name == "Adam":
-                m = 0.9 * m + 0.1 * g
-                v = 0.999 * v + 0.001 * (g ** 2)
-                m_hat = m / (1 - 0.9 ** t)
-                v_hat = v / (1 - 0.999 ** t)
-                update = lr * m_hat / (np.sqrt(v_hat) + 1e-8)
-            elif opt_name == "RMSProp":
-                v = 0.999 * v + 0.001 * (g ** 2)
-                update = lr * g / (np.sqrt(v) + 1e-8)
-            elif opt_name == "Newton's Method":
-                hess = sp.hessian(f_expr, (x, y))
-                hess_func = sp.lambdify((x, y), hess, modules="numpy")
-                try:
-                    H = np.array(hess_func(x_t, y_t))
-                    H_inv = np.linalg.inv(H)
-                    update = H_inv @ g
-                except:
-                    update = g
-            else:
-                update = lr * g
-            x_new, y_new = x_t - update[0], y_t - update[1]
-            path.append((x_new, y_new))
-        final_x, final_y = path[-1]
-        grad_norm = np.linalg.norm(g)
-        return {
-            "Optimizer": opt_name,
-            "Final Value": round(f_func(final_x, final_y), 4),
-            "Gradient Norm": round(grad_norm, 4),
-            "Steps": len(path) - 1
-        }
+
     g_funcs = [sp.lambdify((x_sym, y_sym), g, modules=["numpy"]) for g in constraints]  
     # g_funcs = [sp.lambdify((x, y), g, modules=["numpy"]) for g in constraints]
     f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
