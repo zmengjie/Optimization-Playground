@@ -292,7 +292,7 @@ def show_multivariable_taylor():
 
 
 
-    st.markdown("### 🌐 Multivariable Taylor Expansion (2D Preview)")
+    # st.markdown("### 🌐 Multivariable Taylor Expansion (2D Preview)")
 
 
     # Derivatives
