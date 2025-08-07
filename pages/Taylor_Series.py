@@ -81,7 +81,7 @@ with tab2:
         show_3rd_4th = st.checkbox("➕ Show 3rd & 4th-order", value=False)
         show_parabola = st.checkbox("Show 2nd-order (Parabola)", value=True)
         show_linear = st.checkbox("Show 1st-order (Linear)", value=True)
-        animate = st.checkbox("🎬 Animate Taylor Approximation")
+        animate = st.checkbox("🎬 Animate Taylor Approximation")  # ✅ Only once
 
         x_sym = sp.Symbol('x')
 
@@ -105,6 +105,11 @@ with tab2:
         f_expr, (xmin, xmax) = get_function(func_choice)
         a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
 
+        if animate:
+            order_to_animate = st.radio("Which order to animate?", ["1st", "2nd", "3rd", "4th"])
+        else:
+            order_to_animate = None
+
     # Main content: plot + animation
     show_univariate_taylor(
         f_expr=f_expr,
@@ -114,8 +119,10 @@ with tab2:
         show_linear=show_linear,
         show_2nd=show_parabola,
         show_3rd_4th=show_3rd_4th,
-        animate=animate
+        animate=animate,
+        order_to_animate=order_to_animate
     )
+
 
 
 
