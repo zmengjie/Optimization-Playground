@@ -260,7 +260,38 @@ def show_univariate_taylor(
 
 
 # --- SECTION: Multivariable Taylor Expansion (2D Preview) ---
+
 def show_multivariable_taylor():
+    import streamlit as st
+    import sympy as sp
+    import numpy as np
+    import plotly.graph_objects as go
+
+    st.sidebar.markdown("## 🌐 Multivariable Taylor Settings")
+    multi_func = st.sidebar.selectbox("Choose function:", ["Quadratic Bowl", "Rosenbrock", "sin(x)cos(y)", "exp(-x² - y²)"])
+
+    x, y = sp.symbols('x y')
+    a, b = sp.symbols('a b')
+
+    if multi_func == "Quadratic Bowl":
+        fxy = x**2 + y**2
+    elif multi_func == "Rosenbrock":
+        fxy = (1 - x)**2 + 100 * (y - x**2)**2
+    elif multi_func == "sin(x)cos(y)":
+        fxy = sp.sin(x) * sp.cos(y)
+    elif multi_func == "exp(-x² - y²)":
+        fxy = sp.exp(-(x**2 + y**2))
+
+    # UI-controlled values
+    a_input = st.sidebar.slider("Center a (x)", -5.0, 5.0, 0.0)
+    b_input = st.sidebar.slider("Center b (y)", -5.0, 5.0, 0.0)
+
+    zoom_in = st.sidebar.checkbox("🔍 Zoom into local neighborhood", value=False)
+    xlim = (a_input - 1, a_input + 1) if zoom_in else (-5, 5)
+    ylim = (b_input - 1, b_input + 1) if zoom_in else (-5, 5)
+
+
+
     st.markdown("### 🌐 Multivariable Taylor Expansion (2D Preview)")
 
     multi_func = st.selectbox("Choose function:", ["Quadratic Bowl", "Rosenbrock", "sin(x)cos(y)", "exp(-x² - y²)"])
@@ -377,22 +408,22 @@ def show_multivariable_taylor():
         st.plotly_chart(fig_taylor, use_container_width=True)
 
 
-    st.markdown("---")  # separator
+    # st.markdown("---")  # separator
 
-    with st.expander("ℹ️ Note on 2nd-order Taylor Expansion", expanded=True):
-        st.write("**Note:** The 2nd-order Taylor expansion approximates the function locally around:")
-        st.latex(r"(a, b)")
+    # with st.expander("ℹ️ Note on 2nd-order Taylor Expansion", expanded=True):
+    #     st.write("**Note:** The 2nd-order Taylor expansion approximates the function locally around:")
+    #     st.latex(r"(a, b)")
     
-        st.write("It uses gradient and Hessian values at that point.")
+    #     st.write("It uses gradient and Hessian values at that point.")
     
-        st.write("For smooth functions like:")
-        st.latex(r"\sin(x)\cos(y)")
-        st.write("the approximation is accurate near (a, b), but may diverge further away.")
+    #     st.write("For smooth functions like:")
+    #     st.latex(r"\sin(x)\cos(y)")
+    #     st.write("the approximation is accurate near (a, b), but may diverge further away.")
     
-        st.write("For quadratic functions like:")
-        st.latex(r"x^2 + y^2")
-        st.write("the 2nd-order Taylor expansion exactly matches the function, "
-                 "because the function itself is already a polynomial of degree 2.")
+    #     st.write("For quadratic functions like:")
+    #     st.latex(r"x^2 + y^2")
+    #     st.write("the 2nd-order Taylor expansion exactly matches the function, "
+    #              "because the function itself is already a polynomial of degree 2.")
     
 
 
