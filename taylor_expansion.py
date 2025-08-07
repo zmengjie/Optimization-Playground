@@ -126,7 +126,7 @@ def show_univariate_taylor():
 
 
 # --- SECTION: Multivariable Taylor Expansion (2D Preview) ---
-    st.markdown("---")
+def show_multivariable_taylor():
     st.markdown("### 🌐 Multivariable Taylor Expansion (2D Preview)")
 
     multi_func = st.selectbox("Choose function:", ["Quadratic Bowl", "Rosenbrock", "sin(x)cos(y)", "exp(-x² - y²)"])
