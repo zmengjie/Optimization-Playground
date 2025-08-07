@@ -312,7 +312,7 @@ with tab1:
     st.header("3. 🚦 KKT Conditions & Derivatives")
 
     # 3.1 Objective & Lagrangian
-    st.markdown("### 1. 🎯 Objective & Lagrangian")
+    st.markdown("### 🎯 Objective & Lagrangian")
     st.write("The **objective function** defines what we aim to minimize or maximize:")
     st.latex(r"f(x, y)")
     st.write("The **Lagrangian** incorporates the objective and any constraints using Lagrange multipliers:")
@@ -320,7 +320,7 @@ with tab1:
     st.markdown("---")
 
     # 3.2 KKT Conditions
-    st.markdown("### 2. ✅ KKT Conditions")
+    st.markdown("###  ✅ KKT Conditions")
     st.write("The **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization problems.")
     st.write("They state that the gradient of the Lagrangian must vanish at the optimal point (stationarity condition):")
     st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
@@ -329,7 +329,7 @@ with tab1:
     st.markdown("---")
 
     # 3.3 Gradient & Hessian
-    st.markdown("### 3. 🧮 Gradient & Hessian")
+    st.markdown("### 🧮 Gradient & Hessian")
     st.write("The **gradient** vector points in the direction of steepest ascent or descent. At optimality, it becomes zero:")
     st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\\\ \frac{\partial f}{\partial y} \end{bmatrix}")
     st.write("The **Hessian matrix** captures second-order curvature (concavity/convexity) of the function:")
