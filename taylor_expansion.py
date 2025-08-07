@@ -12,75 +12,162 @@ from PIL import Image
 import plotly.graph_objects as go
 
 
+# def show_univariate_taylor():
+#     st.markdown("### 🔍 Univariate Taylor Expansion (1D Preview)")
+
+#     try:
+#         func_choice = st.selectbox("Choose a function:", ["cos(x)", "exp(x)", "ln(1+x)", "tanh(x)", "Custom"])
+#         show_3rd_4th = st.checkbox("➕ Show 3rd & 4th-order", value=False)
+#         show_linear = st.checkbox("Show 1st-order (Linear)", value=True)
+#         show_parabola = st.checkbox("Show 2nd-order (Parabola)", value=True)
+
+#         x_sym = sp.symbols('x')
+
+#         def get_function(choice):
+#             if choice == "cos(x)": return sp.cos(x_sym), (-3, 3)
+#             if choice == "exp(x)": return sp.exp(x_sym), (-3, 3)
+#             if choice == "ln(1+x)": return sp.ln(1 + x_sym), (-0.9, 3)
+#             if choice == "tanh(x)": return sp.tanh(x_sym), (-3, 3)
+#             if choice == "Custom":
+#                 user_input = st.text_input("Enter function f(x):", "x**2 * sin(x)")
+#                 try:
+#                     return sp.sympify(user_input), (-3, 3)
+#                 except Exception as e:
+#                     st.error(f"Invalid input: {e}")
+#                     st.stop()
+
+#         f_sym, (xmin, xmax) = get_function(func_choice)
+#         x_sym, a_sym = sp.symbols('x a')
+#         h = x_sym - a_sym
+
+#         # Derivatives and Taylor terms
+#         f1, f2, f3, f4 = [sp.diff(f_sym, x_sym, i) for i in range(1, 5)]
+#         T1 = f_sym.subs(x_sym, a_sym) + f1.subs(x_sym, a_sym) * h
+#         T2 = T1 + (1/2) * f2.subs(x_sym, a_sym) * h**2
+#         T4 = T2 + (1/6) * f3.subs(x_sym, a_sym) * h**3 + (1/24) * f4.subs(x_sym, a_sym) * h**4
+
+#         st.markdown("### ✏️ Taylor Expansion at $x = a$")
+#         st.latex(f"f(x) \\approx {sp.latex(T1)}")
+#         st.latex(f"f(x) \\approx {sp.latex(T2)}")
+#         if show_3rd_4th:
+#             st.latex(f"f(x) \\approx {sp.latex(T4)}")
+
+#         # Numeric plotting
+#         f_np = sp.lambdify(x_sym, f_sym, "numpy")
+#         derivs = [sp.lambdify(x_sym, d, "numpy") for d in [f1, f2, f3, f4]]
+#         a = st.slider("Expansion point a:", float(xmin), float(xmax), 0.0, 0.1)
+#         x = np.linspace(xmin, xmax, 500)
+
+#         f_vals = [d(a) for d in derivs]
+#         t1 = f_np(a) + f_vals[0] * (x - a)
+#         t2 = t1 + 0.5 * f_vals[1] * (x - a)**2
+#         t4 = t2 + (1/6) * f_vals[2] * (x - a)**3 + (1/24) * f_vals[3] * (x - a)**4
+
+#         fig, ax = plt.subplots(figsize=(8, 4))
+#         ax.plot(x, f_np(x), label=f"f(x) = {func_choice}", color='blue')
+#         if show_linear: ax.plot(x, t1, '--', label='1st-order', color='red')
+#         if show_parabola: ax.plot(x, t2, '--', label='2nd-order', color='orange')
+#         if show_3rd_4th: ax.plot(x, t4, '--', label='3rd/4th-order', color='green')
+#         ax.axvline(a, color='gray', linestyle=':')
+#         ax.axhline(0, color='black', linewidth=0.8)
+#         ax.scatter(a, f_np(a), color='black')
+#         ax.set_title(f"Taylor Approximations at x = {a}")
+#         ax.legend(); ax.grid(True)
+#         st.pyplot(fig)
+
+
+#         # === Optional Animation ===
+#         if st.checkbox("🎬 Animate 1st & 2nd-order Approximation"):
+#             st.markdown("### 🎬 Animation: 1st & 2nd-Order Taylor Approximation")
+#             fig_anim, ax_anim = plt.subplots(figsize=(10,6))
+        
+
+#             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
+#             line_taylor1, = ax_anim.plot([], [], '--', label="1st-order", color='red')
+#             line_taylor2, = ax_anim.plot([], [], '--', label="2nd-order", color='orange')
+#             point, = ax_anim.plot([], [], 'ko')
+
+#             ax_anim.set_xlim(xmin, xmax)
+#             y_vals = f_np(x)
+#             buffer = 0.4 * (np.max(y_vals) - np.min(y_vals))
+#             ax_anim.set_ylim(np.min(y_vals) - buffer, np.max(y_vals) + buffer)
+#             ax_anim.axhline(0, color='gray', lw=0.5)
+#             ax_anim.grid(True)
+#             ax_anim.legend()
+
+#             a_vals = np.linspace(xmin + 0.1, xmax - 0.1, 60)
+
+#             def update(frame):
+#                 a_val = a_vals[frame]
+#                 f_a = f_np(a_val)
+#                 f1_a = derivs[0](a_val)
+#                 f2_a = derivs[1](a_val)
+
+#                 t1_anim = f_a + f1_a * (x - a_val)
+#                 t2_anim = t1_anim + 0.5 * f2_a * (x - a_val)**2
+
+#                 line_taylor1.set_data(x, t1_anim)
+#                 line_taylor2.set_data(x, t2_anim)
+#                 point.set_data([a_val], [f_a])
+#                 ax_anim.set_title(f"Taylor Approx at a = {a_val:.2f}")
+#                 return line_taylor1, line_taylor2, point
+
+#             ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
+
+#             buf = BytesIO()
+#             writer = PillowWriter(fps=20)
+#             with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
+#                 ani.save(tmpfile.name, writer=writer)
+#                 tmpfile.seek(0)
+#                 gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
+
+#             components.html(f'<img src="data:image/gif;base64,{gif_base64}" width="100%">', height=350)
+
+#     except Exception as e:
+#         st.error(f"Rendering error: {e}")
+
+
+# === UNIVARIATE TAYLOR FUNCTION ===
 def show_univariate_taylor():
-    st.markdown("### 🔍 Univariate Taylor Expansion (1D Preview)")
-
     try:
-        func_choice = st.selectbox("Choose a function:", ["cos(x)", "exp(x)", "ln(1+x)", "tanh(x)", "Custom"])
-        show_3rd_4th = st.checkbox("➕ Show 3rd & 4th-order", value=False)
-        show_linear = st.checkbox("Show 1st-order (Linear)", value=True)
-        show_parabola = st.checkbox("Show 2nd-order (Parabola)", value=True)
+        st.markdown("### 📈 Univariate Taylor Expansion")
+        func_str = st.sidebar.text_input("Enter function f(x)", "sin(x)")
+        xmin, xmax = st.sidebar.slider("Domain range", -10.0, 10.0, (-5.0, 5.0))
+        a_val = st.sidebar.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
+        show_2nd = st.sidebar.checkbox("Show 2nd-order", True)
+        animate = st.sidebar.checkbox("🎬 Animate 1st & 2nd-order Approximation")
 
-        x_sym = sp.symbols('x')
+        x = np.linspace(xmin, xmax, 400)
+        x_sym = sp.Symbol("x")
+        f_sym = sp.sympify(func_str)
+        f_np = sp.lambdify(x_sym, f_sym, modules=["numpy"])
+        f1 = sp.diff(f_sym, x_sym)
+        f2 = sp.diff(f1, x_sym)
+        derivs = [sp.lambdify(x_sym, f1, modules=["numpy"]),
+                  sp.lambdify(x_sym, f2, modules=["numpy"])]
 
-        def get_function(choice):
-            if choice == "cos(x)": return sp.cos(x_sym), (-3, 3)
-            if choice == "exp(x)": return sp.exp(x_sym), (-3, 3)
-            if choice == "ln(1+x)": return sp.ln(1 + x_sym), (-0.9, 3)
-            if choice == "tanh(x)": return sp.tanh(x_sym), (-3, 3)
-            if choice == "Custom":
-                user_input = st.text_input("Enter function f(x):", "x**2 * sin(x)")
-                try:
-                    return sp.sympify(user_input), (-3, 3)
-                except Exception as e:
-                    st.error(f"Invalid input: {e}")
-                    st.stop()
+        f_a = f_np(a_val)
+        f1_a = derivs[0](a_val)
+        f2_a = derivs[1](a_val)
+        t1 = f_a + f1_a * (x - a_val)
+        t2 = t1 + 0.5 * f2_a * (x - a_val)**2
 
-        f_sym, (xmin, xmax) = get_function(func_choice)
-        x_sym, a_sym = sp.symbols('x a')
-        h = x_sym - a_sym
-
-        # Derivatives and Taylor terms
-        f1, f2, f3, f4 = [sp.diff(f_sym, x_sym, i) for i in range(1, 5)]
-        T1 = f_sym.subs(x_sym, a_sym) + f1.subs(x_sym, a_sym) * h
-        T2 = T1 + (1/2) * f2.subs(x_sym, a_sym) * h**2
-        T4 = T2 + (1/6) * f3.subs(x_sym, a_sym) * h**3 + (1/24) * f4.subs(x_sym, a_sym) * h**4
-
-        st.markdown("### ✏️ Taylor Expansion at $x = a$")
-        st.latex(f"f(x) \\approx {sp.latex(T1)}")
-        st.latex(f"f(x) \\approx {sp.latex(T2)}")
-        if show_3rd_4th:
-            st.latex(f"f(x) \\approx {sp.latex(T4)}")
-
-        # Numeric plotting
-        f_np = sp.lambdify(x_sym, f_sym, "numpy")
-        derivs = [sp.lambdify(x_sym, d, "numpy") for d in [f1, f2, f3, f4]]
-        a = st.slider("Expansion point a:", float(xmin), float(xmax), 0.0, 0.1)
-        x = np.linspace(xmin, xmax, 500)
-
-        f_vals = [d(a) for d in derivs]
-        t1 = f_np(a) + f_vals[0] * (x - a)
-        t2 = t1 + 0.5 * f_vals[1] * (x - a)**2
-        t4 = t2 + (1/6) * f_vals[2] * (x - a)**3 + (1/24) * f_vals[3] * (x - a)**4
-
-        fig, ax = plt.subplots(figsize=(8, 4))
-        ax.plot(x, f_np(x), label=f"f(x) = {func_choice}", color='blue')
-        if show_linear: ax.plot(x, t1, '--', label='1st-order', color='red')
-        if show_parabola: ax.plot(x, t2, '--', label='2nd-order', color='orange')
-        if show_3rd_4th: ax.plot(x, t4, '--', label='3rd/4th-order', color='green')
-        ax.axvline(a, color='gray', linestyle=':')
-        ax.axhline(0, color='black', linewidth=0.8)
-        ax.scatter(a, f_np(a), color='black')
-        ax.set_title(f"Taylor Approximations at x = {a}")
-        ax.legend(); ax.grid(True)
-        st.pyplot(fig)
-
+        fig, ax = plt.subplots(figsize=(8, 5))
+        ax.plot(x, f_np(x), label="f(x)", color='blue')
+        ax.plot(x, t1, '--', label="1st-order", color='red')
+        if show_2nd:
+            ax.plot(x, t2, '--', label="2nd-order", color='orange')
+        ax.axvline(a_val, color='gray', linestyle=':')
+        ax.axhline(0, color='gray', lw=0.5)
+        ax.set_title("Taylor Approximation at x = {:.2f}".format(a_val))
+        ax.grid(True)
+        ax.legend()
+        st.pyplot(fig, use_container_width=True)
 
         # === Optional Animation ===
-        if st.checkbox("🎬 Animate 1st & 2nd-order Approximation"):
+        if animate:
             st.markdown("### 🎬 Animation: 1st & 2nd-Order Taylor Approximation")
-            fig_anim, ax_anim = plt.subplots(figsize=(10,6))
-        
+            fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
             line_taylor1, = ax_anim.plot([], [], '--', label="1st-order", color='red')
@@ -125,7 +212,6 @@ def show_univariate_taylor():
 
     except Exception as e:
         st.error(f"Rendering error: {e}")
-
 
 
 # --- SECTION: Multivariable Taylor Expansion (2D Preview) ---
