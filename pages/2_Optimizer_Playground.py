@@ -25,8 +25,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from collections import OrderedDict
 from visualizer import plot_3d_descent, plot_2d_contour
 
-st.set_page_config(page_title="Optimizer Playground", layout="wide")
-
 st.markdown(
     """
     <style>
