@@ -62,7 +62,7 @@ def show_univariate_taylor():
         t2 = t1 + 0.5 * f_vals[1] * (x - a)**2
         t4 = t2 + (1/6) * f_vals[2] * (x - a)**3 + (1/24) * f_vals[3] * (x - a)**4
 
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(8, 4))
         ax.plot(x, f_np(x), label=f"f(x) = {func_choice}", color='blue')
         if show_linear: ax.plot(x, t1, '--', label='1st-order', color='red')
         if show_parabola: ax.plot(x, t2, '--', label='2nd-order', color='orange')
@@ -79,7 +79,7 @@ def show_univariate_taylor():
         if st.checkbox("🎬 Animate 1st & 2nd-order Approximation"):
             st.markdown("### 🎬 Animation: 1st & 2nd-Order Taylor Approximation")
             fig_anim, ax_anim = plt.subplots(figsize=(10,6))
-            st.pyplot(fig, use_container_width=True)
+        
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
             line_taylor1, = ax_anim.plot([], [], '--', label="1st-order", color='red')
