@@ -10,7 +10,7 @@ import base64
 import streamlit.components.v1 as components
 from PIL import Image
 import plotly.graph_objects as go
-
+import math
 
 # def show_univariate_taylor():
 #     st.markdown("### 🔍 Univariate Taylor Expansion (1D Preview)")
@@ -128,15 +128,35 @@ import plotly.graph_objects as go
 
 
 # === UNIVARIATE TAYLOR FUNCTION ===
+import streamlit as st
+import numpy as np
+import sympy as sp
+import matplotlib.pyplot as plt
+import math
+from io import BytesIO
+import tempfile
+import base64
+from matplotlib.animation import FuncAnimation, PillowWriter
+import streamlit.components.v1 as components
+
+
+
 def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=True, show_3rd_4th=False, animate=False):
+    import math
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import sympy as sp
+    from matplotlib.animation import FuncAnimation, PillowWriter
+    import streamlit.components.v1 as components
+    from io import BytesIO
+    import tempfile
+
     try:
-        st.markdown("### 📈 Univariate Taylor Expansion")
+        st.markdown("### 📈 Taylor Approximation")
 
         x = np.linspace(xmin, xmax, 400)
         x_sym = sp.Symbol("x")
-
         f_np = sp.lambdify(x_sym, f_expr, modules=["numpy"])
-
         f_a = f_np(a)
         taylor_series = [f_a * np.ones_like(x)]
 
@@ -148,16 +168,13 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
 
         for i, f_deriv in enumerate(derivs):
             order = i + 1
-            term = (f_deriv(a) * (x - a)**order) / np.math.factorial(order)
+            term = (f_deriv(a) * (x - a) ** order) / math.factorial(order)
             taylor_series.append(term)
-
-        approx = np.sum(taylor_series, axis=0)
 
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.plot(x, f_np(x), label="f(x)", color='blue')
         if show_linear:
-            ax.plot(x, taylor_series[0] + taylor_series[1] if len(taylor_series) > 1 else taylor_series[0],
-                    '--', label="1st-order", color='red')
+            ax.plot(x, np.sum(taylor_series[:2], axis=0), '--', label="1st-order", color='red')
         if show_2nd and len(taylor_series) > 2:
             ax.plot(x, np.sum(taylor_series[:3], axis=0), '--', label="2nd-order", color='orange')
         if show_3rd_4th:
@@ -173,7 +190,6 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
         ax.legend()
         st.pyplot(fig, use_container_width=True)
 
-        # Optional Animation
         if animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
             fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
@@ -198,7 +214,7 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
                 terms = [f_a * np.ones_like(x)]
                 for i, f_deriv in enumerate(derivs):
                     order = i + 1
-                    term = (f_deriv(a_val) * (x - a_val)**order) / np.math.factorial(order)
+                    term = (f_deriv(a_val) * (x - a_val) ** order) / math.factorial(order)
                     terms.append(term)
                 taylor_curve = np.sum(terms, axis=0)
                 line_taylor.set_data(x, taylor_curve)
@@ -219,6 +235,7 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
 
     except Exception as e:
         st.error(f"Rendering error: {e}")
+
 
 
 
