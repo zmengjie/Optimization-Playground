@@ -72,12 +72,12 @@ with tab1:
 st.markdown("---")
 
 with tab2:
-    st.markdown("### 📈 Univariate Taylor Expansion Visualizer")
+    # st.markdown("### 📈 Univariate Taylor Expansion Visualizer")
     show_univariate_taylor()
 
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
 with tab3:
-    st.markdown("### 🌐 Multivariable Taylor Expansion Visualizer")
+    # st.markdown("### 🌐 Multivariable Taylor Expansion Visualizer")
     show_multivariable_taylor()
 
