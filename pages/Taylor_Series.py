@@ -77,15 +77,42 @@ with tab2:
     # Sidebar config
     with st.sidebar:
         st.markdown("### 📈 Univariate Settings")
-        # Only place settings here
-        f_expr = st.text_input("Enter function f(x)", value="sin(x)")
-        xmin, xmax = st.slider("Domain range", -10.0, 10.0, (-5.0, 5.0))
-        a = st.slider("Expansion point a", -10.0, 10.0, 0.0)
-        show_2nd = st.checkbox("Show 2nd-order", value=True)
-        animate = st.checkbox("🎬 Animate 1st & 2nd-order Approximation")
 
-    # Main visualization
-    show_univariate_taylor(f_expr, xmin, xmax, a, show_2nd, animate)
+        func_choice = st.selectbox("Choose a function:", ["cos(x)", "exp(x)", "ln(1+x)", "tanh(x)", "Custom"])
+        show_3rd_4th = st.checkbox("➕ Show 3rd & 4th-order", value=False)
+        show_parabola = st.checkbox("Show 2nd-order (Parabola)", value=True)
+        show_linear = st.checkbox("Show 1st-order (Linear)", value=True)
+        animate = st.checkbox("🎬 Animate Taylor Approximation")
+
+        x_sym = sp.Symbol('x')
+
+        def get_function(choice):
+            if choice == "cos(x)": return sp.cos(x_sym), (-3, 3)
+            if choice == "exp(x)": return sp.exp(x_sym), (-3, 3)
+            if choice == "ln(1+x)": return sp.ln(1 + x_sym), (-0.9, 3)
+            if choice == "tanh(x)": return sp.tanh(x_sym), (-3, 3)
+            if choice == "Custom":
+                user_input = st.text_input("Enter function f(x):", "x**2 * sin(x)")
+                try:
+                    return sp.sympify(user_input), (-3, 3)
+                except Exception as e:
+                    st.error(f"Invalid input: {e}")
+                    st.stop()
+
+        f_expr, (xmin, xmax) = get_function(func_choice)
+        a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
+
+    show_univariate_taylor(
+        f_expr=f_expr,
+        xmin=xmin,
+        xmax=xmax,
+        a=a,
+        show_linear=show_linear,
+        show_2nd=show_parabola,
+        show_3rd_4th=show_3rd_4th,
+        animate=animate
+    )
+
 
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
