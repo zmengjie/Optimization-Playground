@@ -150,6 +150,8 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
     import streamlit.components.v1 as components
     from io import BytesIO
     import tempfile
+    import base64
+    import streamlit as st
 
     try:
         st.markdown("### 📈 Taylor Approximation")
@@ -158,19 +160,21 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
         x_sym = sp.Symbol("x")
         f_np = sp.lambdify(x_sym, f_expr, modules=["numpy"])
         f_a = f_np(a)
-        taylor_series = [f_a * np.ones_like(x)]
 
+        # Build symbolic derivatives
         max_order = 4 if show_3rd_4th else (2 if show_2nd else 1 if show_linear else 0)
-        derivs = []
-        for i in range(1, max_order + 1):
-            deriv = sp.diff(f_expr, x_sym, i)
-            derivs.append(sp.lambdify(x_sym, deriv, modules=["numpy"]))
+        derivs = [sp.diff(f_expr, x_sym, i) for i in range(1, max_order + 1)]
+        derivs_np = [sp.lambdify(x_sym, d, modules=["numpy"]) for d in derivs]
 
-        for i, f_deriv in enumerate(derivs):
+        # Taylor terms (0th to nth)
+        taylor_series = [f_a * np.ones_like(x)]  # Constant term
+
+        for i, f_deriv in enumerate(derivs_np):
             order = i + 1
             term = (f_deriv(a) * (x - a) ** order) / math.factorial(order)
             taylor_series.append(term)
 
+        # Static Plot
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.plot(x, f_np(x), label="f(x)", color='blue')
         if show_linear:
@@ -190,6 +194,7 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
         ax.legend()
         st.pyplot(fig, use_container_width=True)
 
+        # Animated Plot
         if animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
             fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
@@ -210,34 +215,24 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
 
             def update(frame):
                 a_val = a_vals[frame]
-                f_a = f_np(a_val)
-                # terms = [f_a * np.ones_like(x)]
-                # for i, f_deriv in enumerate(derivs):
-                #     order = i + 1
-                #     term = (f_deriv(a_val) * (x - a_val) ** order) / math.factorial(order)
-                #     terms.append(term)
+                f_a_val = f_np(a_val)
 
-                terms = []
-                if show_linear:
-                    terms.append(f_a * np.ones_like(x))
-                if show_2nd and len(derivs) >= 1:
-                    term1 = (derivs[0](a_val) * (x - a_val)) / math.factorial(1)
-                    terms.append(term1)
-                if show_3rd_4th and len(derivs) >= 2:
-                    term2 = (derivs[1](a_val) * (x - a_val)**2) / math.factorial(2)
-                    terms.append(term2)
-                if show_3rd_4th and len(derivs) >= 3:
-                    term3 = (derivs[2](a_val) * (x - a_val)**3) / math.factorial(3)
-                    terms.append(term3)
-                if show_3rd_4th and len(derivs) >= 4:
-                    term4 = (derivs[3](a_val) * (x - a_val)**4) / math.factorial(4)
-                    terms.append(term4)
+                # Always start with constant term
+                terms = [f_a_val * np.ones_like(x)]
 
-                    
+                if show_linear and len(derivs_np) >= 1:
+                    terms.append((derivs_np[0](a_val) * (x - a_val)) / math.factorial(1))
+                if show_2nd and len(derivs_np) >= 2:
+                    terms.append((derivs_np[1](a_val) * (x - a_val)**2) / math.factorial(2))
+                if show_3rd_4th and len(derivs_np) >= 3:
+                    terms.append((derivs_np[2](a_val) * (x - a_val)**3) / math.factorial(3))
+                if show_3rd_4th and len(derivs_np) >= 4:
+                    terms.append((derivs_np[3](a_val) * (x - a_val)**4) / math.factorial(4))
+
                 taylor_curve = np.sum(terms, axis=0)
                 line_taylor.set_data(x, taylor_curve)
                 point.set_data([a_val], [f_np(a_val)])
-                ax_anim.set_title(f"Taylor Approx at a = {a_val:.2f}")
+                ax_anim.set_title(f"Taylor Approximation at a = {a_val:.2f}")
                 return line_taylor, point
 
             ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
