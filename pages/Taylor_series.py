@@ -1,5 +1,5 @@
 import streamlit as st
-from taylor_expansion import show_univariate_taylor
+from taylor_expansion import show_univariate_taylor, show_multivariable_taylor
 
 st.markdown(
     """
