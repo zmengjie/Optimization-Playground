@@ -339,43 +339,40 @@ with tab1:
     """)
 
     # 4. Function description (dynamic)
-    st.markdown(f"### 📘 Function Description:\n> {description}")
 
-    # 5. Newton Methods Expander
-    with st.expander("🧠 Newton Method Variants Explained", expanded=False):
-        st.markdown("### 📘 Classic Newton vs. Numerical vs. Quasi-Newton")
-        st.markdown("Newton's Method is a powerful optimization technique that uses **second-order derivatives** or their approximations to accelerate convergence.")
+    st.markdown("### 📘 Classic Newton vs. Numerical vs. Quasi-Newton")
+    st.markdown("Newton's Method is a powerful optimization technique that uses **second-order derivatives** or their approximations to accelerate convergence.")
 
-        st.markdown("#### 🧮 Classic Newton (Symbolic)")
-        st.markdown("- Uses the **symbolic Hessian matrix** from calculus:")
-        st.latex(r"\nabla^2 f(x, y)")
-        st.markdown("- ✅ Very efficient and accurate for simple analytic functions (e.g., quadratic, convex).")
-        st.markdown("- ⚠️ Can fail or be unstable if the Hessian is singular or badly conditioned.")
+    st.markdown("#### 🧮 Classic Newton (Symbolic)")
+    st.markdown("- Uses the **symbolic Hessian matrix** from calculus:")
+    st.latex(r"\nabla^2 f(x, y)")
+    st.markdown("- ✅ Very efficient and accurate for simple analytic functions (e.g., quadratic, convex).")
+    st.markdown("- ⚠️ Can fail or be unstable if the Hessian is singular or badly conditioned.")
 
-        st.markdown("#### 🔢 Numerical Newton")
-        st.markdown("- Uses **finite differences** to approximate the Hessian.")
-        st.markdown("- No need for symbolic derivatives.")
-        st.markdown("- ✅ More robust for complex or unknown functions.")
-        st.markdown("- 🐢 Slightly slower due to extra evaluations.")
+    st.markdown("#### 🔢 Numerical Newton")
+    st.markdown("- Uses **finite differences** to approximate the Hessian.")
+    st.markdown("- No need for symbolic derivatives.")
+    st.markdown("- ✅ More robust for complex or unknown functions.")
+    st.markdown("- 🐢 Slightly slower due to extra evaluations.")
 
-        st.markdown("#### 🔁 BFGS / L-BFGS (Quasi-Newton)")
-        st.markdown("- ✅ Avoids computing the full Hessian.")
-        st.markdown("- Builds curvature estimate using gradients:")
-        st.latex(r"""
-        H_{k+1} = H_k + \frac{y_k y_k^T}{y_k^T s_k} - \frac{H_k s_k s_k^T H_k}{s_k^T H_k s_k}
-        """)
-        st.markdown("Where:")
-        st.latex(r"s_k = x_{k+1} - x_k")
-        st.latex(r"y_k = \nabla f(x_{k+1}) - \nabla f(x_k)")
-        st.markdown("- 🧠 **BFGS**: High accuracy, stores full matrix.")
-        st.markdown("- 🪶 **L-BFGS**: Stores only a few recent updates — ideal for high-dimensional problems.")
-        st.markdown("💡 Quasi-Newton methods **approximate** curvature and still converge fast — especially useful for functions like Rosenbrock!")
+    st.markdown("#### 🔁 BFGS / L-BFGS (Quasi-Newton)")
+    st.markdown("- ✅ Avoids computing the full Hessian.")
+    st.markdown("- Builds curvature estimate using gradients:")
+    st.latex(r"""
+    H_{k+1} = H_k + \frac{y_k y_k^T}{y_k^T s_k} - \frac{H_k s_k s_k^T H_k}{s_k^T H_k s_k}
+    """)
+    st.markdown("Where:")
+    st.latex(r"s_k = x_{k+1} - x_k")
+    st.latex(r"y_k = \nabla f(x_{k+1}) - \nabla f(x_k)")
+    st.markdown("- 🧠 **BFGS**: High accuracy, stores full matrix.")
+    st.markdown("- 🪶 **L-BFGS**: Stores only a few recent updates — ideal for high-dimensional problems.")
+    st.markdown("💡 Quasi-Newton methods **approximate** curvature and still converge fast — especially useful for functions like Rosenbrock!")
 
-        st.markdown("---")
-        st.markdown("### ✏️ Why No Learning Rate?")
-        st.markdown("Newton’s Method computes:")
-        st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
-        st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
+    st.markdown("---")
+    st.markdown("### ✏️ Why No Learning Rate?")
+    st.markdown("Newton’s Method computes:")
+    st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
+    st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
 
 
 
