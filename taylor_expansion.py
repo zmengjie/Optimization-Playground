@@ -141,7 +141,17 @@ import streamlit.components.v1 as components
 
 
 
-def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=True, show_3rd_4th=False, animate=False):
+def show_univariate_taylor(
+    f_expr,
+    xmin,
+    xmax,
+    a,
+    show_linear=True,
+    show_2nd=True,
+    show_3rd_4th=False,
+    animate=False,
+    order_to_animate=None
+):
     import math
     import matplotlib.pyplot as plt
     import numpy as np
@@ -161,14 +171,13 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
         f_np = sp.lambdify(x_sym, f_expr, modules=["numpy"])
         f_a = f_np(a)
 
-        # Build symbolic derivatives
+        # Derivatives
         max_order = 4 if show_3rd_4th else (2 if show_2nd else 1 if show_linear else 0)
         derivs = [sp.diff(f_expr, x_sym, i) for i in range(1, max_order + 1)]
         derivs_np = [sp.lambdify(x_sym, d, modules=["numpy"]) for d in derivs]
 
-        # Taylor terms (0th to nth)
-        taylor_series = [f_a * np.ones_like(x)]  # Constant term
-
+        # Taylor Series Terms
+        taylor_series = [f_a * np.ones_like(x)]
         for i, f_deriv in enumerate(derivs_np):
             order = i + 1
             term = (f_deriv(a) * (x - a) ** order) / math.factorial(order)
@@ -194,8 +203,8 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
         ax.legend()
         st.pyplot(fig, use_container_width=True)
 
-        # Animated Plot
-        if animate:
+        # Animation
+        if animate and order_to_animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
             fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
 
@@ -217,12 +226,11 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
                 a_val = a_vals[frame]
                 f_a_val = f_np(a_val)
 
-                # Always start with constant term
                 terms = [f_a_val * np.ones_like(x)]
 
-                if show_linear and len(derivs_np) >= 1:
+                if "1st" in order_to_animate and len(derivs_np) >= 1:
                     terms.append((derivs_np[0](a_val) * (x - a_val)) / math.factorial(1))
-                if show_2nd and len(derivs_np) >= 2:
+                if "2nd" in order_to_animate and len(derivs_np) >= 2:
                     terms.append((derivs_np[1](a_val) * (x - a_val)**2) / math.factorial(2))
                 if show_3rd_4th and len(derivs_np) >= 3:
                     terms.append((derivs_np[2](a_val) * (x - a_val)**3) / math.factorial(3))
@@ -248,6 +256,7 @@ def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=Tru
 
     except Exception as e:
         st.error(f"Rendering error: {e}")
+
 
 
 
