@@ -1,6 +1,6 @@
 import streamlit as st
 from taylor_expansion import show_univariate_taylor, show_multivariable_taylor
-
+import sympy as sp
 
 st.markdown(
     """
