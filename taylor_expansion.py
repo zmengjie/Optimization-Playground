@@ -78,7 +78,8 @@ def show_univariate_taylor():
         # === Optional Animation ===
         if st.checkbox("🎬 Animate 1st & 2nd-order Approximation"):
             st.markdown("### 🎬 Animation: 1st & 2nd-Order Taylor Approximation")
-            fig_anim, ax_anim = plt.subplots(figsize=(8, 4))
+            fig_anim, ax_anim = plt.subplots(figsize=(10,6))
+            st.pyplot(fig, use_container_width=True)
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
             line_taylor1, = ax_anim.plot([], [], '--', label="1st-order", color='red')
