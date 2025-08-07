@@ -1,14 +1,21 @@
 import streamlit as st
 from taylor_expansion import show_univariate_taylor, show_multivariable_taylor
 
+
 st.markdown(
     """
     <style>
-        .main .block-container {
-            max-width: 100%;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
+    /* Make the content container full-width */
+    .block-container {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        max-width: 100% !important;
+    }
+
+    /* Optional: Make the page background wider as well */
+    .main {
+        max-width: 100vw !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
