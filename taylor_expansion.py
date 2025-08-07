@@ -128,50 +128,58 @@ import plotly.graph_objects as go
 
 
 # === UNIVARIATE TAYLOR FUNCTION ===
-def show_univariate_taylor():
+def show_univariate_taylor(f_expr, xmin, xmax, a, show_linear=True, show_2nd=True, show_3rd_4th=False, animate=False):
     try:
         st.markdown("### 📈 Univariate Taylor Expansion")
-        func_str = st.sidebar.text_input("Enter function f(x)", "sin(x)")
-        xmin, xmax = st.sidebar.slider("Domain range", -10.0, 10.0, (-5.0, 5.0))
-        a_val = st.sidebar.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
-        show_2nd = st.sidebar.checkbox("Show 2nd-order", True)
-        animate = st.sidebar.checkbox("🎬 Animate 1st & 2nd-order Approximation")
 
         x = np.linspace(xmin, xmax, 400)
         x_sym = sp.Symbol("x")
-        f_sym = sp.sympify(func_str)
-        f_np = sp.lambdify(x_sym, f_sym, modules=["numpy"])
-        f1 = sp.diff(f_sym, x_sym)
-        f2 = sp.diff(f1, x_sym)
-        derivs = [sp.lambdify(x_sym, f1, modules=["numpy"]),
-                  sp.lambdify(x_sym, f2, modules=["numpy"])]
 
-        f_a = f_np(a_val)
-        f1_a = derivs[0](a_val)
-        f2_a = derivs[1](a_val)
-        t1 = f_a + f1_a * (x - a_val)
-        t2 = t1 + 0.5 * f2_a * (x - a_val)**2
+        f_np = sp.lambdify(x_sym, f_expr, modules=["numpy"])
+
+        f_a = f_np(a)
+        taylor_series = [f_a * np.ones_like(x)]
+
+        max_order = 4 if show_3rd_4th else (2 if show_2nd else 1 if show_linear else 0)
+        derivs = []
+        for i in range(1, max_order + 1):
+            deriv = sp.diff(f_expr, x_sym, i)
+            derivs.append(sp.lambdify(x_sym, deriv, modules=["numpy"]))
+
+        for i, f_deriv in enumerate(derivs):
+            order = i + 1
+            term = (f_deriv(a) * (x - a)**order) / np.math.factorial(order)
+            taylor_series.append(term)
+
+        approx = np.sum(taylor_series, axis=0)
 
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.plot(x, f_np(x), label="f(x)", color='blue')
-        ax.plot(x, t1, '--', label="1st-order", color='red')
-        if show_2nd:
-            ax.plot(x, t2, '--', label="2nd-order", color='orange')
-        ax.axvline(a_val, color='gray', linestyle=':')
+        if show_linear:
+            ax.plot(x, taylor_series[0] + taylor_series[1] if len(taylor_series) > 1 else taylor_series[0],
+                    '--', label="1st-order", color='red')
+        if show_2nd and len(taylor_series) > 2:
+            ax.plot(x, np.sum(taylor_series[:3], axis=0), '--', label="2nd-order", color='orange')
+        if show_3rd_4th:
+            if len(taylor_series) > 3:
+                ax.plot(x, np.sum(taylor_series[:4], axis=0), '--', label="3rd-order", color='green')
+            if len(taylor_series) > 4:
+                ax.plot(x, np.sum(taylor_series[:5], axis=0), '--', label="4th-order", color='purple')
+
+        ax.axvline(a, color='gray', linestyle=':')
         ax.axhline(0, color='gray', lw=0.5)
-        ax.set_title("Taylor Approximation at x = {:.2f}".format(a_val))
+        ax.set_title(f"Taylor Approximation at x = {a:.2f}")
         ax.grid(True)
         ax.legend()
         st.pyplot(fig, use_container_width=True)
 
-        # === Optional Animation ===
+        # Optional Animation
         if animate:
-            st.markdown("### 🎬 Animation: 1st & 2nd-Order Taylor Approximation")
+            st.markdown("### 🎬 Animation: Taylor Approximation")
             fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
-            line_taylor1, = ax_anim.plot([], [], '--', label="1st-order", color='red')
-            line_taylor2, = ax_anim.plot([], [], '--', label="2nd-order", color='orange')
+            line_taylor, = ax_anim.plot([], [], '--', label="Taylor Approx.", color='red')
             point, = ax_anim.plot([], [], 'ko')
 
             ax_anim.set_xlim(xmin, xmax)
@@ -187,17 +195,16 @@ def show_univariate_taylor():
             def update(frame):
                 a_val = a_vals[frame]
                 f_a = f_np(a_val)
-                f1_a = derivs[0](a_val)
-                f2_a = derivs[1](a_val)
-
-                t1_anim = f_a + f1_a * (x - a_val)
-                t2_anim = t1_anim + 0.5 * f2_a * (x - a_val)**2
-
-                line_taylor1.set_data(x, t1_anim)
-                line_taylor2.set_data(x, t2_anim)
-                point.set_data([a_val], [f_a])
+                terms = [f_a * np.ones_like(x)]
+                for i, f_deriv in enumerate(derivs):
+                    order = i + 1
+                    term = (f_deriv(a_val) * (x - a_val)**order) / np.math.factorial(order)
+                    terms.append(term)
+                taylor_curve = np.sum(terms, axis=0)
+                line_taylor.set_data(x, taylor_curve)
+                point.set_data([a_val], [f_np(a_val)])
                 ax_anim.set_title(f"Taylor Approx at a = {a_val:.2f}")
-                return line_taylor1, line_taylor2, point
+                return line_taylor, point
 
             ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
 
@@ -212,6 +219,7 @@ def show_univariate_taylor():
 
     except Exception as e:
         st.error(f"Rendering error: {e}")
+
 
 
 # --- SECTION: Multivariable Taylor Expansion (2D Preview) ---
