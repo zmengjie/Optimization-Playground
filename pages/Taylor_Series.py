@@ -87,10 +87,14 @@ with tab2:
         x_sym = sp.Symbol('x')
 
         def get_function(choice):
-            if choice == "cos(x)": return sp.cos(x_sym), (-3, 3)
-            if choice == "exp(x)": return sp.exp(x_sym), (-3, 3)
-            if choice == "ln(1+x)": return sp.ln(1 + x_sym), (-0.9, 3)
-            if choice == "tanh(x)": return sp.tanh(x_sym), (-3, 3)
+            if choice == "cos(x)":
+                return sp.cos(x_sym), (-3, 3)
+            if choice == "exp(x)":
+                return sp.exp(x_sym), (-3, 3)
+            if choice == "ln(1+x)":
+                return sp.ln(1 + x_sym), (-0.9, 3)
+            if choice == "tanh(x)":
+                return sp.tanh(x_sym), (-3, 3)
             if choice == "Custom":
                 user_input = st.text_input("Enter function f(x):", "x**2 * sin(x)")
                 try:
@@ -102,6 +106,7 @@ with tab2:
         f_expr, (xmin, xmax) = get_function(func_choice)
         a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
 
+    # Main content: plot + animation
     show_univariate_taylor(
         f_expr=f_expr,
         xmin=xmin,
@@ -112,6 +117,7 @@ with tab2:
         show_3rd_4th=show_3rd_4th,
         animate=animate
     )
+
 
 
 # Section 3: Interactive Visualization
