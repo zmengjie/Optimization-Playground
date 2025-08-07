@@ -257,6 +257,7 @@ def backtracking_line_search_sym(f_sym, grad_f_sym, x0, y0, alpha0=1.0, beta=0.5
     # === Main Area: Title & Playground ===
 st.title("🚀 Optimizer Visual Playground")
 
+
 x, y, w = sp.symbols("x y w")
 x_sym, y_sym, w_sym = sp.symbols("x y w")
 
@@ -277,510 +278,527 @@ predefined_funcs = {
 
 }
 
-col_left, col_right = st.columns([1, 1])
+tab1, tab2, tab3, tab4 = st.tabs(["📘 Guide", "🧪 Optimizer Playground", "🧰 Diagnostics", "📐 Symbolic Analysis"])
 
-with col_left:
-    mode = st.radio("Function Source", ["Predefined", "Custom"])
-    func_name = st.selectbox("Function", list(predefined_funcs.keys())) if mode == "Predefined" else None
-    expr_str = st.text_input("Enter function f(x,y):", "x**2 + y**2") if mode == "Custom" else ""
-    w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
+with tab1:
+    st.title("📘 Optimization Guide")
+    st.subheader("1. Optimization Methods")
+    # With illustrations or markdown
 
-    optimizers = ["GradientDescent", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
-    optimizer = st.selectbox("Optimizer", optimizers)
+    st.subheader("2. Taylor Series in Optimization")
+    # Show formulae and usage
     
-    options = {}
+    st.subheader("3. KKT Conditions")
+    # Explain + example
 
-    if optimizer == "Newton's Method":
-        newton_variant = st.selectbox("Newton Variant", ["Classic Newton", "Numerical Newton", "BFGS", "L-BFGS"])
-        options["newton_variant"] = newton_variant
-    elif optimizer == "Simulated Annealing":
-        options["T"] = st.slider("Initial Temperature (T)", 0.1, 10.0, 2.0)
-        options["cooling"] = st.slider("Cooling Rate", 0.80, 0.99, 0.95)
-    elif optimizer == "Genetic Algorithm":
-        options["pop_size"] = st.slider("Population Size", 10, 100, 20)
-        options["mutation_std"] = st.slider("Mutation Std Dev", 0.1, 1.0, 0.3)
 
-    auto_tune = False
+with tab2:
+    st.title("🧪 Optimizer Playground")
+    col_left, col_right = st.columns([1, 1])
 
-    if optimizer in ["GradientDescent", "Adam", "RMSProp"]:
-        if optimizer == "GradientDescent":
-            use_backtracking = st.checkbox("🔍 Use Backtracking Line Search", value=False)
-            options["use_backtracking"] = use_backtracking
+    with col_left:
+        mode = st.radio("Function Source", ["Predefined", "Custom"])
+        func_name = st.selectbox("Function", list(predefined_funcs.keys())) if mode == "Predefined" else None
+        expr_str = st.text_input("Enter function f(x,y):", "x**2 + y**2") if mode == "Custom" else ""
+        w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
 
-            if use_backtracking:
-                st.checkbox("⚙️ Auto-Tune Learning Rate & Steps", value=False, disabled=True, key="auto_tune_disabled")
-                auto_tune = False
-                if "auto_tune_checkbox" in st.session_state:
-                    st.session_state["auto_tune_checkbox"] = False
-                st.caption("ℹ️ Disabled because backtracking search dynamically adjusts step size.")
+        optimizers = ["GradientDescent", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
+        optimizer = st.selectbox("Optimizer", optimizers)
+        
+        options = {}
+
+        if optimizer == "Newton's Method":
+            newton_variant = st.selectbox("Newton Variant", ["Classic Newton", "Numerical Newton", "BFGS", "L-BFGS"])
+            options["newton_variant"] = newton_variant
+        elif optimizer == "Simulated Annealing":
+            options["T"] = st.slider("Initial Temperature (T)", 0.1, 10.0, 2.0)
+            options["cooling"] = st.slider("Cooling Rate", 0.80, 0.99, 0.95)
+        elif optimizer == "Genetic Algorithm":
+            options["pop_size"] = st.slider("Population Size", 10, 100, 20)
+            options["mutation_std"] = st.slider("Mutation Std Dev", 0.1, 1.0, 0.3)
+
+        auto_tune = False
+
+        if optimizer in ["GradientDescent", "Adam", "RMSProp"]:
+            if optimizer == "GradientDescent":
+                use_backtracking = st.checkbox("🔍 Use Backtracking Line Search", value=False)
+                options["use_backtracking"] = use_backtracking
+
+                if use_backtracking:
+                    st.checkbox("⚙️ Auto-Tune Learning Rate & Steps", value=False, disabled=True, key="auto_tune_disabled")
+                    auto_tune = False
+                    if "auto_tune_checkbox" in st.session_state:
+                        st.session_state["auto_tune_checkbox"] = False
+                    st.caption("ℹ️ Disabled because backtracking search dynamically adjusts step size.")
+                else:
+                    auto_tune = st.checkbox("⚙️ Auto-Tune Learning Rate & Steps", value=True, key="auto_tune_checkbox")
             else:
                 auto_tune = st.checkbox("⚙️ Auto-Tune Learning Rate & Steps", value=True, key="auto_tune_checkbox")
-        else:
-            auto_tune = st.checkbox("⚙️ Auto-Tune Learning Rate & Steps", value=True, key="auto_tune_checkbox")
 
-    elif optimizer == "Newton's Method":
-        st.checkbox("⚙️ Auto-Tune Learning Rate & Steps", value=False, disabled=True, key="auto_tune_disabled")
-        auto_tune = False
-        if "auto_tune_checkbox" in st.session_state:
-            st.session_state["auto_tune_checkbox"] = False
-        st.caption("ℹ️ Auto-tune is not applicable to Newton’s Method.")
-        
-    start_xy_defaults = {
-        "Quadratic Bowl": (-3.0, 3.0), "Saddle": (-2.0, 2.0), "Rosenbrock": (-1.5, 1.5),
-        "Constrained Circle": (0.5, 0.5), "Double Constraint": (-1.5, 1.5),
-        "Multi-Objective": (0.0, 0.0), "Ackley": (2.0, -2.0), "Rastrigin": (3.0, 3.0),
-        "Styblinski-Tang": (-2.5, -2.5), "Sphere": (-3.0, 3.0), "Himmelblau": (0.0, 0.0),
-        "Booth": (1.0, 1.0), "Beale": (-2.0, 2.0)
-    }
-    default_x, default_y = start_xy_defaults.get(func_name, (-3.0, 3.0))
-    default_lr = 0.005
-    default_steps = 50
+        elif optimizer == "Newton's Method":
+            st.checkbox("⚙️ Auto-Tune Learning Rate & Steps", value=False, disabled=True, key="auto_tune_disabled")
+            auto_tune = False
+            if "auto_tune_checkbox" in st.session_state:
+                st.session_state["auto_tune_checkbox"] = False
+            st.caption("ℹ️ Auto-tune is not applicable to Newton’s Method.")
+            
+        start_xy_defaults = {
+            "Quadratic Bowl": (-3.0, 3.0), "Saddle": (-2.0, 2.0), "Rosenbrock": (-1.5, 1.5),
+            "Constrained Circle": (0.5, 0.5), "Double Constraint": (-1.5, 1.5),
+            "Multi-Objective": (0.0, 0.0), "Ackley": (2.0, -2.0), "Rastrigin": (3.0, 3.0),
+            "Styblinski-Tang": (-2.5, -2.5), "Sphere": (-3.0, 3.0), "Himmelblau": (0.0, 0.0),
+            "Booth": (1.0, 1.0), "Beale": (-2.0, 2.0)
+        }
+        default_x, default_y = start_xy_defaults.get(func_name, (-3.0, 3.0))
+        default_lr = 0.005
+        default_steps = 50
 
 
-    # Make sure this is properly initialized before calling the function
-    if auto_tune:
-        # Ensure function is properly initialized
-        x_sym, y_sym, w_sym = sp.symbols("x y w")
-        symbolic_expr = predefined_funcs[func_name][0]
+        # Make sure this is properly initialized before calling the function
+        if auto_tune:
+            # Ensure function is properly initialized
+            x_sym, y_sym, w_sym = sp.symbols("x y w")
+            symbolic_expr = predefined_funcs[func_name][0]
 
+            if func_name == "Multi-Objective" and w_val is not None:
+                symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+
+            # Lambdify the symbolic function to make it usable
+            f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
+
+            # Call the auto-tuning simulation function
+            best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
+            # st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
+            default_lr, default_steps = best_lr, best_steps
+
+        if auto_tune:
+            # Run the auto-tuning simulation to find the best lr and steps
+            best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
+
+            # Update session state with the tuned values
+            st.session_state.lr = best_lr
+            st.session_state.steps = best_steps
+            st.session_state.start_x = default_x
+            st.session_state.start_y = default_y
+            st.session_state.params_set = True  # Flag to indicate parameters are set
+
+            # Provide feedback to the user
+            st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
+
+        # Ensure session state values exist to avoid AttributeError
+        if "params_set" not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
+            # Reset session state to the auto-tuned values when "Reset to Auto-Tuned" is clicked
+            st.session_state.lr = default_lr
+            st.session_state.steps = default_steps
+            st.session_state.start_x = default_x
+            st.session_state.start_y = default_y
+            st.session_state.params_set = True
+
+        # Final user inputs for learning rate and steps
+        if not (
+            optimizer == "GradientDescent" and options.get("use_backtracking", False)
+        ) and optimizer != "Newton's Method":
+            lr = st.selectbox("Learning Rate", sorted(set([0.0001, 0.001, 0.005, 0.01, 0.02, 0.05, 0.1, default_lr])), index=0, key="lr")
+            steps = st.slider("Steps", 10, 100, value=st.session_state.get("steps", 50), key="steps")
+        elif optimizer == "Newton's Method":
+            lr = None
+            steps = None
+            st.info("📌 Newton’s Method computes its own step size using the Hessian inverse — learning rate is not needed.")
+        elif optimizer == "GradientDescent" and options.get("use_backtracking", False):
+            lr = None
+            steps = None
+            st.info("📌 Using Backtracking Line Search — no need to set learning rate or step count.")
+
+        # Ensure session state values exist for initial positions
+        if "start_x" not in st.session_state:
+            st.session_state["start_x"] = -3.0
+        if "start_y" not in st.session_state:
+            st.session_state["start_y"] = 3.0
+
+        # Sliders for the initial starting positions
+        st.slider("Initial x", -5.0, 5.0, st.session_state.start_x, key="start_x")
+        st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
+
+        # Animation toggle
+        show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
+
+        # Display auto-tuning trial log if available
+        if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
+            with col_right:
+                st.markdown("### 📊 Auto-Tuning Trial Log")
+                if "df_log" in st.session_state:
+                    st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
+                    st.markdown("""
+                    **🧠 How to Read Score:**
+                    - `score = final_loss + penalty × steps`
+                    - ✅ Lower score is better (fast and accurate convergence).
+                    """)
+                else:
+                    st.info("Auto-tuning not yet triggered.")
+
+
+    if mode == "Predefined":
+        f_expr, constraints, description = predefined_funcs[func_name]
         if func_name == "Multi-Objective" and w_val is not None:
-            symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+            f_expr = f_expr.subs(w, w_val)
+    else:
+        try:
+            f_expr = sp.sympify(expr_str)
+            constraints = []
+            description = "Custom function."
+        except:
+            st.error("Invalid expression.")
+            st.stop()
 
-        # Lambdify the symbolic function to make it usable
-        f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
-
-        # Call the auto-tuning simulation function
-        best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
-        # st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
-        default_lr, default_steps = best_lr, best_steps
-
-    if auto_tune:
-        # Run the auto-tuning simulation to find the best lr and steps
-        best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
-
-        # Update session state with the tuned values
-        st.session_state.lr = best_lr
-        st.session_state.steps = best_steps
-        st.session_state.start_x = default_x
-        st.session_state.start_y = default_y
-        st.session_state.params_set = True  # Flag to indicate parameters are set
-
-        # Provide feedback to the user
-        st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
-
-    # Ensure session state values exist to avoid AttributeError
-    if "params_set" not in st.session_state or st.button("🔄 Reset to Auto-Tuned"):
-        # Reset session state to the auto-tuned values when "Reset to Auto-Tuned" is clicked
-        st.session_state.lr = default_lr
-        st.session_state.steps = default_steps
-        st.session_state.start_x = default_x
-        st.session_state.start_y = default_y
-        st.session_state.params_set = True
-
-    # Final user inputs for learning rate and steps
-    if not (
-        optimizer == "GradientDescent" and options.get("use_backtracking", False)
-    ) and optimizer != "Newton's Method":
-        lr = st.selectbox("Learning Rate", sorted(set([0.0001, 0.001, 0.005, 0.01, 0.02, 0.05, 0.1, default_lr])), index=0, key="lr")
-        steps = st.slider("Steps", 10, 100, value=st.session_state.get("steps", 50), key="steps")
-    elif optimizer == "Newton's Method":
-        lr = None
-        steps = None
-        st.info("📌 Newton’s Method computes its own step size using the Hessian inverse — learning rate is not needed.")
-    elif optimizer == "GradientDescent" and options.get("use_backtracking", False):
-        lr = None
-        steps = None
-        st.info("📌 Using Backtracking Line Search — no need to set learning rate or step count.")
-
-    # Ensure session state values exist for initial positions
-    if "start_x" not in st.session_state:
-        st.session_state["start_x"] = -3.0
-    if "start_y" not in st.session_state:
-        st.session_state["start_y"] = 3.0
-
-    # Sliders for the initial starting positions
-    st.slider("Initial x", -5.0, 5.0, st.session_state.start_x, key="start_x")
-    st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
-
-    # Animation toggle
-    show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
-
-    # Display auto-tuning trial log if available
-    if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
-        with col_right:
-            st.markdown("### 📊 Auto-Tuning Trial Log")
-            if "df_log" in st.session_state:
-                st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
-                st.markdown("""
-                **🧠 How to Read Score:**
-                - `score = final_loss + penalty × steps`
-                - ✅ Lower score is better (fast and accurate convergence).
-                """)
-            else:
-                st.info("Auto-tuning not yet triggered.")
-
-
-if mode == "Predefined":
-    f_expr, constraints, description = predefined_funcs[func_name]
-    if func_name == "Multi-Objective" and w_val is not None:
-        f_expr = f_expr.subs(w, w_val)
-else:
-    try:
-        f_expr = sp.sympify(expr_str)
-        constraints = []
-        description = "Custom function."
-    except:
-        st.error("Invalid expression.")
-        st.stop()
-
-f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-
-grad_f = lambda x0, y0: np.array([
-    (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
-    (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
-])
-
-def hessian_f(x0, y0):
-    hess_expr = sp.hessian(f_expr, (x, y))
-    hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
-    return np.array(hess_func(x0, y0))
-
-
-st.markdown(f"### 📘 Function Description:\n> {description}")
-
-# Setup for symbolic Lagrangian and KKT (if needed)
-L_expr = f_expr + sum(sp.Symbol(f"lambda{i+1}") * g for i, g in enumerate(constraints))
-# grad_L = [sp.diff(L_expr, v) for v in (x, y)]
-grad_L = [sp.diff(L_expr, v) for v in (x_sym, y_sym)]
-kkt_conditions = grad_L + constraints
-
-
-if optimizer == "Newton's Method":
-    with st.expander("🧠 Newton Method Variants Explained", expanded=False):
-        st.markdown("### 📘 Classic Newton vs. Numerical vs. Quasi-Newton")
-        st.markdown("Newton's Method is a powerful optimization technique that uses **second-order derivatives** or their approximations to accelerate convergence.")
-
-        st.markdown("#### 🧮 Classic Newton (Symbolic)")
-        st.markdown("- Uses the **symbolic Hessian matrix** from calculus:")
-        st.latex(r"\nabla^2 f(x, y)")
-        st.markdown("- ✅ Very efficient and accurate for simple analytic functions (e.g., quadratic, convex).")
-        st.markdown("- ⚠️ Can fail or be unstable if the Hessian is singular or badly conditioned.")
-
-        st.markdown("#### 🔢 Numerical Newton")
-        st.markdown("- Uses **finite differences** to approximate the Hessian.")
-        st.markdown("- No need for symbolic derivatives.")
-        st.markdown("- ✅ More robust for complex or unknown functions.")
-        st.markdown("- 🐢 Slightly slower due to extra evaluations.")
-
-        st.markdown("#### 🔁 BFGS / L-BFGS (Quasi-Newton)")
-        st.markdown("- ✅ Avoids computing the full Hessian.")
-        st.markdown("- Builds curvature estimate using gradients:")
-        st.latex(r"""
-        H_{k+1} = H_k + \frac{y_k y_k^T}{y_k^T s_k} - \frac{H_k s_k s_k^T H_k}{s_k^T H_k s_k}
-        """)
-        st.markdown("Where:")
-        st.latex(r"s_k = x_{k+1} - x_k")
-        st.latex(r"y_k = \nabla f(x_{k+1}) - \nabla f(x_k)")
-        st.markdown("- 🧠 **BFGS**: High accuracy, stores full matrix.")
-        st.markdown("- 🪶 **L-BFGS**: Stores only a few recent updates — ideal for high-dimensional problems.")
-        st.markdown("💡 Quasi-Newton methods **approximate** curvature and still converge fast — especially useful for functions like Rosenbrock!")
-
-        st.markdown("---")
-        st.markdown("### ✏️ Why No Learning Rate?")
-        st.markdown("Newton’s Method computes:")
-        st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
-        st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
-
-
-def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
     f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-    # f_func = sp.lambdify((x, y), f_expr, modules="numpy")
-    x0, y0 = -3, 3
-    path = [(x0, y0)]
-    m, v = 0, 0
-    for t in range(1, steps + 1):
-        x_t, y_t = path[-1]
-        dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
-        dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
-        g = np.array([dx, dy])
-        if opt_name == "Adam":
-            m = 0.9 * m + 0.1 * g
-            v = 0.999 * v + 0.001 * (g ** 2)
-            m_hat = m / (1 - 0.9 ** t)
-            v_hat = v / (1 - 0.999 ** t)
-            update = lr * m_hat / (np.sqrt(v_hat) + 1e-8)
-        elif opt_name == "RMSProp":
-            v = 0.999 * v + 0.001 * (g ** 2)
-            update = lr * g / (np.sqrt(v) + 1e-8)
-        elif opt_name == "Newton's Method":
-            hess = sp.hessian(f_expr, (x, y))
-            hess_func = sp.lambdify((x, y), hess, modules="numpy")
-            try:
-                H = np.array(hess_func(x_t, y_t))
-                H_inv = np.linalg.inv(H)
-                update = H_inv @ g
-            except:
-                update = g
-        else:
-            update = lr * g
-        x_new, y_new = x_t - update[0], y_t - update[1]
-        path.append((x_new, y_new))
-    final_x, final_y = path[-1]
-    grad_norm = np.linalg.norm(g)
-    return {
-        "Optimizer": opt_name,
-        "Final Value": round(f_func(final_x, final_y), 4),
-        "Gradient Norm": round(grad_norm, 4),
-        "Steps": len(path) - 1
-    }
-g_funcs = [sp.lambdify((x_sym, y_sym), g, modules=["numpy"]) for g in constraints]  
-# g_funcs = [sp.lambdify((x, y), g, modules=["numpy"]) for g in constraints]
-f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-# f_func = sp.lambdify((x, y), f_expr, modules=["numpy"])
-grad_f = lambda x0, y0: np.array([
-    (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
-    (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
-])
 
-def hessian_f(x0, y0):
-    hess_expr = sp.hessian(f_expr, (x, y))
-    hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
-    return np.array(hess_func(x0, y0))
+    grad_f = lambda x0, y0: np.array([
+        (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
+        (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
+    ])
 
-# === Pull final values from session_state
-start_x = st.session_state.get("start_x", -3.0)
-start_y = st.session_state.get("start_y", 3.0)
-lr = st.session_state.get("lr", 0.01)
-steps = st.session_state.get("steps", 50)
+    def hessian_f(x0, y0):
+        hess_expr = sp.hessian(f_expr, (x, y))
+        hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
+        return np.array(hess_func(x0, y0))
 
 
-path, alpha_log, meta = optimize_path(
-    start_x, start_y,
-    optimizer=optimizer,
-    lr=lr,
-    steps=steps,
-    f_func=f_func,
-    grad_f=grad_f,
-    hessian_f=hessian_f,
-    options=options
-)
+    st.markdown(f"### 📘 Function Description:\n> {description}")
 
-xs, ys = zip(*path)
-Z_path = [f_func(xp, yp) for xp, yp in path]
+    # Setup for symbolic Lagrangian and KKT (if needed)
+    L_expr = f_expr + sum(sp.Symbol(f"lambda{i+1}") * g for i, g in enumerate(constraints))
+    # grad_L = [sp.diff(L_expr, v) for v in (x, y)]
+    grad_L = [sp.diff(L_expr, v) for v in (x_sym, y_sym)]
+    kkt_conditions = grad_L + constraints
 
-x_vals = np.linspace(-5, 5, 200)
-y_vals = np.linspace(-5, 5, 200)
-X, Y = np.meshgrid(x_vals, y_vals)
-Z = f_func(X, Y)
 
-# --- Taylor Expansion Toggle ---
+    if optimizer == "Newton's Method":
+        with st.expander("🧠 Newton Method Variants Explained", expanded=False):
+            st.markdown("### 📘 Classic Newton vs. Numerical vs. Quasi-Newton")
+            st.markdown("Newton's Method is a powerful optimization technique that uses **second-order derivatives** or their approximations to accelerate convergence.")
 
-show_taylor = st.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
+            st.markdown("#### 🧮 Classic Newton (Symbolic)")
+            st.markdown("- Uses the **symbolic Hessian matrix** from calculus:")
+            st.latex(r"\nabla^2 f(x, y)")
+            st.markdown("- ✅ Very efficient and accurate for simple analytic functions (e.g., quadratic, convex).")
+            st.markdown("- ⚠️ Can fail or be unstable if the Hessian is singular or badly conditioned.")
 
-show_2nd = False
-Z_t1 = None
-Z_t2 = None
+            st.markdown("#### 🔢 Numerical Newton")
+            st.markdown("- Uses **finite differences** to approximate the Hessian.")
+            st.markdown("- No need for symbolic derivatives.")
+            st.markdown("- ✅ More robust for complex or unknown functions.")
+            st.markdown("- 🐢 Slightly slower due to extra evaluations.")
 
-a_val, b_val = None, None  # set early to avoid NameError
-expansion_point = None
+            st.markdown("#### 🔁 BFGS / L-BFGS (Quasi-Newton)")
+            st.markdown("- ✅ Avoids computing the full Hessian.")
+            st.markdown("- Builds curvature estimate using gradients:")
+            st.latex(r"""
+            H_{k+1} = H_k + \frac{y_k y_k^T}{y_k^T s_k} - \frac{H_k s_k s_k^T H_k}{s_k^T H_k s_k}
+            """)
+            st.markdown("Where:")
+            st.latex(r"s_k = x_{k+1} - x_k")
+            st.latex(r"y_k = \nabla f(x_{k+1}) - \nabla f(x_k)")
+            st.markdown("- 🧠 **BFGS**: High accuracy, stores full matrix.")
+            st.markdown("- 🪶 **L-BFGS**: Stores only a few recent updates — ideal for high-dimensional problems.")
+            st.markdown("💡 Quasi-Newton methods **approximate** curvature and still converge fast — especially useful for functions like Rosenbrock!")
 
-# expansion_point = (a_val, b_val) if show_taylor else None
+            st.markdown("---")
+            st.markdown("### ✏️ Why No Learning Rate?")
+            st.markdown("Newton’s Method computes:")
+            st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
+            st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
 
-if show_taylor:
-    st.markdown("**Taylor Expansion Center (a, b)**")
 
-    # --- Initialize session state on first run ---
-    if "a_val" not in st.session_state or "b_val" not in st.session_state:
-        if float(start_x) == 0.0 and float(start_y) == 0.0 and func_name != "Quadratic Bowl":
+    def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
+        f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
+        # f_func = sp.lambdify((x, y), f_expr, modules="numpy")
+        x0, y0 = -3, 3
+        path = [(x0, y0)]
+        m, v = 0, 0
+        for t in range(1, steps + 1):
+            x_t, y_t = path[-1]
+            dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
+            dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
+            g = np.array([dx, dy])
+            if opt_name == "Adam":
+                m = 0.9 * m + 0.1 * g
+                v = 0.999 * v + 0.001 * (g ** 2)
+                m_hat = m / (1 - 0.9 ** t)
+                v_hat = v / (1 - 0.999 ** t)
+                update = lr * m_hat / (np.sqrt(v_hat) + 1e-8)
+            elif opt_name == "RMSProp":
+                v = 0.999 * v + 0.001 * (g ** 2)
+                update = lr * g / (np.sqrt(v) + 1e-8)
+            elif opt_name == "Newton's Method":
+                hess = sp.hessian(f_expr, (x, y))
+                hess_func = sp.lambdify((x, y), hess, modules="numpy")
+                try:
+                    H = np.array(hess_func(x_t, y_t))
+                    H_inv = np.linalg.inv(H)
+                    update = H_inv @ g
+                except:
+                    update = g
+            else:
+                update = lr * g
+            x_new, y_new = x_t - update[0], y_t - update[1]
+            path.append((x_new, y_new))
+        final_x, final_y = path[-1]
+        grad_norm = np.linalg.norm(g)
+        return {
+            "Optimizer": opt_name,
+            "Final Value": round(f_func(final_x, final_y), 4),
+            "Gradient Norm": round(grad_norm, 4),
+            "Steps": len(path) - 1
+        }
+    g_funcs = [sp.lambdify((x_sym, y_sym), g, modules=["numpy"]) for g in constraints]  
+    # g_funcs = [sp.lambdify((x, y), g, modules=["numpy"]) for g in constraints]
+    f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
+    # f_func = sp.lambdify((x, y), f_expr, modules=["numpy"])
+    grad_f = lambda x0, y0: np.array([
+        (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
+        (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
+    ])
+
+    def hessian_f(x0, y0):
+        hess_expr = sp.hessian(f_expr, (x, y))
+        hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
+        return np.array(hess_func(x0, y0))
+
+    # === Pull final values from session_state
+    start_x = st.session_state.get("start_x", -3.0)
+    start_y = st.session_state.get("start_y", 3.0)
+    lr = st.session_state.get("lr", 0.01)
+    steps = st.session_state.get("steps", 50)
+
+
+    path, alpha_log, meta = optimize_path(
+        start_x, start_y,
+        optimizer=optimizer,
+        lr=lr,
+        steps=steps,
+        f_func=f_func,
+        grad_f=grad_f,
+        hessian_f=hessian_f,
+        options=options
+    )
+
+    xs, ys = zip(*path)
+    Z_path = [f_func(xp, yp) for xp, yp in path]
+
+    x_vals = np.linspace(-5, 5, 200)
+    y_vals = np.linspace(-5, 5, 200)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = f_func(X, Y)
+
+    # --- Taylor Expansion Toggle ---
+
+    show_taylor = st.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
+
+    show_2nd = False
+    Z_t1 = None
+    Z_t2 = None
+
+    a_val, b_val = None, None  # set early to avoid NameError
+    expansion_point = None
+
+    # expansion_point = (a_val, b_val) if show_taylor else None
+
+    if show_taylor:
+        st.markdown("**Taylor Expansion Center (a, b)**")
+
+        # --- Initialize session state on first run ---
+        if "a_val" not in st.session_state or "b_val" not in st.session_state:
+            if float(start_x) == 0.0 and float(start_y) == 0.0 and func_name != "Quadratic Bowl":
+                st.session_state.a_val = 0.1
+                st.session_state.b_val = 0.1
+                st.info("🔁 Auto-shifted expansion point from (0,0) → (0.1, 0.1)")
+            else:
+                st.session_state.a_val = float(start_x)
+                st.session_state.b_val = float(start_y)
+
+        # --- Sliders using session state ---
+        a_val = st.slider("a (expansion x)", -5.0, 5.0, value=st.session_state.a_val, step=0.1, key="a_val")
+        b_val = st.slider("b (expansion y)", -5.0, 5.0, value=st.session_state.b_val, step=0.1, key="b_val")
+
+        # --- Prevent user from going back to (0,0) if it's not allowed ---
+        if a_val == 0.0 and b_val == 0.0 and func_name != "Quadratic Bowl":
+            st.warning("🚫 (0,0) is a singular point. Auto-shifting again to (0.1, 0.1)")
+            a_val = 0.1
+            b_val = 0.1
             st.session_state.a_val = 0.1
             st.session_state.b_val = 0.1
-            st.info("🔁 Auto-shifted expansion point from (0,0) → (0.1, 0.1)")
-        else:
-            st.session_state.a_val = float(start_x)
-            st.session_state.b_val = float(start_y)
 
-    # --- Sliders using session state ---
-    a_val = st.slider("a (expansion x)", -5.0, 5.0, value=st.session_state.a_val, step=0.1, key="a_val")
-    b_val = st.slider("b (expansion y)", -5.0, 5.0, value=st.session_state.b_val, step=0.1, key="b_val")
-
-    # --- Prevent user from going back to (0,0) if it's not allowed ---
-    if a_val == 0.0 and b_val == 0.0 and func_name != "Quadratic Bowl":
-        st.warning("🚫 (0,0) is a singular point. Auto-shifting again to (0.1, 0.1)")
-        a_val = 0.1
-        b_val = 0.1
-        st.session_state.a_val = 0.1
-        st.session_state.b_val = 0.1
-
-    expansion_point = (a_val, b_val)
-    show_2nd = st.checkbox("Include 2nd-order terms", value=True)
+        expansion_point = (a_val, b_val)
+        show_2nd = st.checkbox("Include 2nd-order terms", value=True)
 
 
-    # --- Symbolic derivatives ---
-    grad_fx = [sp.diff(f_expr, var) for var in (x_sym, y_sym)]
-    hess_fx = sp.hessian(f_expr, (x_sym, y_sym))
+        # --- Symbolic derivatives ---
+        grad_fx = [sp.diff(f_expr, var) for var in (x_sym, y_sym)]
+        hess_fx = sp.hessian(f_expr, (x_sym, y_sym))
 
-    subs = {x_sym: a_val, y_sym: b_val}
-    st.text(f"📌 Taylor center used: (a={a_val:.3f}, b={b_val:.3f})")
+        subs = {x_sym: a_val, y_sym: b_val}
+        st.text(f"📌 Taylor center used: (a={a_val:.3f}, b={b_val:.3f})")
 
-    f_ab = float(f_expr.subs(subs))
-    grad_vals = [float(g.subs(subs)) for g in grad_fx]
-    hess_vals = hess_fx.subs(subs)
-    Hxx = float(hess_vals[0, 0])
-    Hxy = float(hess_vals[0, 1])
-    Hyy = float(hess_vals[1, 1])
+        f_ab = float(f_expr.subs(subs))
+        grad_vals = [float(g.subs(subs)) for g in grad_fx]
+        hess_vals = hess_fx.subs(subs)
+        Hxx = float(hess_vals[0, 0])
+        Hxy = float(hess_vals[0, 1])
+        Hyy = float(hess_vals[1, 1])
 
-    # dx, dy remain symbolic
-    dx, dy = x_sym - a_val, y_sym - b_val
+        # dx, dy remain symbolic
+        dx, dy = x_sym - a_val, y_sym - b_val
 
-    # Fully numeric constants in expression
-    T1_expr = f_ab + grad_vals[0]*dx + grad_vals[1]*dy
-    T2_expr = T1_expr + 0.5 * (Hxx*dx**2 + 2*Hxy*dx*dy + Hyy*dy**2)
+        # Fully numeric constants in expression
+        T1_expr = f_ab + grad_vals[0]*dx + grad_vals[1]*dy
+        T2_expr = T1_expr + 0.5 * (Hxx*dx**2 + 2*Hxy*dx*dy + Hyy*dy**2)
 
-    # Numerical evaluation for plotting
-    t1_np = sp.lambdify((x_sym, y_sym), T1_expr, "numpy")
-    t2_np = sp.lambdify((x_sym, y_sym), T2_expr, "numpy") if show_2nd else None
-    Z_t1 = t1_np(X, Y)
+        # Numerical evaluation for plotting
+        t1_np = sp.lambdify((x_sym, y_sym), T1_expr, "numpy")
+        t2_np = sp.lambdify((x_sym, y_sym), T2_expr, "numpy") if show_2nd else None
+        Z_t1 = t1_np(X, Y)
 
+
+        if show_2nd:
+            try:
+                Z_t2 = t2_np(X, Y)
+
+                # --- Safety checks ---
+                if isinstance(Z_t2, (int, float, np.number)):
+                    st.warning(f"❌ Z_t2 is scalar: {Z_t2}. Skipping.")
+                    Z_t2 = None
+                else:
+                    Z_t2 = np.array(Z_t2, dtype=np.float64)
+
+                    if Z_t2.ndim != 2:
+                        st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
+                        Z_t2 = None
+                    elif Z_t2.shape != (len(y_vals), len(x_vals)):
+                        if Z_t2.shape == (len(x_vals), len(y_vals)):
+                            Z_t2 = Z_t2.T
+                        else:
+                            st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape}")
+                            Z_t2 = None
+                    elif np.isnan(Z_t2).any():
+                        st.warning("❌ Z_t2 contains NaNs.")
+                        Z_t2 = None
+
+            except Exception as e:
+                st.warning(f"⚠️ Failed to evaluate 2nd-order Taylor surface: {e}")
+                Z_t2 = None
+
+        # Z_t2 = t2_np(X, Y) if show_2nd else None
+
+        # ✅ Display symbolic formula as LaTeX
+        st.markdown("### ✏️ Taylor Approximation Formula at \\( (a, b) = ({:.1f}, {:.1f}) \\)".format(a_val, b_val))
+
+        fx, fy = grad_vals
+        Hxx, Hxy, Hyy = hess_vals[0, 0], hess_vals[0, 1], hess_vals[1, 1]
+
+        T1_latex = f"f(x, y) \\approx {f_ab:.3f} + ({fx}) (x - {a_val}) + ({fy}) (y - {b_val})"
+        T2_latex = (
+            f"{T1_latex} + \\frac{{1}}{{2}}({Hxx}) (x - {a_val})^2 + "
+            f"{Hxy} (x - {a_val})(y - {b_val}) + "
+            f"\\frac{{1}}{{2}}({Hyy}) (y - {b_val})^2"
+        )
+
+        st.latex(T1_latex)
+        if show_2nd:
+            st.latex(T2_latex)
+
+
+    st.markdown("### 📈 3D View")
 
     if show_2nd:
         try:
-            Z_t2 = t2_np(X, Y)
+            if Z_t2 is not None:
+                # ❗ Reject raw scalar values
+                if isinstance(Z_t2, (int, float)):
+                    st.warning(f"❌ Z_t2 is a scalar ({Z_t2}), not an array.")
+                    Z_t2 = None
 
-            # --- Safety checks ---
-            if isinstance(Z_t2, (int, float, np.number)):
-                st.warning(f"❌ Z_t2 is scalar: {Z_t2}. Skipping.")
-                Z_t2 = None
-            else:
                 Z_t2 = np.array(Z_t2, dtype=np.float64)
 
                 if Z_t2.ndim != 2:
                     st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
                     Z_t2 = None
+                elif np.isnan(Z_t2).any():
+                    st.warning("❌ Z_t2 contains NaNs.")
+                    Z_t2 = None
                 elif Z_t2.shape != (len(y_vals), len(x_vals)):
                     if Z_t2.shape == (len(x_vals), len(y_vals)):
                         Z_t2 = Z_t2.T
                     else:
-                        st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape}")
+                        st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape} vs mesh ({len(y_vals)}, {len(x_vals)})")
                         Z_t2 = None
-                elif np.isnan(Z_t2).any():
-                    st.warning("❌ Z_t2 contains NaNs.")
-                    Z_t2 = None
-
         except Exception as e:
-            st.warning(f"⚠️ Failed to evaluate 2nd-order Taylor surface: {e}")
+            st.warning(f"❌ Error processing Z_t2: {e}")
             Z_t2 = None
 
-    # Z_t2 = t2_np(X, Y) if show_2nd else None
-
-    # ✅ Display symbolic formula as LaTeX
-    st.markdown("### ✏️ Taylor Approximation Formula at \\( (a, b) = ({:.1f}, {:.1f}) \\)".format(a_val, b_val))
-
-    fx, fy = grad_vals
-    Hxx, Hxy, Hyy = hess_vals[0, 0], hess_vals[0, 1], hess_vals[1, 1]
-
-    T1_latex = f"f(x, y) \\approx {f_ab:.3f} + ({fx}) (x - {a_val}) + ({fy}) (y - {b_val})"
-    T2_latex = (
-        f"{T1_latex} + \\frac{{1}}{{2}}({Hxx}) (x - {a_val})^2 + "
-        f"{Hxy} (x - {a_val})(y - {b_val}) + "
-        f"\\frac{{1}}{{2}}({Hyy}) (y - {b_val})^2"
+            
+    plot_3d_descent(
+        x_vals=x_vals,
+        y_vals=y_vals,
+        Z=Z,
+        path=path,
+        Z_path=Z_path,
+        Z_t1=Z_t1,
+        Z_t2=Z_t2,
+        show_taylor=show_taylor,
+        show_2nd=show_2nd,
+        expansion_point=expansion_point,
+        f_func=f_func
     )
 
-    st.latex(T1_latex)
-    if show_2nd:
-        st.latex(T2_latex)
 
-
-st.markdown("### 📈 3D View")
-
-if show_2nd:
-    try:
-        if Z_t2 is not None:
-            # ❗ Reject raw scalar values
-            if isinstance(Z_t2, (int, float)):
-                st.warning(f"❌ Z_t2 is a scalar ({Z_t2}), not an array.")
-                Z_t2 = None
-
-            Z_t2 = np.array(Z_t2, dtype=np.float64)
-
-            if Z_t2.ndim != 2:
-                st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
-                Z_t2 = None
-            elif np.isnan(Z_t2).any():
-                st.warning("❌ Z_t2 contains NaNs.")
-                Z_t2 = None
-            elif Z_t2.shape != (len(y_vals), len(x_vals)):
-                if Z_t2.shape == (len(x_vals), len(y_vals)):
-                    Z_t2 = Z_t2.T
-                else:
-                    st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape} vs mesh ({len(y_vals)}, {len(x_vals)})")
-                    Z_t2 = None
-    except Exception as e:
-        st.warning(f"❌ Error processing Z_t2: {e}")
-        Z_t2 = None
-
-        
-plot_3d_descent(
-    x_vals=x_vals,
-    y_vals=y_vals,
-    Z=Z,
-    path=path,
-    Z_path=Z_path,
-    Z_t1=Z_t1,
-    Z_t2=Z_t2,
-    show_taylor=show_taylor,
-    show_2nd=show_2nd,
-    expansion_point=expansion_point,
-    f_func=f_func
-)
-
-
-st.markdown("### 🗺️ 2D View")
-plot_2d_contour(
-    x_vals=x_vals,
-    y_vals=y_vals,
-    Z=Z,
-    path=path,
-    g_funcs=g_funcs if constraints else None,
-    X=X, Y=Y,
-    Z_t2=Z_t2,
-    show_2nd=show_2nd,
-    expansion_point=expansion_point
-)
-
-
-
-if show_taylor:
-    st.caption("🔺 Red = 1st-order Taylor, 🔷 Blue = 2nd-order Taylor, 🟢 Green = true surface")
-
-if show_animation:
-    frames = []
-    fig_anim, ax_anim = plt.subplots(figsize=(5, 4))
-
-    for i in range(1, len(path) + 1):
-        ax_anim.clear()
-        ax_anim.contour(X, Y, Z, levels=30, cmap="viridis")
-        ax_anim.plot(*zip(*path[:i]), 'r*-')
-        ax_anim.set_xlim([-5, 5])
-        ax_anim.set_ylim([-5, 5])
-        ax_anim.set_title(f"Step {i}/{len(path)-1}")
-
-        buf = BytesIO()
-        fig_anim.savefig(buf, format='png', dpi=100)  # optional: set dpi
-        buf.seek(0)
-        frames.append(Image.open(buf).convert("P"))  # convert to palette for GIF efficiency
-        buf.close()
-
-    gif_buf = BytesIO()
-    frames[0].save(
-        gif_buf, format="GIF", save_all=True,
-        append_images=frames[1:], duration=300, loop=0
+    st.markdown("### 🗺️ 2D View")
+    plot_2d_contour(
+        x_vals=x_vals,
+        y_vals=y_vals,
+        Z=Z,
+        path=path,
+        g_funcs=g_funcs if constraints else None,
+        X=X, Y=Y,
+        Z_t2=Z_t2,
+        show_2nd=show_2nd,
+        expansion_point=expansion_point
     )
-    gif_buf.seek(0)
-    st.image(gif_buf, caption="📽️ Animated Descent Path", use_container_width=True)
 
 
 
-with st.expander("🧰 Optimizer Diagnostic Tools", expanded=True):
+    if show_taylor:
+        st.caption("🔺 Red = 1st-order Taylor, 🔷 Blue = 2nd-order Taylor, 🟢 Green = true surface")
+
+    if show_animation:
+        frames = []
+        fig_anim, ax_anim = plt.subplots(figsize=(5, 4))
+
+        for i in range(1, len(path) + 1):
+            ax_anim.clear()
+            ax_anim.contour(X, Y, Z, levels=30, cmap="viridis")
+            ax_anim.plot(*zip(*path[:i]), 'r*-')
+            ax_anim.set_xlim([-5, 5])
+            ax_anim.set_ylim([-5, 5])
+            ax_anim.set_title(f"Step {i}/{len(path)-1}")
+
+            buf = BytesIO()
+            fig_anim.savefig(buf, format='png', dpi=100)  # optional: set dpi
+            buf.seek(0)
+            frames.append(Image.open(buf).convert("P"))  # convert to palette for GIF efficiency
+            buf.close()
+
+        gif_buf = BytesIO()
+        frames[0].save(
+            gif_buf, format="GIF", save_all=True,
+            append_images=frames[1:], duration=300, loop=0
+        )
+        gif_buf.seek(0)
+        st.image(gif_buf, caption="📽️ Animated Descent Path", use_container_width=True)
+
+
+with tab3:
+    st.header("🧰 Optimizer Diagnostic Tools")
+
     col1, col2 = st.columns(2)
 
     with col1:
@@ -951,9 +969,8 @@ with st.expander("🧰 Optimizer Diagnostic Tools", expanded=True):
             st.info("No constraints defined.")
 
 
-
-# === Symbolic Analysis: KKT, Gradient & Hessian ===
-with st.expander("📐 Symbolic Analysis: KKT, Gradient & Hessian", expanded=False):
+with tab4:
+    st.header("📐 Symbolic Analysis: KKT, Gradient & Hessian")
     with st.expander("💡 Interpretation of Results", expanded=True):        
         # 1. Objective & Lagrangian
         st.subheader("1. 🎯 Objective & Lagrangian")
