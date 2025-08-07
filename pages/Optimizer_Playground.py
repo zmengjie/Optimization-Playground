@@ -278,7 +278,7 @@ predefined_funcs = {
 
 }
 
-tab1, tab2, tab3, tab4 = st.tabs(["📘 Guide", "🧪 Optimizer Playground", "🧰 Diagnostics", "📐 Symbolic Analysis"])
+tab1, tab2, tab3 = st.tabs(["📘 Guide", "🧪 Optimizer Playground", "📐 Symbolic Analysis"])
 
 with tab1:
     st.title("📘 Optimization Guide")
@@ -288,8 +288,36 @@ with tab1:
     st.subheader("2. Taylor Series in Optimization")
     # Show formulae and usage
     
-    st.subheader("3. KKT Conditions")
-    # Explain + example
+    st.subheader("3. 🚦 KKT Conditions & Derivatives")
+
+    # 1. Objective & Lagrangian
+    st.markdown("### 1. 🎯 Objective & Lagrangian")
+    st.write("The **objective function** defines what we aim to minimize or maximize:")
+    st.latex(r"f(x, y)")
+    st.write("The **Lagrangian** incorporates the objective and any constraints using Lagrange multipliers:")
+    st.latex(r"\mathcal{L}(x, y, \lambda) = f(x, y) + \lambda \cdot g(x, y)")
+
+    # 2. KKT Conditions
+    st.markdown("### 2. ✅ KKT Conditions")
+    st.write("The **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization problems.")
+    st.write("They require that the gradient of the Lagrangian with respect to all variables equals zero:")
+    st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
+    st.write("In the case of unconstrained optimization, this reduces to:")
+    st.latex(r"\nabla f(x, y) = 0")
+
+    # 3. Gradient & Hessian
+    st.markdown("### 3. 🧮 Gradient & Hessian")
+    st.write("The **gradient** vector points in the direction of steepest ascent. At optimal points, it becomes zero:")
+    st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\\\ \frac{\partial f}{\partial y} \end{bmatrix}")
+    st.write("The **Hessian matrix** captures second-order curvature information of the objective function:")
+    st.latex(r"\nabla^2 f(x, y) = \begin{bmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\\\ \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} \end{bmatrix}")
+
+    st.markdown("**Interpretation of the Hessian:**")
+    st.markdown("""
+    - **Positive definite** → Local **minimum**  
+    - **Negative definite** → Local **maximum**  
+    - **Indefinite** → **Saddle point**
+    """)
 
 
 with tab2:
@@ -796,210 +824,182 @@ with tab2:
         st.image(gif_buf, caption="📽️ Animated Descent Path", use_container_width=True)
 
 
+# with tab3:
+#     st.header("🧰 Optimizer Diagnostic Tools")
+
+#     col1, col2 = st.columns(2)
+
+#     with col1:
+#         st.markdown("#### 📊 Optimizer Comparison")
+
+#         start_x = st.session_state.get("start_x", 0.0)
+#         start_y = st.session_state.get("start_y", 0.0)
+
+#         selected_opts = st.multiselect(
+#             "Optimizers",
+#             ["GradientDescent", "Adam", "RMSProp", "Newton's Method"],
+#             default=["GradientDescent"],
+#             key="compare"
+#         )
+#         fig_comp, ax_comp = plt.subplots(figsize=(4, 3))
+
+#         results = []
+#         summary_results = []
+
+#         for opt in selected_opts:
+#             path_opt, losses, meta= optimize_path(  # ✅ unpack both outputs
+#                 start_x,
+#                 start_y,
+#                 optimizer=opt,
+#                 lr=lr,
+#                 steps=steps,
+#                 f_func=f_func,
+#                 grad_f=grad_f,
+#                 hessian_f=hessian_f,
+#                 options=options
+#             )
+
+#             zs_coords = path_opt
+#             zs_vals = losses if losses is not None and len(losses) > 0 else [f_func(xp, yp) for xp, yp in zs_coords]
+#             grad_norm = float(np.linalg.norm(grad_f(*zs_coords[-1])))
+
+#             results.append((opt, zs_vals))
+
+#             summary_results.append({
+#                 "Optimizer": opt,
+#                 "Final Value": np.round(zs_vals[-1], 4),
+#                 "Gradient Norm": np.round(grad_norm, 4),
+#                 "Steps": len(zs_vals),
+#                 "Actual Steps": meta.get("res_nit", "N/A"),   # ✅ 使用 meta.get()
+#                 "Logged Steps": meta.get("callback_steps", "N/A")
+#             })
+
+#         # Sort results by final loss
+#         results.sort(key=lambda x: x[1][-1])
+
+#         for opt, zs in results:
+#             if zs is not None and len(zs) > 0:
+#                 ax_comp.plot(zs, label=f"{opt} ({len(zs)} steps)", marker="o", markersize=2)
+#             else:
+#                 st.warning(f"⚠️ No convergence data for {opt}")
+
+#         ax_comp.set_title("Convergence")
+#         ax_comp.set_xlabel("Step")
+#         ax_comp.set_ylabel("f(x, y)")
+#         ax_comp.set_ylim(bottom=0)
+#         ax_comp.legend()
+#         st.pyplot(fig_comp)
+
+#         # Show summary table
+#         # st.markdown("#### 📋 Optimizer Summary Table")
+#         # df_summary = pd.DataFrame(summary_results)
+#         # st.dataframe(df_summary)
+
+
+
+#         st.markdown("#### 🔥 Gradient Norm Heatmap")
+#         # norm_grad = np.sqrt((np.gradient(Z, axis=0))**2 + (np.gradient(Z, axis=1))**2)
+#         # Temporary definition in case not computed above
+#         if 'Z_loss' not in locals():
+#             x_range = np.linspace(-5, 5, 50)
+#             y_range = np.linspace(-5, 5, 50)
+#             X_loss, Y_loss = np.meshgrid(x_range, y_range)
+#             Z_loss = (X_loss - 2)**2 + (Y_loss + 1)**2  # Default MSE-like loss
+
+#         norm_grad = np.sqrt((np.gradient(Z_loss, axis=0))**2 + (np.gradient(Z_loss, axis=1))**2)
+
+#         fig3, ax3 = plt.subplots()
+#         heat = ax3.imshow(norm_grad, extent=[-5, 5, -5, 5], origin='lower', cmap='plasma')
+#         fig3.colorbar(heat, ax=ax3, label="‖∇f‖")
+#         ax3.set_title("‖∇f(x, y)‖")
+#         st.pyplot(fig3)
+
+#     with col2:
+#         st.markdown("#### 🌄 Loss Surface")
+
+#         loss_type = st.radio("Loss Type", ["MSE", "Log Loss", "Cross Entropy", "Custom"])
+
+#         # Create input grid
+#         x_range = np.linspace(-5, 5, 50)  # reduced resolution for arrows
+#         y_range = np.linspace(-5, 5, 50)
+#         X_loss, Y_loss = np.meshgrid(x_range, y_range)
+
+#         # Compute Z surface and manually define minimum
+#         if loss_type == "MSE":
+#             Z_loss = (X_loss - 2)**2 + (Y_loss + 1)**2
+#             min_x, min_y = 2, -1
+#         elif loss_type == "Log Loss":
+#             Z_loss = np.log(1 + np.exp(-(X_loss + Y_loss)))
+#             min_x, min_y = 5, -5
+#         elif loss_type == "Cross Entropy":
+#             p = 1 / (1 + np.exp(-(X_loss + Y_loss)))
+#             Z_loss = -p * np.log(p + 1e-8) - (1 - p) * np.log(1 - p + 1e-8)
+#             min_x, min_y = 5, -5
+#         else:
+#             Z_loss = np.sin(X_loss) * np.cos(Y_loss)
+#             min_x, min_y = 0, 0
+
+#         # Compute gradients (numerical partial derivatives)
+#         dZ_dx, dZ_dy = np.gradient(Z_loss, x_range, y_range)
+
+#         # === Side-by-side plots ===
+#         col1, col2 = st.columns(2)
+
+#         with col1:
+#             fig3d = plt.figure(figsize=(5, 4))
+#             ax3d = fig3d.add_subplot(111, projection='3d')
+#             ax3d.plot_surface(X_loss, Y_loss, Z_loss, cmap='viridis', edgecolor='none', alpha=0.9)
+#             ax3d.scatter(min_x, min_y, np.min(Z_loss), color='red', s=50, label='Min')
+#             ax3d.set_title(f"{loss_type} Surface")
+#             ax3d.legend()
+#             st.pyplot(fig3d)
+
+#         with col2:
+#             fig2d, ax2d = plt.subplots(figsize=(5, 4))
+#             contour = ax2d.contourf(X_loss, Y_loss, Z_loss, levels=30, cmap='viridis')
+#             ax2d.plot(min_x, min_y, 'ro', label='Min')
+#             # Overlay gradient arrows (negative for descent)
+#             ax2d.quiver(X_loss, Y_loss, -dZ_dx, -dZ_dy, color='white', alpha=0.7, scale=50)
+#             fig2d.colorbar(contour, ax=ax2d, label="Loss")
+#             ax2d.set_title(f"{loss_type} Contour View + Gradient Field")
+#             ax2d.legend()
+#             st.pyplot(fig2d)
+
+#         st.markdown("#### ✅ Constraint Checker")
+
+#         start_x = st.session_state.get("start_x", 0.0)
+#         start_y = st.session_state.get("start_y", 0.0)
+
+
+#         # ⛳ Ensure path is updated
+#         path, losses, meta = optimize_path(
+#             start_x,
+#             start_y,
+#             optimizer=selected_opts[0],  # or st.session_state.get("optimizer", "GradientDescent")
+#             lr=lr,
+#             steps=steps,
+#             f_func=f_func,
+#             grad_f=grad_f,
+#             hessian_f=hessian_f,
+#             options=options
+#         )
+#         if constraints:
+#             fig_con, ax_con = plt.subplots(figsize=(4, 3))
+#             for i, g_func in enumerate(g_funcs):
+#                 violations = [g_func(xp, yp) for xp, yp in path]
+#                 ax_con.plot(violations, label=f"g{i+1}(x, y)")
+#             ax_con.axhline(0, color="red", linestyle="--")
+#             ax_con.set_xlabel("Step")
+#             ax_con.set_ylabel("g(x, y)")
+#             ax_con.legend()
+#             st.pyplot(fig_con)
+#         else:
+#             st.info("No constraints defined.")
+
+
 with tab3:
-    st.header("🧰 Optimizer Diagnostic Tools")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("#### 📊 Optimizer Comparison")
-
-        start_x = st.session_state.get("start_x", 0.0)
-        start_y = st.session_state.get("start_y", 0.0)
-
-        selected_opts = st.multiselect(
-            "Optimizers",
-            ["GradientDescent", "Adam", "RMSProp", "Newton's Method"],
-            default=["GradientDescent"],
-            key="compare"
-        )
-        fig_comp, ax_comp = plt.subplots(figsize=(4, 3))
-
-        results = []
-        summary_results = []
-
-        for opt in selected_opts:
-            path_opt, losses, meta= optimize_path(  # ✅ unpack both outputs
-                start_x,
-                start_y,
-                optimizer=opt,
-                lr=lr,
-                steps=steps,
-                f_func=f_func,
-                grad_f=grad_f,
-                hessian_f=hessian_f,
-                options=options
-            )
-
-            zs_coords = path_opt
-            zs_vals = losses if losses is not None and len(losses) > 0 else [f_func(xp, yp) for xp, yp in zs_coords]
-            grad_norm = float(np.linalg.norm(grad_f(*zs_coords[-1])))
-
-            results.append((opt, zs_vals))
-
-            summary_results.append({
-                "Optimizer": opt,
-                "Final Value": np.round(zs_vals[-1], 4),
-                "Gradient Norm": np.round(grad_norm, 4),
-                "Steps": len(zs_vals),
-                "Actual Steps": meta.get("res_nit", "N/A"),   # ✅ 使用 meta.get()
-                "Logged Steps": meta.get("callback_steps", "N/A")
-            })
-
-        # Sort results by final loss
-        results.sort(key=lambda x: x[1][-1])
-
-        for opt, zs in results:
-            if zs is not None and len(zs) > 0:
-                ax_comp.plot(zs, label=f"{opt} ({len(zs)} steps)", marker="o", markersize=2)
-            else:
-                st.warning(f"⚠️ No convergence data for {opt}")
-
-        ax_comp.set_title("Convergence")
-        ax_comp.set_xlabel("Step")
-        ax_comp.set_ylabel("f(x, y)")
-        ax_comp.set_ylim(bottom=0)
-        ax_comp.legend()
-        st.pyplot(fig_comp)
-
-        # Show summary table
-        # st.markdown("#### 📋 Optimizer Summary Table")
-        # df_summary = pd.DataFrame(summary_results)
-        # st.dataframe(df_summary)
-
-
-
-        st.markdown("#### 🔥 Gradient Norm Heatmap")
-        # norm_grad = np.sqrt((np.gradient(Z, axis=0))**2 + (np.gradient(Z, axis=1))**2)
-        # Temporary definition in case not computed above
-        if 'Z_loss' not in locals():
-            x_range = np.linspace(-5, 5, 50)
-            y_range = np.linspace(-5, 5, 50)
-            X_loss, Y_loss = np.meshgrid(x_range, y_range)
-            Z_loss = (X_loss - 2)**2 + (Y_loss + 1)**2  # Default MSE-like loss
-
-        norm_grad = np.sqrt((np.gradient(Z_loss, axis=0))**2 + (np.gradient(Z_loss, axis=1))**2)
-
-        fig3, ax3 = plt.subplots()
-        heat = ax3.imshow(norm_grad, extent=[-5, 5, -5, 5], origin='lower', cmap='plasma')
-        fig3.colorbar(heat, ax=ax3, label="‖∇f‖")
-        ax3.set_title("‖∇f(x, y)‖")
-        st.pyplot(fig3)
-
-    with col2:
-        st.markdown("#### 🌄 Loss Surface")
-
-        loss_type = st.radio("Loss Type", ["MSE", "Log Loss", "Cross Entropy", "Custom"])
-
-        # Create input grid
-        x_range = np.linspace(-5, 5, 50)  # reduced resolution for arrows
-        y_range = np.linspace(-5, 5, 50)
-        X_loss, Y_loss = np.meshgrid(x_range, y_range)
-
-        # Compute Z surface and manually define minimum
-        if loss_type == "MSE":
-            Z_loss = (X_loss - 2)**2 + (Y_loss + 1)**2
-            min_x, min_y = 2, -1
-        elif loss_type == "Log Loss":
-            Z_loss = np.log(1 + np.exp(-(X_loss + Y_loss)))
-            min_x, min_y = 5, -5
-        elif loss_type == "Cross Entropy":
-            p = 1 / (1 + np.exp(-(X_loss + Y_loss)))
-            Z_loss = -p * np.log(p + 1e-8) - (1 - p) * np.log(1 - p + 1e-8)
-            min_x, min_y = 5, -5
-        else:
-            Z_loss = np.sin(X_loss) * np.cos(Y_loss)
-            min_x, min_y = 0, 0
-
-        # Compute gradients (numerical partial derivatives)
-        dZ_dx, dZ_dy = np.gradient(Z_loss, x_range, y_range)
-
-        # === Side-by-side plots ===
-        col1, col2 = st.columns(2)
-
-        with col1:
-            fig3d = plt.figure(figsize=(5, 4))
-            ax3d = fig3d.add_subplot(111, projection='3d')
-            ax3d.plot_surface(X_loss, Y_loss, Z_loss, cmap='viridis', edgecolor='none', alpha=0.9)
-            ax3d.scatter(min_x, min_y, np.min(Z_loss), color='red', s=50, label='Min')
-            ax3d.set_title(f"{loss_type} Surface")
-            ax3d.legend()
-            st.pyplot(fig3d)
-
-        with col2:
-            fig2d, ax2d = plt.subplots(figsize=(5, 4))
-            contour = ax2d.contourf(X_loss, Y_loss, Z_loss, levels=30, cmap='viridis')
-            ax2d.plot(min_x, min_y, 'ro', label='Min')
-            # Overlay gradient arrows (negative for descent)
-            ax2d.quiver(X_loss, Y_loss, -dZ_dx, -dZ_dy, color='white', alpha=0.7, scale=50)
-            fig2d.colorbar(contour, ax=ax2d, label="Loss")
-            ax2d.set_title(f"{loss_type} Contour View + Gradient Field")
-            ax2d.legend()
-            st.pyplot(fig2d)
-
-        st.markdown("#### ✅ Constraint Checker")
-
-        start_x = st.session_state.get("start_x", 0.0)
-        start_y = st.session_state.get("start_y", 0.0)
-
-
-        # ⛳ Ensure path is updated
-        path, losses, meta = optimize_path(
-            start_x,
-            start_y,
-            optimizer=selected_opts[0],  # or st.session_state.get("optimizer", "GradientDescent")
-            lr=lr,
-            steps=steps,
-            f_func=f_func,
-            grad_f=grad_f,
-            hessian_f=hessian_f,
-            options=options
-        )
-        if constraints:
-            fig_con, ax_con = plt.subplots(figsize=(4, 3))
-            for i, g_func in enumerate(g_funcs):
-                violations = [g_func(xp, yp) for xp, yp in path]
-                ax_con.plot(violations, label=f"g{i+1}(x, y)")
-            ax_con.axhline(0, color="red", linestyle="--")
-            ax_con.set_xlabel("Step")
-            ax_con.set_ylabel("g(x, y)")
-            ax_con.legend()
-            st.pyplot(fig_con)
-        else:
-            st.info("No constraints defined.")
-
-
-with tab4:
     st.header("📐 Symbolic Analysis: KKT, Gradient & Hessian")
-    with st.expander("💡 Interpretation of Results", expanded=True):        
-        # 1. Objective & Lagrangian
-        st.subheader("1. 🎯 Objective & Lagrangian")
-        st.write("- The **objective function** is what we are trying to minimize or maximize:")
-        st.latex(r"f(x, y)")
-        st.write("- The **Lagrangian** combines the objective and any constraints using Lagrange multipliers:")
-        st.latex(r"\mathcal{L}(x, y, \lambda) = f(x, y) + \lambda \cdot g(x, y)")
-    
-        # 2. KKT Conditions
-        st.subheader("2. ✅ KKT Conditions")
-        st.write("- **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization.")
-        st.write("- They are found by setting all partial derivatives of the Lagrangian to zero (stationary points):")
-        st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
-        st.write("- For unconstrained problems, they reduce to the gradient of the objective being zero:")
-        st.latex(r"\nabla f(x, y) = 0")
-    
-        # 3. Gradient & Hessian
-        st.subheader("3. 🧮 Gradient & Hessian")
-        st.write("- **Gradient** points in the direction of steepest ascent. At a stationary point, the gradient is zero:")
-        st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\ \frac{\partial f}{\partial y} \end{bmatrix}")
-        st.write("- **Hessian** is the matrix of second derivatives, showing curvature of the function:")
-        st.latex(r"\nabla^2 f(x, y) = \begin{bmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\ \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} \end{bmatrix}")
-    
-        st.write("Interpretation:")
-        st.markdown("""
-        - Positive definite → Local minimum  
-        - Negative definite → Local maximum  
-        - Mixed signs → Saddle point  
-        """)
+
 
     st.markdown("#### 🎯 Objective & Lagrangian")
     st.latex(r"f(x, y) = " + sp.latex(f_expr))
