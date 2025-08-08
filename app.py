@@ -38,3 +38,8 @@ This interactive app lets you explore:
 
 st.info("👉 Use the sidebar to dive into each section. You can switch between **Taylor Series** and **Optimizer Playground** tabs.")
 
+st.markdown(
+    "If you have any feedback regarding the application, kindly fill out [this form](https://forms.gle/tae4s9EH5dqcG6rm9).",
+    unsafe_allow_html=True
+)
+
