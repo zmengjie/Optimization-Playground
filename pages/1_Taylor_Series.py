@@ -126,30 +126,61 @@ st.markdown("---")
 
 
 with tab2:
-    left, right = st.columns([1,3])
+    left, right = st.columns([1, 3])
+
+    # -------------------- LEFT: controls --------------------
     with left:
         st.markdown("### 📈 Univariate Settings")
-        func_choice = st.selectbox("Choose a function:", ["cos(x)","exp(x)","ln(1+x)","tanh(x)","Custom"])
+        func_choice = st.selectbox("Choose a function:", ["cos(x)", "exp(x)", "ln(1+x)", "tanh(x)", "Custom"])
         show_3rd_4th = st.checkbox("➕ Show 3rd & 4th-order", value=False)
         show_parabola = st.checkbox("Show 2nd-order (Parabola)", value=True)
         show_linear = st.checkbox("Show 1st-order (Linear)", value=True)
         animate = st.checkbox("🎬 Animate Taylor Approximation", value=False)
 
-        x_sym = sp.Symbol('x')
+        x_sym = sp.Symbol("x")
+
         def get_function(choice):
             if choice == "cos(x)":   return sp.cos(x_sym), (-3, 3)
             if choice == "exp(x)":   return sp.exp(x_sym), (-3, 3)
-            if choice == "ln(1+x)":  return sp.ln(1 + x_sym), (-0.9, 3)
+            if choice == "ln(1+x)":  return sp.log(1 + x_sym), (-0.9, 3)   # log == natural log
             if choice == "tanh(x)":  return sp.tanh(x_sym), (-3, 3)
             if choice == "Custom":
                 user = st.text_input("Enter f(x):", "x**2 * sin(x)")
-                return sp.sympify(user), (-3, 3)
+                try:
+                    return sp.sympify(user), (-3, 3)
+                except Exception as e:
+                    st.error(f"Invalid input: {e}")
+                    st.stop()
 
         f_expr, (xmin, xmax) = get_function(func_choice)
         a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
-        animate_orders = ["1st","2nd"] if animate else []
+        animate_orders = ["1st", "2nd"] if animate else []
 
+    # -------------------- RIGHT: formulas + plot --------------------
     with right:
+        st.markdown(r"### ✏️ Taylor Expansion at $x = a$")
+
+        try:
+            # 1st- and 2nd-order series at x=a
+            t1 = sp.series(f_expr, x_sym, a, 2).removeO()  # up to (x-a)^1
+            t2 = sp.series(f_expr, x_sym, a, 3).removeO()  # up to (x-a)^2
+            st.latex(rf"f(x) \approx {sp.latex(t1)}")
+            st.latex(rf"f(x) \approx {sp.latex(t2)}")
+
+            # Optional 3rd & 4th
+            if show_3rd_4th:
+                t3 = sp.series(f_expr, x_sym, a, 4).removeO()
+                t4 = sp.series(f_expr, x_sym, a, 5).removeO()
+                st.latex(rf"f(x) \approx {sp.latex(t3)}")
+                st.latex(rf"f(x) \approx {sp.latex(t4)}")
+
+        except Exception as e:
+            st.info(
+                "Could not compute the Taylor series at this a (e.g., singularity for log near -1). "
+                "Try another expansion point."
+            )
+
+        # Plot / animation
         show_univariate_taylor(
             f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
             show_linear=show_linear, show_2nd=show_parabola,
