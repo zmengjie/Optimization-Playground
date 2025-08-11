@@ -203,16 +203,17 @@ def show_univariate_taylor(
         ax.legend()
         st.pyplot(fig, use_container_width=True)
 
-        # Animation
+        # # Animation
         if animate and order_to_animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
-            fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
 
-            line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
-            line_1st, = ax_anim.plot([], [], '--', label="1st-order", color='red')
-            line_2nd, = ax_anim.plot([], [], '--', label="2nd-order", color='orange')
-            point, = ax_anim.plot([], [], 'ko')
+            fig_anim, ax_anim = plt.subplots(figsize=(12, 7), dpi=180)  # bigger + sharper
+            fig_anim.tight_layout(pad=0.6)
 
+            line_true, = ax_anim.plot(x, f_np(x), label="f(x)")
+            line_1st,  = ax_anim.plot([], [], '--', label="1st-order")
+            line_2nd,  = ax_anim.plot([], [], '--', label="2nd-order")
+            point,     = ax_anim.plot([], [], 'ko')
 
             ax_anim.set_xlim(xmin, xmax)
             y_vals = f_np(x)
@@ -227,30 +228,69 @@ def show_univariate_taylor(
             def update(frame):
                 a_val = a_vals[frame]
                 f_a_val = f_np(a_val)
-
-                # Compute 1st-order term
-                first_order = f_a_val + derivs_np[0](a_val) * (x - a_val)
-                # Compute 2nd-order term
+                first_order  = f_a_val + derivs_np[0](a_val) * (x - a_val)
                 second_order = first_order + (derivs_np[1](a_val) * (x - a_val)**2) / math.factorial(2)
-
-                # Update both lines
                 line_1st.set_data(x, first_order)
                 line_2nd.set_data(x, second_order)
                 point.set_data([a_val], [f_np(a_val)])
                 ax_anim.set_title(f"Taylor Approximation at a = {a_val:.2f}")
                 return line_1st, line_2nd, point
 
-
             ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
 
-            buf = BytesIO()
-            writer = PillowWriter(fps=20)
+            # Save larger GIF and display full width
             with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                ani.save(tmpfile.name, writer=writer)
-                tmpfile.seek(0)
-                gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
+                ani.save(tmpfile.name, writer=PillowWriter(fps=20), dpi=180,
+                        savefig_kwargs={"bbox_inches": "tight"})
+                st.image(tmpfile.name, use_container_width=True)  # ← fills the column
 
-            components.html(f'<img src="data:image/gif;base64,{gif_base64}" width="100%">', height=350)
+        # if animate and order_to_animate:
+        #     st.markdown("### 🎬 Animation: Taylor Approximation")
+        #     fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
+
+        #     line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
+        #     line_1st, = ax_anim.plot([], [], '--', label="1st-order", color='red')
+        #     line_2nd, = ax_anim.plot([], [], '--', label="2nd-order", color='orange')
+        #     point, = ax_anim.plot([], [], 'ko')
+
+
+        #     ax_anim.set_xlim(xmin, xmax)
+        #     y_vals = f_np(x)
+        #     buffer = 0.4 * (np.max(y_vals) - np.min(y_vals))
+        #     ax_anim.set_ylim(np.min(y_vals) - buffer, np.max(y_vals) + buffer)
+        #     ax_anim.axhline(0, color='gray', lw=0.5)
+        #     ax_anim.grid(True)
+        #     ax_anim.legend(loc='upper right')
+
+        #     a_vals = np.linspace(xmin + 0.1, xmax - 0.1, 60)
+
+        #     def update(frame):
+        #         a_val = a_vals[frame]
+        #         f_a_val = f_np(a_val)
+
+        #         # Compute 1st-order term
+        #         first_order = f_a_val + derivs_np[0](a_val) * (x - a_val)
+        #         # Compute 2nd-order term
+        #         second_order = first_order + (derivs_np[1](a_val) * (x - a_val)**2) / math.factorial(2)
+
+        #         # Update both lines
+        #         line_1st.set_data(x, first_order)
+        #         line_2nd.set_data(x, second_order)
+        #         point.set_data([a_val], [f_np(a_val)])
+        #         ax_anim.set_title(f"Taylor Approximation at a = {a_val:.2f}")
+        #         return line_1st, line_2nd, point
+
+
+        #     ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
+
+        #     buf = BytesIO()
+        #     writer = PillowWriter(fps=20)
+        #     with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
+        #         ani.save(tmpfile.name, writer=writer)
+        #         tmpfile.seek(0)
+        #         gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
+
+        #     components.html(f'<img src="data:image/gif;base64,{gif_base64}" width="100%">', height=350)
 
     except Exception as e:
         st.error(f"Rendering error: {e}")
