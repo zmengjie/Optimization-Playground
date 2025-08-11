@@ -161,50 +161,53 @@ with tab2:
         st.markdown(r"### ✏️ Taylor Expansion at $x = a$")
 
         show_steps = st.checkbox("Show derivation steps", value=True)
-        max_order = 4 if show_3rd_4th else 2  # 2 → up to quadratic; 4 → up to 4th
+        max_order = 4 if show_3rd_4th else 2
 
-        def render_steps(f, x, a_val, order):
-            # General Taylor form
+        # Use a SymPy numeric for the expansion point to avoid series() hiccups
+        a_val = sp.N(a)
+
+        def render_steps(f, x, a_num, order):
+            # General Taylor template
             st.latex(rf"f(x) \approx \sum_{{k=0}}^{order} \frac{{f^{({{k}})}(a)}}{{k!}}(x-a)^k")
 
-            # Build derivatives f^(k)
+            # Derivatives up to 'order'
             derivs = [f]
             for _ in range(1, order + 1):
                 derivs.append(sp.diff(derivs[-1], x))
 
-            # Values at a
-            vals = [sp.simplify(d.subs(x, a_val)) for d in derivs]
+            # Evaluate derivatives at a
+            vals = [sp.simplify(d.subs(x, a_num)) for d in derivs]
 
-            # List f(a), f'(a), f''(a), ...
+            # Display f(a), f'(a), ...
             for k, v in enumerate(vals):
                 label = r"f(a)" if k == 0 else rf"f^{{({k})}}(a)"
                 st.latex(rf"{label} = {sp.latex(v)}")
 
-            # Partial sums term-by-term
+            # Partial sums
             st.markdown("**Partial sums:**")
             partial = 0
             for k, v in enumerate(vals):
-                term = sp.simplify(v * (x - a_val)**k / sp.factorial(k))
+                term = sp.simplify(v * (x - a_num)**k / sp.factorial(k))
                 partial = sp.simplify(partial + term)
                 st.latex(rf"\text{{Up to }}k={k}:\quad f(x) \approx {sp.latex(partial)}")
 
         try:
             if show_steps:
-                render_steps(f_expr, x_sym, a, max_order)
+                render_steps(f_expr, x_sym, a_val, max_order)
             else:
-                # Final compact formulas (like your current version)
-                t2 = sp.series(f_expr, x_sym, a, 3).removeO()  # up to (x-a)^2
+                # Compact final formulas
+                t2 = sp.series(f_expr, x_sym, a_val, 3).removeO()  # up to (x-a)^2
                 st.latex(rf"f(x) \approx {sp.latex(t2)}")
                 if show_3rd_4th:
-                    t4 = sp.series(f_expr, x_sym, a, 5).removeO()
+                    t4 = sp.series(f_expr, x_sym, a_val, 5).removeO()
                     st.latex(rf"f(x) \approx {sp.latex(t4)}")
         except Exception:
-            st.info("Could not compute the Taylor series at this a (e.g., singularity). Try another expansion point.")
+            st.info("Could not compute the Taylor series at this a (e.g., outside domain). Try another expansion point.")
 
         # ---- plot / animation ----
         st.markdown("### 📉 Taylor Approximation")
         show_univariate_taylor(
-            f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
+            f_expr=f_expr, xmin=xmin, xmax=xmax, a=float(a_val),
             show_linear=show_linear, show_2nd=show_parabola,
             show_3rd_4th=show_3rd_4th, animate=animate,
             order_to_animate=animate_orders
