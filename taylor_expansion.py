@@ -206,7 +206,8 @@ def show_univariate_taylor(
         # Animation
         if animate and order_to_animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
-            fig_anim, ax_anim = plt.subplots(figsize=(10, 6))
+            fig_anim, ax_anim = plt.subplots(figsize=(12, 7), dpi=150)  # bigger & sharper
+
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
             line_1st, = ax_anim.plot([], [], '--', label="1st-order", color='red')
