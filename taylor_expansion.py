@@ -206,13 +206,13 @@ def show_univariate_taylor(
         # Animation
         if animate and order_to_animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
-            fig_anim, ax_anim = plt.subplots(figsize=(20, 6))
+            # Bigger canvas + higher resolution
+            fig_anim, ax_anim = plt.subplots(figsize=(20, 8), dpi=150)
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
             line_1st, = ax_anim.plot([], [], '--', label="1st-order", color='red')
             line_2nd, = ax_anim.plot([], [], '--', label="2nd-order", color='orange')
             point, = ax_anim.plot([], [], 'ko')
-
 
             ax_anim.set_xlim(xmin, xmax)
             y_vals = f_np(x)
@@ -240,17 +240,18 @@ def show_univariate_taylor(
                 ax_anim.set_title(f"Taylor Approximation at a = {a_val:.2f}")
                 return line_1st, line_2nd, point
 
-
             ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
 
             buf = BytesIO()
             writer = PillowWriter(fps=20)
             with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                ani.save(tmpfile.name, writer=writer)
+                ani.save(tmpfile.name, writer=writer, dpi=150)  # ⬅ bump dpi here too
                 tmpfile.seek(0)
                 gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
 
-            components.html(f'<img src="data:image/gif;base64,{gif_base64}" width="100%">', height=350)
+            # Bigger display height
+            components.html(f'<img src="data:image/gif;base64,{gif_base64}" width="100%">', height=600)
+
 
     except Exception as e:
         st.error(f"Rendering error: {e}")
