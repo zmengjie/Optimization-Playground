@@ -72,60 +72,90 @@ with tab1:
 st.markdown("---")
 
     # st.markdown("### 📈 Univariate Taylor Expansion Visualizer")
-with tab2:
-    # Sidebar config
-    with st.sidebar:
-        st.markdown("### 📈 Univariate Settings")
+# with tab2:
+#     # Sidebar config
+#     with st.sidebar:
+#         st.markdown("### 📈 Univariate Settings")
 
-        func_choice = st.selectbox("Choose a function:", ["cos(x)", "exp(x)", "ln(1+x)", "tanh(x)", "Custom"])
+#         func_choice = st.selectbox("Choose a function:", ["cos(x)", "exp(x)", "ln(1+x)", "tanh(x)", "Custom"])
+#         show_3rd_4th = st.checkbox("➕ Show 3rd & 4th-order", value=False)
+#         show_parabola = st.checkbox("Show 2nd-order (Parabola)", value=True)
+#         show_linear = st.checkbox("Show 1st-order (Linear)", value=True)
+#         animate = st.checkbox("🎬 Animate Taylor Approximation")  # ✅ Only once
+
+#         x_sym = sp.Symbol('x')
+
+#         def get_function(choice):
+#             if choice == "cos(x)":
+#                 return sp.cos(x_sym), (-3, 3)
+#             if choice == "exp(x)":
+#                 return sp.exp(x_sym), (-3, 3)
+#             if choice == "ln(1+x)":
+#                 return sp.ln(1 + x_sym), (-0.9, 3)
+#             if choice == "tanh(x)":
+#                 return sp.tanh(x_sym), (-3, 3)
+#             if choice == "Custom":
+#                 user_input = st.text_input("Enter function f(x):", "x**2 * sin(x)")
+#                 try:
+#                     return sp.sympify(user_input), (-3, 3)
+#                 except Exception as e:
+#                     st.error(f"Invalid input: {e}")
+#                     st.stop()
+
+#         f_expr, (xmin, xmax) = get_function(func_choice)
+#         a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
+
+#         if animate:
+#             animate_orders = ["1st", "2nd"]  # Always animate both
+#         else:
+#             animate_orders = []
+
+
+#     # Main content: plot + animation
+#     show_univariate_taylor(
+#         f_expr=f_expr,
+#         xmin=xmin,
+#         xmax=xmax,
+#         a=a,
+#         show_linear=show_linear,
+#         show_2nd=show_parabola,
+#         show_3rd_4th=show_3rd_4th,
+#         animate=animate,
+#         order_to_animate=animate_orders  # Pass list instead of string
+#     )
+
+
+with tab2:
+    left, right = st.columns([1,3])
+    with left:
+        st.markdown("### 📈 Univariate Settings")
+        func_choice = st.selectbox("Choose a function:", ["cos(x)","exp(x)","ln(1+x)","tanh(x)","Custom"])
         show_3rd_4th = st.checkbox("➕ Show 3rd & 4th-order", value=False)
         show_parabola = st.checkbox("Show 2nd-order (Parabola)", value=True)
         show_linear = st.checkbox("Show 1st-order (Linear)", value=True)
-        animate = st.checkbox("🎬 Animate Taylor Approximation")  # ✅ Only once
+        animate = st.checkbox("🎬 Animate Taylor Approximation", value=False)
 
         x_sym = sp.Symbol('x')
-
         def get_function(choice):
-            if choice == "cos(x)":
-                return sp.cos(x_sym), (-3, 3)
-            if choice == "exp(x)":
-                return sp.exp(x_sym), (-3, 3)
-            if choice == "ln(1+x)":
-                return sp.ln(1 + x_sym), (-0.9, 3)
-            if choice == "tanh(x)":
-                return sp.tanh(x_sym), (-3, 3)
+            if choice == "cos(x)":   return sp.cos(x_sym), (-3, 3)
+            if choice == "exp(x)":   return sp.exp(x_sym), (-3, 3)
+            if choice == "ln(1+x)":  return sp.ln(1 + x_sym), (-0.9, 3)
+            if choice == "tanh(x)":  return sp.tanh(x_sym), (-3, 3)
             if choice == "Custom":
-                user_input = st.text_input("Enter function f(x):", "x**2 * sin(x)")
-                try:
-                    return sp.sympify(user_input), (-3, 3)
-                except Exception as e:
-                    st.error(f"Invalid input: {e}")
-                    st.stop()
+                user = st.text_input("Enter f(x):", "x**2 * sin(x)")
+                return sp.sympify(user), (-3, 3)
 
         f_expr, (xmin, xmax) = get_function(func_choice)
         a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
+        animate_orders = ["1st","2nd"] if animate else []
 
-        if animate:
-            animate_orders = ["1st", "2nd"]  # Always animate both
-        else:
-            animate_orders = []
-
-
-    # Main content: plot + animation
-    show_univariate_taylor(
-        f_expr=f_expr,
-        xmin=xmin,
-        xmax=xmax,
-        a=a,
-        show_linear=show_linear,
-        show_2nd=show_parabola,
-        show_3rd_4th=show_3rd_4th,
-        animate=animate,
-        order_to_animate=animate_orders  # Pass list instead of string
-    )
-
-
-
+    with right:
+        show_univariate_taylor(
+            f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
+            show_linear=show_linear, show_2nd=show_parabola,
+            show_3rd_4th=show_3rd_4th, animate=animate,
+            order_to_animate=animate_orders
+        )
 
 
 # Section 3: Interactive Visualization
