@@ -244,20 +244,15 @@ def show_univariate_taylor(
 
             buf = BytesIO()
             writer = PillowWriter(fps=20)
+            
             with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                ani.save(tmpfile.name, writer=writer, dpi=150)  # ⬅ bump dpi here too
+                ani.save(tmpfile.name, writer=writer, dpi=150)  # high DPI for clarity
                 tmpfile.seek(0)
-                gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
+                gif_bytes = tmpfile.read()
 
-            # Bigger display height
-            components.html(
-                f'''
-                <div style="display: flex; justify-content: center;">
-                    <img src="data:image/gif;base64,{gif_base64}" style="max-width: 100%; height: auto;">
-                </div>
-                ''',
-                height=900  # give Streamlit room to show full image height
-            )
+            # Use Streamlit-native display — scales cleanly, keeps aspect ratio
+            st.image(gif_bytes, format="gif", use_column_width=True)
+
 
 
 
