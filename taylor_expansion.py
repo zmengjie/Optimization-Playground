@@ -246,18 +246,18 @@ def show_univariate_taylor(
             writer = PillowWriter(fps=20)
             
             with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                ani.save(tmpfile.name, writer=writer, dpi=150)
+                ani.save(tmpfile.name, writer=writer, dpi=150)  # ✅ higher dpi
                 tmpfile.seek(0)
                 gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
 
-            # Use HTML to embed animated gif responsively
-            components.html(
-                f"""
+            # Display GIF full-width in Streamlit
+            st.components.v1.html(
+                f'''
                 <div style="display: flex; justify-content: center;">
-                    <img src="data:image/gif;base64,{gif_base64}" style="max-width: 100%; height: auto;">
+                    <img src="data:image/gif;base64,{gif_base64}" 
+                        style="width: 100%; height: auto; display: block; margin: 0 auto;">
                 </div>
-                """,
-                height=800
+                '''
             )
 
 
