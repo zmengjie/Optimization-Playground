@@ -1300,12 +1300,12 @@ def optimize_path(x0, y0, optimizer, lr, steps, f_func, grad_f=None, hessian_f=N
                 except:
                     update = grad
 
-            elif optimizer == "Momentum":
-                momentum = options.get("momentum", 0.9)
-                m = momentum * m + lr * grad
-                update = m
-            else:  # Default: GradientDescent
-                update = lr * grad
+        elif optimizer == "Momentum":
+            momentum = options.get("momentum", 0.9)
+            m = momentum * m + lr * grad
+            update = m
+        else:  # Default: GradientDescent
+            update = lr * grad
 
 
         update = np.asarray(update)
