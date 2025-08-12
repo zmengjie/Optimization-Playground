@@ -154,7 +154,13 @@ with tab2:
 
         f_expr, (xmin, xmax) = get_function(func_choice)
         a = st.slider("Expansion point a", xmin + 0.1, xmax - 0.1, 0.0)
-        animate_orders = ["1st", "2nd"] if animate else []
+        # animate_orders = ["1st", "2nd"] if animate else []
+        animate_orders = []
+        if animate:
+            if show_linear:
+                animate_orders.append("1st")
+            if show_parabola:
+                animate_orders.append("2nd")
 
     # -------------------- RIGHT: formulas + plot --------------------
     with right:
@@ -188,7 +194,7 @@ with tab2:
             order_to_animate=None
         )
 
-    if animate:
+    if animate and animate_orders:
         st.markdown("---")
         st.markdown("### 🎬 Taylor Approximation Animation")
         show_univariate_taylor(
