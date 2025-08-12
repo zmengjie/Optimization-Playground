@@ -250,7 +250,15 @@ def show_univariate_taylor(
                 gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
 
             # Bigger display height
-            components.html(f'<img src="data:image/gif;base64,{gif_base64}" width="100%">', height=600)
+            components.html(
+                f'''
+                <div style="display: flex; justify-content: center;">
+                    <img src="data:image/gif;base64,{gif_base64}" style="max-width: 100%; height: auto;">
+                </div>
+                ''',
+                height=900  # give Streamlit room to show full image height
+            )
+
 
 
     except Exception as e:
