@@ -3,20 +3,24 @@ import streamlit as st
 def show_resources():
     st.title("📚 Educational Resources")
 
-    # You can expand this list
-    external_pdfs = {
-        "Convex Optimization (Boyd & Vandenberghe)": "https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf",
+    # Unified resource dictionary
+    resources = {
+        "📘 Convex Optimization (Boyd & Vandenberghe) [PDF]":
+            "https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf",
+        "🎥 Convex Optimization Lecture 1 [YouTube]":
+            "https://www.youtube.com/watch?v=McLq1hEq3UY",
+        "▶️ Full Lecture Playlist":
+            "https://www.youtube.com/watch?v=McLq1hEq3UY&list=PL3940DD956CDF0622"
     }
 
-    selected_title = st.selectbox("Select a resource:", list(external_pdfs.keys()))
-    url = external_pdfs[selected_title]
+    selected_title = st.selectbox("Select a resource:", list(resources.keys()))
+    url = resources[selected_title]
 
-    # Link to open in new tab
+    # Display the link
     st.markdown(f"[🌐 Open in new tab]({url})", unsafe_allow_html=True)
 
-    # Optional inline iframe preview (for some browsers)
-    st.markdown(f"""
-    <iframe src="{url}" width="100%" height="800px" style="border:none;"></iframe>
-    """, unsafe_allow_html=True)
+    # Optionally embed YouTube if selected
+    if "youtube.com" in url:
+        st.video(url)
 
 show_resources()
