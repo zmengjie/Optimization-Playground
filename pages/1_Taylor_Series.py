@@ -181,12 +181,12 @@ with tab2:
             )
 
         # Plot / animation
-        show_univariate_taylor(
-            f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
-            show_linear=show_linear, show_2nd=show_parabola,
-            show_3rd_4th=show_3rd_4th, animate=animate,
-            order_to_animate=animate_orders
-        )
+    show_univariate_taylor(
+        f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
+        show_linear=show_linear, show_2nd=show_parabola,
+        show_3rd_4th=show_3rd_4th, animate=animate,
+        order_to_animate=animate_orders
+    )
 
 
 # Section 3: Interactive Visualization
