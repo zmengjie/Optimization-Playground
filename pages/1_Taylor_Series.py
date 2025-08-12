@@ -188,6 +188,12 @@ with tab2:
             order_to_animate=None
         )
 
+    show_univariate_taylor(
+        f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
+        show_linear=False, show_2nd=False,
+        show_3rd_4th=False, animate=animate,
+        order_to_animate=animate_orders
+    )
 
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
