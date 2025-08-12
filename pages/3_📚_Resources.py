@@ -2,7 +2,7 @@ import streamlit as st
 import os
 import base64
 
-PDF_DIR = "files/convex_optimization.pdf"
+PDF_DIR = "files"
 
 def list_pdfs():
     return [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")]
