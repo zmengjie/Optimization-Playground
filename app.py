@@ -43,32 +43,3 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-import base64
-
-PDF_PATH = "/Users/zhangmengjie/Documents/Capstone Project/Text book/convex optimisation.pdf"  # Replace with your file path
-
-# Display PDF inline
-def display_pdf(file_path):
-    with open(file_path, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-        pdf_display = f'''
-            <iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="700px" type="application/pdf"></iframe>
-        '''
-        st.markdown(pdf_display, unsafe_allow_html=True)
-
-# Layout
-st.subheader("📘 Document Viewer and Download")
-
-col1, col2 = st.columns([4, 1])
-
-with col1:
-    display_pdf(PDF_PATH)
-
-with col2:
-    with open(PDF_PATH, "rb") as file:
-        st.download_button(
-            label="📥 Download PDF",
-            data=file,
-            file_name="your_file.pdf",
-            mime="application/pdf"
-        )
