@@ -204,12 +204,11 @@ def show_univariate_taylor(
         st.pyplot(fig, use_container_width=True)
 
         # Animation
-# Animation block
         if animate and order_to_animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
 
-            # Create bigger figure
-            fig_anim, ax_anim = plt.subplots(figsize=(12, 6), dpi=150)
+            # Create high-resolution figure
+            fig_anim, ax_anim = plt.subplots(figsize=(12, 6), dpi=200)  # <- bigger and higher DPI
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
             line_1st, = ax_anim.plot([], [], '--', label="1st-order", color='red')
@@ -239,28 +238,25 @@ def show_univariate_taylor(
 
             ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=False)
 
-            # Save GIF with proper dpi
+            # Save high-DPI GIF
             gif_path = tempfile.NamedTemporaryFile(suffix=".gif", delete=False).name
             ani.save(gif_path, writer=PillowWriter(fps=20))
 
-            # Read and encode to base64
             with open(gif_path, "rb") as f:
                 gif_bytes = f.read()
             gif_base64 = base64.b64encode(gif_bytes).decode("utf-8")
 
-            # Show full-width in HTML
+            # 💡 Force full-width, responsive display
             st.components.v1.html(
                 f"""
-                <div style='display: flex; justify-content: center;'>
-                    <img src="data:image/gif;base64,{gif_base64}" 
-                        style="width: 90%; max-width: 1200px; height: auto; border: 1px solid #ddd; border-radius: 8px;" />
+                <div style="text-align: center;">
+                    <img src="data:image/gif;base64,{gif_base64}"
+                         style="max-width: 100%; width: 100%; height: auto;
+                         border-radius: 8px; border: 1px solid #ddd;" />
                 </div>
                 """,
-                height=600
+                height=620,
             )
-
-
-
 
 
 
