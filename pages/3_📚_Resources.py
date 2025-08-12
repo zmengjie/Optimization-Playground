@@ -11,11 +11,10 @@ def list_pdfs():
 def render_pdf_viewer(file_path):
     with open(file_path, "rb") as f:
         base64_pdf = base64.b64encode(f.read()).decode("utf-8")
-
     pdf_display = f"""
-        <embed src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800px" type="application/pdf">
+        <embed src="data:application/pdf;base64,{base64_pdf}" 
+               width="100%" height="800px" type="application/pdf">
     """
-
     components.html(pdf_display, height=800)
 
 def show_resources():
@@ -29,9 +28,11 @@ def show_resources():
     selected_pdf = st.selectbox("Select a resource:", pdf_files)
     file_path = os.path.join(PDF_DIR, selected_pdf)
 
-    # Provide a download and open-in-tab link
-    st.markdown(f"[📄 Open {selected_pdf} in new tab](./{file_path})")
+    # Preview inside app
+    st.subheader(f"Preview: {selected_pdf}")
+    render_pdf_viewer(file_path)
 
+    # Download button
     with open(file_path, "rb") as f:
         st.download_button(
             label="📥 Download this file",
@@ -40,6 +41,5 @@ def show_resources():
             mime="application/pdf"
         )
 
-
-if __name__ == "__main__":
-    show_resources()
+# Call the function (Streamlit entry point)
+show_resources()
