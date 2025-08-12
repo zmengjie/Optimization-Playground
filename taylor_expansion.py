@@ -248,10 +248,18 @@ def show_univariate_taylor(
             with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
                 ani.save(tmpfile.name, writer=writer, dpi=150)
                 tmpfile.seek(0)
-                gif_bytes = tmpfile.read()
+                gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
 
-            # Correct way: just pass raw bytes, no `format=` needed
-            st.image(gif_bytes, use_column_width=True)
+            # Use HTML to embed animated gif responsively
+            components.html(
+                f"""
+                <div style="display: flex; justify-content: center;">
+                    <img src="data:image/gif;base64,{gif_base64}" style="max-width: 100%; height: auto;">
+                </div>
+                """,
+                height=800
+            )
+
 
 
 
