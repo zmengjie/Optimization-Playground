@@ -246,12 +246,13 @@ def show_univariate_taylor(
             writer = PillowWriter(fps=20)
             
             with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                ani.save(tmpfile.name, writer=writer, dpi=150)  # high DPI for clarity
+                ani.save(tmpfile.name, writer=writer, dpi=150)
                 tmpfile.seek(0)
                 gif_bytes = tmpfile.read()
 
-            # Use Streamlit-native display — scales cleanly, keeps aspect ratio
-            st.image(gif_bytes, format="gif", use_column_width=True)
+            # Correct way: just pass raw bytes, no `format=` needed
+            st.image(gif_bytes, use_column_width=True)
+
 
 
 
