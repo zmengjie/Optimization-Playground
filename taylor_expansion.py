@@ -150,8 +150,7 @@ def show_univariate_taylor(
     show_2nd=True,
     show_3rd_4th=False,
     animate=False,
-    order_to_animate=None,
-    **kwargs, 
+    order_to_animate=None
 ):
     import math
     import matplotlib.pyplot as plt
@@ -247,28 +246,15 @@ def show_univariate_taylor(
                 gif_bytes = f.read()
             gif_base64 = base64.b64encode(gif_bytes).decode("utf-8")
 
-            # 💡 Force full-width, responsive display
-            if "target_container" in kwargs:
-                target = kwargs["target_container"]
-            else:
-                target = st
+            # === Display GIF in HTML with adjustable size ===
+            gif_html = f"""
+            <div style='text-align: center;'>
+                <img src="data:image/gif;base64,{gif_base64}" width="700"/>
+            </div>
+            """
+            st.markdown(gif_html, unsafe_allow_html=True)
 
-            # Display inside the correct layout container
-            with target:
-                # Option 1 (recommended): layout-aware image display
-                st.image(gif_bytes, use_column_width=True)
 
-                # Option 2 (fallback): HTML embedding
-                # st.components.v1.html(
-                #     f"""
-                #     <div style="text-align: center;">
-                #         <img src="data:image/gif;base64,{gif_base64}"
-                #              style="max-width: 100%; width: 100%; height: auto;
-                #              border-radius: 8px; border: 1px solid #ddd;" />
-                #     </div>
-                #     """,
-                #     height=620,
-                # )
 
 
 
