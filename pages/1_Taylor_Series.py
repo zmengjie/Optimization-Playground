@@ -186,7 +186,8 @@ with tab2:
             f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
             show_linear=show_linear, show_2nd=show_parabola,
             show_3rd_4th=show_3rd_4th, animate=True,
-            order_to_animate=animate_orders
+            order_to_animate=animate_orders,
+            target_container=st.container()
         )
 
 
