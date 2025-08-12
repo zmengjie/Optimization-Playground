@@ -8,7 +8,7 @@ def show_resources():
         "📘 Convex Optimization (Boyd & Vandenberghe) [PDF]":
             "https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf",
 
-        "▶️ Convex Optimization Lecture Playlist[YouTube]":
+        "🎥 Convex Optimization Lecture Playlist [YouTube]":
             "https://www.youtube.com/watch?v=McLq1hEq3UY&list=PL3940DD956CDF0622"
     }
 
