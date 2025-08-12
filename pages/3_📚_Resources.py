@@ -22,15 +22,15 @@ def show_resources():
     st.title("📚 Educational Resources")
 
     pdf_files = list_pdfs()
-
     if not pdf_files:
-        st.warning("No PDFs available in the resources folder.")
+        st.warning("No PDFs found in the folder.")
         return
 
     selected_pdf = st.selectbox("Select a resource:", pdf_files)
     file_path = os.path.join(PDF_DIR, selected_pdf)
 
-    render_pdf_viewer(file_path)
+    # Provide a download and open-in-tab link
+    st.markdown(f"[📄 Open {selected_pdf} in new tab](./{file_path})")
 
     with open(file_path, "rb") as f:
         st.download_button(
