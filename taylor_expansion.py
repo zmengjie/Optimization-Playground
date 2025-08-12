@@ -254,10 +254,11 @@ def show_univariate_taylor(
             st.components.v1.html(
                 f'''
                 <div style="display: flex; justify-content: center;">
-                    <img src="data:image/gif;base64,{gif_base64}" 
-                        style="width: 100%; height: auto; display: block; margin: 0 auto;">
+                    <img src="data:image/gif;base64,{gif_base64}"
+                        style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;">
                 </div>
-                '''
+                ''',
+                height=650,
             )
 
 
