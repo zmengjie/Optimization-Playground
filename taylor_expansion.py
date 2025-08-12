@@ -274,7 +274,7 @@ def show_multivariable_taylor():
     import plotly.graph_objects as go
 
     st.sidebar.markdown("## 🌐 Multivariable Taylor Settings")
-    multi_func = st.sidebar.selectbox("Choose function:", ["Quadratic Bowl", "Rosenbrock", "sin(x)cos(y)", "exp(-x² - y²)"])
+    multi_func = st.sidebar.selectbox("Choose function:", ["Quadratic Bowl", "Rosenbrock", "sin(x)cos(y)", "exp(-x² - y²)","Custom"])
 
     x, y = sp.symbols('x y')
     a, b = sp.symbols('a b')
@@ -287,6 +287,13 @@ def show_multivariable_taylor():
         fxy = sp.sin(x) * sp.cos(y)
     elif multi_func == "exp(-x² - y²)":
         fxy = sp.exp(-(x**2 + y**2))
+    elif multi_func == "Custom":
+        user_input = st.sidebar.text_input("Enter a custom function f(x, y):", "x**2 + y**2 + sin(x*y)")
+        try:
+            fxy = sp.sympify(user_input)
+        except Exception as e:
+            st.error(f"Invalid function: {e}")
+            st.stop()
 
     # UI-controlled values
     a_input = st.sidebar.slider("Center a (x)", -5.0, 5.0, 0.0)
@@ -391,25 +398,6 @@ def show_multivariable_taylor():
         st.plotly_chart(fig_true, use_container_width=True)
     with col2:
         st.plotly_chart(fig_taylor, use_container_width=True)
-
-
-    # st.markdown("---")  # separator
-
-    # with st.expander("ℹ️ Note on 2nd-order Taylor Expansion", expanded=True):
-    #     st.write("**Note:** The 2nd-order Taylor expansion approximates the function locally around:")
-    #     st.latex(r"(a, b)")
-    
-    #     st.write("It uses gradient and Hessian values at that point.")
-    
-    #     st.write("For smooth functions like:")
-    #     st.latex(r"\sin(x)\cos(y)")
-    #     st.write("the approximation is accurate near (a, b), but may diverge further away.")
-    
-    #     st.write("For quadratic functions like:")
-    #     st.latex(r"x^2 + y^2")
-    #     st.write("the 2nd-order Taylor expansion exactly matches the function, "
-    #              "because the function itself is already a polynomial of degree 2.")
-    
 
 
     # --- Animation ---
