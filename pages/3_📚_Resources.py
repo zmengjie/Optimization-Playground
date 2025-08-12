@@ -1,45 +1,24 @@
 import streamlit as st
-import os
-import base64
-import streamlit.components.v1 as components
-
-PDF_DIR = "files"
-
-def list_pdfs():
-    return [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")]
-
-def render_pdf_viewer(file_path):
-    with open(file_path, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode("utf-8")
-    pdf_display = f"""
-        <embed src="data:application/pdf;base64,{base64_pdf}" 
-               width="100%" height="800px" type="application/pdf">
-    """
-    components.html(pdf_display, height=800)
 
 def show_resources():
     st.title("📚 Educational Resources")
 
-    pdf_files = list_pdfs()
-    if not pdf_files:
-        st.warning("No PDFs found in the folder.")
-        return
+    # You can expand this list
+    external_pdfs = {
+        "Convex Optimization (Boyd & Vandenberghe)": "https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf",
+        "ISLR Book (Gareth James)": "https://www.statlearning.com/s/ISLRv2_website.pdf",
+        "Deep Learning (Ian Goodfellow)": "https://www.deeplearningbook.org/contents/dlbook.pdf"
+    }
 
-    selected_pdf = st.selectbox("Select a resource:", pdf_files)
-    file_path = os.path.join(PDF_DIR, selected_pdf)
+    selected_title = st.selectbox("Select a resource:", list(external_pdfs.keys()))
+    url = external_pdfs[selected_title]
 
-    # Preview inside app
-    st.subheader(f"Preview: {selected_pdf}")
-    render_pdf_viewer(file_path)
+    # Link to open in new tab
+    st.markdown(f"[🌐 Open in new tab]({url})", unsafe_allow_html=True)
 
-    # Download button
-    with open(file_path, "rb") as f:
-        st.download_button(
-            label="📥 Download this file",
-            data=f,
-            file_name=selected_pdf,
-            mime="application/pdf"
-        )
+    # Optional inline iframe preview (for some browsers)
+    st.markdown(f"""
+    <iframe src="{url}" width="100%" height="800px" style="border:none;"></iframe>
+    """, unsafe_allow_html=True)
 
-# Call the function (Streamlit entry point)
 show_resources()
