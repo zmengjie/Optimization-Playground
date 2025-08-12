@@ -7,9 +7,8 @@ def show_resources():
     resources = {
         "📘 Convex Optimization (Boyd & Vandenberghe) [PDF]":
             "https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf",
-        "🎥 Convex Optimization Lecture 1 [YouTube]":
-            "https://www.youtube.com/watch?v=McLq1hEq3UY",
-        "▶️ Full Lecture Playlist":
+
+        "▶️ Convex Optimization Lecture Playlist[YouTube]":
             "https://www.youtube.com/watch?v=McLq1hEq3UY&list=PL3940DD956CDF0622"
     }
 
