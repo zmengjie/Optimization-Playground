@@ -204,10 +204,12 @@ def show_univariate_taylor(
         st.pyplot(fig, use_container_width=True)
 
         # Animation
+# Animation block
         if animate and order_to_animate:
             st.markdown("### 🎬 Animation: Taylor Approximation")
-            # Bigger canvas + higher resolution
-            fig_anim, ax_anim = plt.subplots(figsize=(20, 8), dpi=150)
+
+            # Create bigger figure
+            fig_anim, ax_anim = plt.subplots(figsize=(12, 6), dpi=150)
 
             line_true, = ax_anim.plot(x, f_np(x), label="f(x)", color='blue')
             line_1st, = ax_anim.plot([], [], '--', label="1st-order", color='red')
@@ -227,38 +229,34 @@ def show_univariate_taylor(
             def update(frame):
                 a_val = a_vals[frame]
                 f_a_val = f_np(a_val)
-
-                # Compute 1st-order term
                 first_order = f_a_val + derivs_np[0](a_val) * (x - a_val)
-                # Compute 2nd-order term
                 second_order = first_order + (derivs_np[1](a_val) * (x - a_val)**2) / math.factorial(2)
-
-                # Update both lines
                 line_1st.set_data(x, first_order)
                 line_2nd.set_data(x, second_order)
                 point.set_data([a_val], [f_np(a_val)])
                 ax_anim.set_title(f"Taylor Approximation at a = {a_val:.2f}")
                 return line_1st, line_2nd, point
 
-            ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=True)
+            ani = FuncAnimation(fig_anim, update, frames=len(a_vals), interval=100, blit=False)
 
-            buf = BytesIO()
-            writer = PillowWriter(fps=20)
-            
-            with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                ani.save(tmpfile.name, writer=writer, dpi=150)  # ✅ higher dpi
-                tmpfile.seek(0)
-                gif_base64 = base64.b64encode(tmpfile.read()).decode("utf-8")
+            # Save GIF with proper dpi
+            gif_path = tempfile.NamedTemporaryFile(suffix=".gif", delete=False).name
+            ani.save(gif_path, writer=PillowWriter(fps=20))
 
-            # Display GIF full-width in Streamlit
+            # Read and encode to base64
+            with open(gif_path, "rb") as f:
+                gif_bytes = f.read()
+            gif_base64 = base64.b64encode(gif_bytes).decode("utf-8")
+
+            # Show full-width in HTML
             st.components.v1.html(
-                f'''
-                <div style="display: flex; justify-content: center;">
-                    <img src="data:image/gif;base64,{gif_base64}"
-                        style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;">
+                f"""
+                <div style='display: flex; justify-content: center;'>
+                    <img src="data:image/gif;base64,{gif_base64}" 
+                        style="width: 90%; max-width: 1200px; height: auto; border: 1px solid #ddd; border-radius: 8px;" />
                 </div>
-                ''',
-                height=650,
+                """,
+                height=600
             )
 
 
