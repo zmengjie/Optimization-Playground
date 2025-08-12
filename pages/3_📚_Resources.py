@@ -6,8 +6,6 @@ def show_resources():
     # You can expand this list
     external_pdfs = {
         "Convex Optimization (Boyd & Vandenberghe)": "https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf",
-        "ISLR Book (Gareth James)": "https://www.statlearning.com/s/ISLRv2_website.pdf",
-        "Deep Learning (Ian Goodfellow)": "https://www.deeplearningbook.org/contents/dlbook.pdf"
     }
 
     selected_title = st.selectbox("Select a resource:", list(external_pdfs.keys()))
