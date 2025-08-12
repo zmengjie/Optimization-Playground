@@ -39,3 +39,6 @@ def show_resources():
             file_name=selected_pdf,
             mime="application/pdf"
         )
+
+if __name__ == "__main__":
+    show_resources()
