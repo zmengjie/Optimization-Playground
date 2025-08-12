@@ -185,11 +185,19 @@ with tab2:
         show_univariate_taylor(
             f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
             show_linear=show_linear, show_2nd=show_parabola,
-            show_3rd_4th=show_3rd_4th, animate=True,
-            order_to_animate=animate_orders,
-            target_container=st.container()
+            show_3rd_4th=show_3rd_4th,
+            animate=False  # plot only
         )
 
+        if animate:
+            st.markdown("### 🎞️ Animated Taylor Series")
+            show_univariate_taylor(
+                f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
+                show_linear=False, show_2nd=False, show_3rd_4th=False,
+                animate=True,
+                order_to_animate=animate_orders,
+                target_container=st.container()  # 👈 ensure it's full-width *inside* col_right
+            )
 
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
