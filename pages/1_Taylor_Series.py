@@ -188,13 +188,15 @@ with tab2:
             order_to_animate=None
         )
 
-if animate:
-    show_univariate_taylor(
-        f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
-        show_linear=False, show_2nd=False,
-        show_3rd_4th=False, animate=True,
-        order_to_animate=animate_orders
-    )
+    if animate:
+        st.markdown("---")
+        st.markdown("### 🎬 Taylor Approximation Animation")
+        show_univariate_taylor(
+            f_expr=f_expr, xmin=xmin, xmax=xmax, a=a,
+            show_linear=False, show_2nd=False,
+            show_3rd_4th=False, animate=True,
+            order_to_animate=animate_orders
+        )
 
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
