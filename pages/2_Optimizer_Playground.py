@@ -1700,11 +1700,17 @@ with tab2:
 
     # st.markdown(f"### 📘 Function Description:\n> {description}")
 
-    # Setup for symbolic Lagrangian and KKT (if needed)
-    L_expr = f_expr + sum(sp.Symbol(f"lambda{i+1}") * g for i, g in enumerate(constraints))
-    # grad_L = [sp.diff(L_expr, v) for v in (x, y)]
-    grad_L = [sp.diff(L_expr, v) for v in (x_sym, y_sym)]
-    kkt_conditions = grad_L + constraints
+    # Setup for symbolic Lagrangian and KKT (only for bivariate)
+    if mode_dim == "Univariate (f(x))":
+        constraints = []
+        L_expr = None
+        grad_L = []
+        kkt_conditions = []
+    else:
+        L_expr = f_expr + sum(sp.Symbol(f"lambda{i+1}") * g for i, g in enumerate(constraints))
+        grad_L = [sp.diff(L_expr, v) for v in (x_sym, y_sym)]
+        kkt_conditions = grad_L + constraints
+
 
 
     def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
