@@ -1485,7 +1485,6 @@ with tab2:
     description = ""
 
 
-
     predefined_funcs = {
         "Quadratic Bowl": (x**2 + y**2, [], "Convex bowl with global minimum at origin."),
         "Saddle": (x**2 - y**2, [], "Saddle point at origin, non-convex."),
@@ -1502,7 +1501,6 @@ with tab2:
         "Beale": ((1.5 - x + x*y)**2 + (2.25 - x + x*y**2)**2 + (2.625 - x + x*y**3)**2, [], "Non-convex with several valleys.")
 
     }
-
 
     st.title("🧪 Optimizer Playground")
     col_left, col_right = st.columns([1, 1])
@@ -1651,30 +1649,34 @@ with tab2:
 
 
     if mode_dim == "Univariate (f(x))":
-        expr_str = st.text_input("Enter univariate function f(x):", "x**2")
-        try:
-            f_expr = sp.sympify(expr_str)
-            f_func = sp.lambdify(x_sym, f_expr, modules="numpy")
-            grad_f = lambda x: (f_func(x + 1e-5) - f_func(x - 1e-5)) / 2e-5
-            description = "Custom univariate function"
-            constraints = []
-        except:
-            st.error("Invalid expression.")
-            st.stop()
+        x_sym = sp.Symbol("x")
+        f_func = sp.lambdify(x_sym, f_expr, modules="numpy")
+        grad_expr = sp.diff(f_expr, x_sym)
+        grad_f = sp.lambdify(x_sym, grad_expr, modules="numpy")
+
+        x_vals = np.linspace(-5, 5, 100)
+        y_vals = np.linspace(-5, 5, 100)
+        X, Y = np.meshgrid(x_vals, y_vals)
+
+        # Create a fake surface by broadcasting f(x) over y
+        Z = np.array([[f_func(x) for x in x_vals] for _ in y_vals])
 
     elif mode_dim == "Bivariate (f(x,y))":
-        if mode == "Predefined":
-            f_expr, constraints, description = predefined_funcs[func_name]
-            if func_name == "Multi-Objective" and w_val is not None:
-                f_expr = f_expr.subs(w, w_val)
-        else:
-            try:
-                f_expr = sp.sympify(expr_str)
-                constraints = []
-                description = "Custom function."
-            except:
-                st.error("Invalid expression.")
-                st.stop()
+        x_sym, y_sym = sp.symbols("x y")
+        f_func = sp.lambdify((x_sym, y_sym), f_expr, modules="numpy")
+
+        grad_x = sp.diff(f_expr, x_sym)
+        grad_y = sp.diff(f_expr, y_sym)
+
+        grad_f = lambda x, y: np.array([
+            float(grad_x.subs({x_sym: x, y_sym: y})),
+            float(grad_y.subs({x_sym: x, y_sym: y}))
+        ])
+
+        x_vals = np.linspace(-5, 5, 100)
+        y_vals = np.linspace(-5, 5, 100)
+        X, Y = np.meshgrid(x_vals, y_vals)
+        Z = f_func(X, Y)
 
 
     def hessian_f(x0, y0):
