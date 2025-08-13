@@ -1357,26 +1357,6 @@ def backtracking_line_search_sym(f_sym, grad_f_sym, x0, y0, alpha0=1.0, beta=0.5
 st.title("🚀 Optimizer Visual Playground")
 
 
-x, y, w = sp.symbols("x y w")
-x_sym, y_sym, w_sym = sp.symbols("x y w")
-
-predefined_funcs = {
-    "Quadratic Bowl": (x**2 + y**2, [], "Convex bowl with global minimum at origin."),
-    "Saddle": (x**2 - y**2, [], "Saddle point at origin, non-convex."),
-    "Rosenbrock": ((1 - x)**2 + 100 * (y - x**2)**2, [], "Banana-shaped curved valley; classic non-convex test function."),
-    "Constrained Circle": (x * y, [x + y - 1], "Constrained optimization with linear constraint x + y = 1."),
-    "Double Constraint": (x**2 + y**2, [x + y - 1, x**2 + y**2 - 4], "Intersection of circle and line constraints."),
-    "Multi-Objective": (w * ((x - 1)**2 + (y - 2)**2) + (1 - w) * ((x + 2)**2 + (y + 1)**2), [], "Weighted sum of two quadratic objectives."),
-    "Ackley": (-20*sp.exp(-0.2*sp.sqrt(0.5*(x**2 + y**2))) - sp.exp(0.5*(sp.cos(2*sp.pi*x) + sp.cos(2*sp.pi*y))) + sp.E + 20, [], "Highly multimodal, non-convex function."),
-    "Rastrigin": (20 + x**2 - 10*sp.cos(2*sp.pi*x) + y**2 - 10*sp.cos(2*sp.pi*y), [], "Non-convex with many local minima (periodic)."),
-    "Styblinski-Tang": (0.5*((x**4 - 16*x**2 + 5*x) + (y**4 - 16*y**2 + 5*y)), [], "Non-convex with many local minima."),
-    "Sphere": (x**2 + y**2, [], "Simple convex function; global minimum at origin."),
-    "Himmelblau": ((x**2 + y - 11)**2 + (x + y**2 - 7)**2, [], "Non-convex with four global minima."),
-    "Booth": ((x + 2*y - 7)**2 + (2*x + y - 5)**2, [], "Simple convex quadratic function."),
-    "Beale": ((1.5 - x + x*y)**2 + (2.25 - x + x*y**2)**2 + (2.625 - x + x*y**3)**2, [], "Non-convex with several valleys.")
-
-}
-
 
 tab1, tab2, tab3 = st.tabs(["📘 Guide", "🧪 Optimizer Playground", "📐 Symbolic Analysis"])
 
@@ -1492,6 +1472,28 @@ with tab1:
 
 
 with tab2:
+
+    x, y, w = sp.symbols("x y w")
+    x_sym, y_sym, w_sym = sp.symbols("x y w")
+
+    predefined_funcs = {
+        "Quadratic Bowl": (x**2 + y**2, [], "Convex bowl with global minimum at origin."),
+        "Saddle": (x**2 - y**2, [], "Saddle point at origin, non-convex."),
+        "Rosenbrock": ((1 - x)**2 + 100 * (y - x**2)**2, [], "Banana-shaped curved valley; classic non-convex test function."),
+        "Constrained Circle": (x * y, [x + y - 1], "Constrained optimization with linear constraint x + y = 1."),
+        "Double Constraint": (x**2 + y**2, [x + y - 1, x**2 + y**2 - 4], "Intersection of circle and line constraints."),
+        "Multi-Objective": (w * ((x - 1)**2 + (y - 2)**2) + (1 - w) * ((x + 2)**2 + (y + 1)**2), [], "Weighted sum of two quadratic objectives."),
+        "Ackley": (-20*sp.exp(-0.2*sp.sqrt(0.5*(x**2 + y**2))) - sp.exp(0.5*(sp.cos(2*sp.pi*x) + sp.cos(2*sp.pi*y))) + sp.E + 20, [], "Highly multimodal, non-convex function."),
+        "Rastrigin": (20 + x**2 - 10*sp.cos(2*sp.pi*x) + y**2 - 10*sp.cos(2*sp.pi*y), [], "Non-convex with many local minima (periodic)."),
+        "Styblinski-Tang": (0.5*((x**4 - 16*x**2 + 5*x) + (y**4 - 16*y**2 + 5*y)), [], "Non-convex with many local minima."),
+        "Sphere": (x**2 + y**2, [], "Simple convex function; global minimum at origin."),
+        "Himmelblau": ((x**2 + y - 11)**2 + (x + y**2 - 7)**2, [], "Non-convex with four global minima."),
+        "Booth": ((x + 2*y - 7)**2 + (2*x + y - 5)**2, [], "Simple convex quadratic function."),
+        "Beale": ((1.5 - x + x*y)**2 + (2.25 - x + x*y**2)**2 + (2.625 - x + x*y**3)**2, [], "Non-convex with several valleys.")
+
+    }
+
+
     st.title("🧪 Optimizer Playground")
     col_left, col_right = st.columns([1, 1])
 
@@ -1774,10 +1776,6 @@ with tab2:
     lr = st.session_state.get("lr", 0.01)
     steps = st.session_state.get("steps", 50)
 
-
-    f_expr = sp.sympify(func_input)  # from user input
-    grad_expr = sp.diff(f_expr, x_sym)
-    grad_f = sp.lambdify(x_sym, grad_expr, "numpy")
 
 
     if mode_dim == "Univariate (f(x))":
