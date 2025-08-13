@@ -1627,16 +1627,20 @@ with tab2:
         # Animation toggle
         show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
 
+    # --- Function definition based on mode_dim ---
     if mode_dim == "Univariate (f(x))":
         expr_str = st.text_input("Enter univariate function f(x):", "x**2")
         try:
             f_expr = sp.sympify(expr_str)
             f_func = sp.lambdify(x_sym, f_expr, modules="numpy")
             grad_f = lambda x: (f_func(x + 1e-5) - f_func(x - 1e-5)) / 2e-5
+            description = "Custom univariate function"
+            constraints = []
         except:
             st.error("Invalid expression.")
             st.stop()
-    else:
+
+    elif mode_dim == "Bivariate (f(x,y))":
         if mode == "Predefined":
             f_expr, constraints, description = predefined_funcs[func_name]
             if func_name == "Multi-Objective" and w_val is not None:
@@ -1650,6 +1654,7 @@ with tab2:
                 st.error("Invalid expression.")
                 st.stop()
 
+        # Lambdify and gradient for bivariate case
         f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
         grad_f = lambda x0, y0: np.array([
             (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
