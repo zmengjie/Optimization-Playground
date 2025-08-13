@@ -1476,14 +1476,6 @@ with tab2:
     x, y, w = sp.symbols("x y w")
     x_sym, y_sym, w_sym = sp.symbols("x y w")
 
-    # BEFORE tabs, after mode_dim is defined and x_sym declared
-    f_expr = None
-    f_func = None
-    grad_f = None
-    hessian_f = None
-    constraints = []
-    description = ""
-
 
     predefined_funcs = {
         "Quadratic Bowl": (x**2 + y**2, [], "Convex bowl with global minimum at origin."),
@@ -1514,14 +1506,6 @@ with tab2:
         w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
 
             # --- Function definition based on mode_dim ---
-
-
-            # Lambdify and gradient for bivariate case
-        f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-        grad_f = lambda x0, y0: np.array([
-            (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
-            (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
-        ])
 
 
         optimizers = ["GradientDescent",  "Momentum", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
@@ -1648,56 +1632,106 @@ with tab2:
         show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
 
 
+    # --- Function definition based on mode_dim ---
+    # Decide f_expr + constraints + description ONCE
     if mode_dim == "Univariate (f(x))":
-        x_sym = sp.Symbol("x")
+        # Univariate input (separate prompt if you like; keeping your default here)
+        expr_uni = st.text_input("Enter univariate function f(x):", "x**2")
+        try:
+            f_expr = sp.sympify(expr_uni)
+            constraints = []
+            description = "Custom univariate function."
+        except Exception:
+            st.error("Invalid univariate expression.")
+            st.stop()
+    else:  # Bivariate (f(x,y))
+        if mode == "Predefined":
+            f_expr, constraints, description = predefined_funcs[func_name]
+            if func_name == "Multi-Objective" and w_val is not None:
+                f_expr = f_expr.subs(w, w_val)
+        else:
+            try:
+                f_expr = sp.sympify(expr_str)
+                constraints = []
+                description = "Custom bivariate function."
+            except Exception:
+                st.error("Invalid bivariate expression.")
+                st.stop()
+
+    # --- Lambdify + gradient + helpers guarded by mode ---
+    if mode_dim == "Univariate (f(x))":
+        # DO NOT overwrite x_sym elsewhere; keep one symbol set
+        # Lambdify f(x) and its exact derivative (faster & cleaner than finite diff)
         f_func = sp.lambdify(x_sym, f_expr, modules="numpy")
         grad_expr = sp.diff(f_expr, x_sym)
         grad_f = sp.lambdify(x_sym, grad_expr, modules="numpy")
 
-        x_vals = np.linspace(-5, 5, 100)
-        y_vals = np.linspace(-5, 5, 100)
-        X, Y = np.meshgrid(x_vals, y_vals)
-
-        # Create a fake surface by broadcasting f(x) over y
-        Z = np.array([[f_func(x) for x in x_vals] for _ in y_vals])
-
-    elif mode_dim == "Bivariate (f(x,y))":
-        x_sym, y_sym = sp.symbols("x y")
-        f_func = sp.lambdify((x_sym, y_sym), f_expr, modules="numpy")
-
-        grad_x = sp.diff(f_expr, x_sym)
-        grad_y = sp.diff(f_expr, y_sym)
-
-        grad_f = lambda x, y: np.array([
-            float(grad_x.subs({x_sym: x, y_sym: y})),
-            float(grad_y.subs({x_sym: x, y_sym: y}))
-        ])
-
-        x_vals = np.linspace(-5, 5, 100)
-        y_vals = np.linspace(-5, 5, 100)
-        X, Y = np.meshgrid(x_vals, y_vals)
-        Z = f_func(X, Y)
-
-
-    def hessian_f(x0, y0):
-        hess_expr = sp.hessian(f_expr, (x, y))
-        hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
-        return np.array(hess_func(x0, y0))
-
-
-    # st.markdown(f"### 📘 Function Description:\n> {description}")
-
-    # Setup for symbolic Lagrangian and KKT (only for bivariate)
-    if mode_dim == "Univariate (f(x))":
-        constraints = []
+        # Placeholders for 1D
+        hessian_f = None
         L_expr = None
         grad_L = []
         kkt_conditions = []
+        g_funcs = None
     else:
+        # Bivariate lambdify
+        f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
+
+        # Use finite-diff gradient (you can keep your symbolic version if you prefer)
+        def grad_f(x0, y0):
+            dx = (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5
+            dy = (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
+            return np.array([dx, dy], dtype=float)
+
+        def hessian_f(x0, y0):
+            hess_expr = sp.hessian(f_expr, (x_sym, y_sym))
+            hess_func = sp.lambdify((x_sym, y_sym), hess_expr, modules=["numpy"])
+            return np.array(hess_func(x0, y0))
+
+        # KKT only meaningful for bivariate constraints
         L_expr = f_expr + sum(sp.Symbol(f"lambda{i+1}") * g for i, g in enumerate(constraints))
         grad_L = [sp.diff(L_expr, v) for v in (x_sym, y_sym)]
         kkt_conditions = grad_L + constraints
+        g_funcs = [sp.lambdify((x_sym, y_sym), g, modules=["numpy"]) for g in constraints] if constraints else None
 
+    # --- Pull session params
+    start_x = st.session_state.get("start_x", -3.0)
+    start_y = st.session_state.get("start_y", 3.0)
+    lr = st.session_state.get("lr", 0.01)
+    steps = st.session_state.get("steps", 50)
+
+    # --- Run optimization with correct signatures
+    if mode_dim == "Univariate (f(x))":
+        path = optimize_univariate(
+            start_x, optimizer, lr, steps,
+            f_func,  # expects f(x)
+            grad_f,  # expects grad(x)
+            options
+        )
+        xs = path
+        ys = [float(f_func(x)) for x in xs]
+    else:
+        path, alpha_log, meta = optimize_path(
+            start_x, start_y,
+            optimizer=optimizer, lr=lr, steps=steps,
+            f_func=f_func,      # expects f(x,y)
+            grad_f=grad_f,      # expects grad(x,y)->(2,)
+            hessian_f=hessian_f,
+            options=options
+        )
+        xs, ys = zip(*path)
+        Z_path = [float(f_func(xp, yp)) for xp, yp in path]
+
+    # --- Grid & surface for plotting (mode-aware) ---
+    x_vals = np.linspace(-5, 5, 200)
+    y_vals = np.linspace(-5, 5, 200)
+    X, Y = np.meshgrid(x_vals, y_vals)
+
+    if mode_dim == "Bivariate (f(x,y))":
+        Z = f_func(X, Y)
+    else:
+        # Broadcast f(x) across Y to make a 2D surface for your existing 3D/contour plotting
+        fx_line = np.array([f_func(xi) for xi in x_vals], dtype=float)   # shape (Nx,)
+        Z = np.tile(fx_line, (len(y_vals), 1))                           # shape (Ny, Nx)
 
 
     def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
