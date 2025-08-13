@@ -1729,9 +1729,9 @@ with tab2:
     if mode_dim == "Bivariate (f(x,y))":
         Z = f_func(X, Y)
     else:
-        # Broadcast f(x) across Y to make a 2D surface for your existing 3D/contour plotting
-        fx_line = np.array([f_func(xi) for xi in x_vals], dtype=float)   # shape (Nx,)
-        Z = np.tile(fx_line, (len(y_vals), 1))                           # shape (Ny, Nx)
+        # Broadcast 1D f(x) so your plotting code still works
+        fx_line = np.array([float(f_func(xi)) for xi in x_vals])
+        Z = np.tile(fx_line, (len(y_vals), 1))                       # shape (Ny, Nx)
 
 
     def simulate_optimizer(opt_name, f_expr, lr=0.01, steps=50):
@@ -1775,19 +1775,6 @@ with tab2:
             "Gradient Norm": round(grad_norm, 4),
             "Steps": len(path) - 1
         }
-    g_funcs = [sp.lambdify((x_sym, y_sym), g, modules=["numpy"]) for g in constraints]  
-    # g_funcs = [sp.lambdify((x, y), g, modules=["numpy"]) for g in constraints]
-    f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-    # f_func = sp.lambdify((x, y), f_expr, modules=["numpy"])
-    grad_f = lambda x0, y0: np.array([
-        (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
-        (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
-    ])
-
-    def hessian_f(x0, y0):
-        hess_expr = sp.hessian(f_expr, (x, y))
-        hess_func = sp.lambdify((x, y), hess_expr, modules=["numpy"])
-        return np.array(hess_func(x0, y0))
 
     # === Pull final values from session_state
     start_x = st.session_state.get("start_x", -3.0)
@@ -1823,12 +1810,6 @@ with tab2:
         xs, ys = zip(*path)
         Z_path = [f_func(xp, yp) for xp, yp in path]
 
-
-
-    x_vals = np.linspace(-5, 5, 200)
-    y_vals = np.linspace(-5, 5, 200)
-    X, Y = np.meshgrid(x_vals, y_vals)
-    Z = f_func(X, Y)
 
     # --- Taylor Expansion Toggle ---
 
