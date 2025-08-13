@@ -1627,35 +1627,6 @@ with tab2:
         # Animation toggle
         show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
 
-        # Display auto-tuning trial log if available
-        # if auto_tune and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
-        #     with col_right:
-        #         st.markdown("### 📊 Auto-Tuning Trial Log")
-        #         if "df_log" in st.session_state:
-        #             st.dataframe(st.session_state.df_log.sort_values("score").reset_index(drop=True))
-        #             st.markdown("""
-        #             **🧠 How to Read Score:**
-        #             - `score = final_loss + penalty × steps`
-        #             - ✅ Lower score is better (fast and accurate convergence).
-        #             """)
-        #         else:
-        #             st.info("Auto-tuning not yet triggered.")
-
-
-    # if mode == "Predefined":
-    #     f_expr, constraints, description = predefined_funcs[func_name]
-    #     if func_name == "Multi-Objective" and w_val is not None:
-    #         f_expr = f_expr.subs(w, w_val)
-    # else:
-    #     try:
-    #         f_expr = sp.sympify(expr_str)
-    #         constraints = []
-    #         description = "Custom function."
-    #     except:
-    #         st.error("Invalid expression.")
-    #         st.stop()
-
-
     if mode_dim == "Univariate (f(x))":
         expr_str = st.text_input("Enter univariate function f(x):", "x**2")
         try:
@@ -1686,13 +1657,6 @@ with tab2:
         ])
 
 
-
-    f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-
-    grad_f = lambda x0, y0: np.array([
-        (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
-        (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
-    ])
 
     def hessian_f(x0, y0):
         hess_expr = sp.hessian(f_expr, (x, y))
