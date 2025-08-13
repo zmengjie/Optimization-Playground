@@ -1784,31 +1784,30 @@ with tab2:
 
 
 
+    # === Run optimization
     if mode_dim == "Univariate (f(x))":
         path = optimize_univariate(
-            start_x,
-            optimizer,
-            lr,
-            steps,
-            f_func,
-            grad_f,
+            start_x, optimizer, lr, steps,
+            f_func,      # f(x)
+            grad_f,      # grad(x)
             options
         )
         xs = path
-        ys = [f_func(x) for x in xs]
+        ys = [float(f_func(x)) for x in xs]
+        Z_path = ys  # <- make Z_path exist in 1D too (values along the path)
+
     else:
         path, alpha_log, meta = optimize_path(
             start_x, start_y,
-            optimizer=optimizer,
-            lr=lr,
-            steps=steps,
-            f_func=f_func,
-            grad_f=grad_f,
+            optimizer=optimizer, lr=lr, steps=steps,
+            f_func=f_func,      # f(x,y)
+            grad_f=grad_f,      # grad(x,y)->(2,)
             hessian_f=hessian_f,
             options=options
         )
         xs, ys = zip(*path)
-        Z_path = [f_func(xp, yp) for xp, yp in path]
+        Z_path = [float(f_func(xp, yp)) for xp, yp in path]
+
 
 
     # --- Taylor Expansion Toggle ---
