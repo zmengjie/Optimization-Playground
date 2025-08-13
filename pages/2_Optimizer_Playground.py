@@ -1775,6 +1775,11 @@ with tab2:
     steps = st.session_state.get("steps", 50)
 
 
+    f_expr = sp.sympify(func_input)  # from user input
+    grad_expr = sp.diff(f_expr, x_sym)
+    grad_f = sp.lambdify(x_sym, grad_expr, "numpy")
+
+
     if mode_dim == "Univariate (f(x))":
         path = optimize_univariate(
             start_x,
