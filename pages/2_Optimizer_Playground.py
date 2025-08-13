@@ -1476,6 +1476,16 @@ with tab2:
     x, y, w = sp.symbols("x y w")
     x_sym, y_sym, w_sym = sp.symbols("x y w")
 
+    # BEFORE tabs, after mode_dim is defined and x_sym declared
+    f_expr = None
+    f_func = None
+    grad_f = None
+    hessian_f = None
+    constraints = []
+    description = ""
+
+
+
     predefined_funcs = {
         "Quadratic Bowl": (x**2 + y**2, [], "Convex bowl with global minimum at origin."),
         "Saddle": (x**2 - y**2, [], "Saddle point at origin, non-convex."),
@@ -1506,38 +1516,14 @@ with tab2:
         w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
 
             # --- Function definition based on mode_dim ---
-        if mode_dim == "Univariate (f(x))":
-            expr_str = st.text_input("Enter univariate function f(x):", "x**2")
-            try:
-                f_expr = sp.sympify(expr_str)
-                f_func = sp.lambdify(x_sym, f_expr, modules="numpy")
-                grad_f = lambda x: (f_func(x + 1e-5) - f_func(x - 1e-5)) / 2e-5
-                description = "Custom univariate function"
-                constraints = []
-            except:
-                st.error("Invalid expression.")
-                st.stop()
 
-        elif mode_dim == "Bivariate (f(x,y))":
-            if mode == "Predefined":
-                f_expr, constraints, description = predefined_funcs[func_name]
-                if func_name == "Multi-Objective" and w_val is not None:
-                    f_expr = f_expr.subs(w, w_val)
-            else:
-                try:
-                    f_expr = sp.sympify(expr_str)
-                    constraints = []
-                    description = "Custom function."
-                except:
-                    st.error("Invalid expression.")
-                    st.stop()
 
             # Lambdify and gradient for bivariate case
-            f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
-            grad_f = lambda x0, y0: np.array([
-                (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
-                (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
-            ])
+        f_func = sp.lambdify((x_sym, y_sym), f_expr, modules=["numpy"])
+        grad_f = lambda x0, y0: np.array([
+            (f_func(x0 + 1e-5, y0) - f_func(x0 - 1e-5, y0)) / 2e-5,
+            (f_func(x0, y0 + 1e-5) - f_func(x0, y0 - 1e-5)) / 2e-5
+        ])
 
 
         optimizers = ["GradientDescent",  "Momentum", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
@@ -1664,6 +1650,31 @@ with tab2:
         show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
 
 
+    if mode_dim == "Univariate (f(x))":
+        expr_str = st.text_input("Enter univariate function f(x):", "x**2")
+        try:
+            f_expr = sp.sympify(expr_str)
+            f_func = sp.lambdify(x_sym, f_expr, modules="numpy")
+            grad_f = lambda x: (f_func(x + 1e-5) - f_func(x - 1e-5)) / 2e-5
+            description = "Custom univariate function"
+            constraints = []
+        except:
+            st.error("Invalid expression.")
+            st.stop()
+
+    elif mode_dim == "Bivariate (f(x,y))":
+        if mode == "Predefined":
+            f_expr, constraints, description = predefined_funcs[func_name]
+            if func_name == "Multi-Objective" and w_val is not None:
+                f_expr = f_expr.subs(w, w_val)
+        else:
+            try:
+                f_expr = sp.sympify(expr_str)
+                constraints = []
+                description = "Custom function."
+            except:
+                st.error("Invalid expression.")
+                st.stop()
 
 
     def hessian_f(x0, y0):
