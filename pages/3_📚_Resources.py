@@ -4,12 +4,27 @@ def show_resources():
     # st.title("📚 Educational Resources")
 
     section = st.sidebar.selectbox("Select a topic:", [
+        "",  # Default empty option for intro screen
         "🔎 Taylor Series",
         "🛠️ Optimization",
         "🌐 External References"
     ])
 
-    if section == "🔎 Taylor Series":
+    if section == "":
+        st.markdown("""
+        <div style='background-color:#fef9e7; padding:20px 25px; border-radius:12px; margin-bottom:25px;'>
+        <h3>📘 Welcome to the Learning Hub!</h3>
+        <p>This section contains key mathematical insights behind optimization algorithms.</p>
+        <ul>
+        <li>🔍 <strong>Taylor Series</strong>: Understand how derivatives power approximation.</li>
+        <li>📐 <strong>Gradient & Hessian</strong>: Dive into first- and second-order methods.</li>
+        <li>🚀 <strong>Optimizer Summary</strong>: Compare techniques and their behaviors.</li>
+        </ul>
+        <p>Choose a topic from the dropdown in the sidebar to explore more.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    elif section == "🔎 Taylor Series":
         st.header("📚 How Taylor Series Explains Optimizers")
         st.markdown("""
         Many optimization algorithms are grounded in the **Taylor series expansion**, 
@@ -157,9 +172,6 @@ def show_resources():
         st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
         st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
         st.markdown("---")
-
-
-
 
 
 
