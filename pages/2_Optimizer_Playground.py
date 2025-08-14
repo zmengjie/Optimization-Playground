@@ -1654,11 +1654,16 @@ with tab2:
 
             else:
                 # Multivariable
-                symbolic_expr = predefined_funcs[func_name][0]
-                if func_name == "Multi-Objective" and w_val is not None:
-                    symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+                if mode == "Predefined":
+                    symbolic_expr = predefined_funcs[func_name][0]
+                    if func_name == "Multi-Objective" and w_val is not None:
+                        symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+                else:
+                    symbolic_expr = st.session_state.custom_expr
 
+                
                 f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
+
                 best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y, is_univariate=False)
 
             default_lr, default_steps = best_lr, best_steps
