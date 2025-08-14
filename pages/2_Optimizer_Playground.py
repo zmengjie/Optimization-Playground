@@ -1127,23 +1127,44 @@ with tab2:
                 buf.close()
 
         elif mode_dim == "Univariate (f(x))":
-            for i in range(1, len(path) + 1):
-                ax_anim.clear()
-                x_vals_anim = path[:i]
-                y_vals_anim = [float(f_func(xi)) for xi in x_vals_anim]
-                ax_anim.plot(x_vals_anim, y_vals_anim, "ro-", label="Descent Path")
-                ax_anim.set_xlim([-5, 5])
-                ax_anim.set_ylim([min(y_vals_anim) - 1, max(y_vals_anim) + 1])
+            x_vals = np.linspace(-5, 5, 500)
+            y_vals = [f_func(xi) for xi in x_vals]
+
+            for i in range(1, len(xs) + 1):
+                fig_anim, ax_anim = plt.subplots(figsize=(6, 4))
+
+                # Plot the full f(x) function
+                ax_anim.plot(x_vals, y_vals, label="f(x)", color="blue", linewidth=2, alpha=0.7)
+
+                # Plot descent steps so far
+                ax_anim.plot(xs[:i], ys[:i], 'r*-', label="Descent Path")
+
+                # Optional: mark start and end points
+                ax_anim.plot(xs[0], ys[0], 'go', label="Start")       # green start
+                ax_anim.plot(xs[i-1], ys[i-1], 'ro', label="Current")  # red current
+
+                ax_anim.set_title("Univariate Gradient Descent Animation")
                 ax_anim.set_xlabel("x")
                 ax_anim.set_ylabel("f(x)")
-                ax_anim.set_title(f"Step {i}/{len(path)-1}")
-                ax_anim.grid(True)
+                ax_anim.legend()
+                st.pyplot(fig_anim)
+            # for i in range(1, len(path) + 1):
+            #     ax_anim.clear()
+            #     x_vals_anim = path[:i]
+            #     y_vals_anim = [float(f_func(xi)) for xi in x_vals_anim]
+            #     ax_anim.plot(x_vals_anim, y_vals_anim, "ro-", label="Descent Path")
+            #     ax_anim.set_xlim([-5, 5])
+            #     ax_anim.set_ylim([min(y_vals_anim) - 1, max(y_vals_anim) + 1])
+            #     ax_anim.set_xlabel("x")
+            #     ax_anim.set_ylabel("f(x)")
+            #     ax_anim.set_title(f"Step {i}/{len(path)-1}")
+            #     ax_anim.grid(True)
 
-                buf = BytesIO()
-                fig_anim.savefig(buf, format='png', dpi=100)
-                buf.seek(0)
-                frames.append(Image.open(buf).convert("P"))
-                buf.close()
+            #     buf = BytesIO()
+            #     fig_anim.savefig(buf, format='png', dpi=100)
+            #     buf.seek(0)
+            #     frames.append(Image.open(buf).convert("P"))
+            #     buf.close()
 
         # Final rendering
         gif_buf = BytesIO()
