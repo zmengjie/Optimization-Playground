@@ -29,13 +29,26 @@ def clustering_ui():
 
         st.caption(dataset_explanations[dataset_choice])
 
-        if dataset_choice == "Blobs" or dataset_choice == "Moons":
+        if dataset_choice in ["Blobs", "Moons"]:
             n_samples = st.slider("Number of Samples", 100, 1000, 300, 50)
 
         method = st.radio("Choose clustering method", [
             "K-Means", "DBSCAN", "Agglomerative", "Birch", "GMM", "Spectral"
         ])
 
+        algo_explanations = {
+            "K-Means": "**K-Means**: Fast, scalable method that minimizes intra-cluster distance. Best for spherical clusters.",
+            "DBSCAN": "**DBSCAN**: Density-based clustering algorithm that can find arbitrarily shaped clusters and identify noise.",
+            "Agglomerative": "**Agglomerative Clustering**: Hierarchical bottom-up clustering that merges clusters based on a linkage strategy.",
+            "Birch": "**Birch**: Efficient for large datasets. Builds a tree structure and clusters incrementally.",
+            "GMM": "**GMM (Gaussian Mixture Model)**: Soft clustering based on probabilistic assignment using Gaussian distributions.",
+            "Spectral": "**Spectral Clustering**: Converts data into a graph structure and performs dimensionality reduction before clustering."
+        }
+
+        st.markdown("### 📘 Method Explanation")
+        st.markdown(algo_explanations.get(method, "No explanation available."))
+
+        
         if method in ["K-Means", "Agglomerative", "Birch", "GMM", "Spectral"]:
             k = st.slider("Number of Clusters", 2, 10, 3)
         if method == "DBSCAN":
@@ -48,24 +61,15 @@ def clustering_ui():
             threshold = st.slider("Threshold", 0.01, 2.0, 0.5, 0.01)
 
     if dataset_choice == "Blobs":
-        n_samples = st.slider("Number of Samples", 100, 1000, 300, 50)
         X, _ = make_blobs(n_samples=n_samples, centers=4, random_state=42)
     elif dataset_choice == "Moons":
-        n_samples = st.slider("Number of Samples", 100, 1000, 300, 50)
         X, _ = make_moons(n_samples=n_samples, noise=0.1, random_state=42)
     elif dataset_choice == "Iris":
         iris = load_iris()
         X = iris.data[:, :2]
 
 
-    algo_explanations = {
-        "K-Means": "**K-Means**: Fast, scalable method that minimizes intra-cluster distance. Best for spherical clusters.",
-        "DBSCAN": "**DBSCAN**: Density-based clustering algorithm that can find arbitrarily shaped clusters and identify noise.",
-        "Agglomerative": "**Agglomerative Clustering**: Hierarchical bottom-up clustering that merges clusters based on a linkage strategy.",
-        "Birch": "**Birch**: Efficient for large datasets. Builds a tree structure and clusters incrementally.",
-        "GMM": "**GMM (Gaussian Mixture Model)**: Soft clustering based on probabilistic assignment using Gaussian distributions.",
-        "Spectral": "**Spectral Clustering**: Converts data into a graph structure and performs dimensionality reduction before clustering."
-    }
+
 
 
     st.markdown(f"### ℹ️ Selected Method: **{method}**")
@@ -75,7 +79,7 @@ def clustering_ui():
     labels, centers, covariances = None, None, None
 
     if method == "K-Means":
-        k = st.slider("Number of Clusters (K)", 2, 10, 3)
+        # k = st.slider("Number of Clusters (K)", 2, 10, 3)
         model = KMeans(n_clusters=k, random_state=0)
         labels = model.fit_predict(X)
         centers = model.cluster_centers_
