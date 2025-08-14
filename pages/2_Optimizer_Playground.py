@@ -297,7 +297,7 @@ st.title("🚀 Optimizer Visual Playground")
 tab1, tab2, tab3 = st.tabs(["📘 Guide", "🧪 Optimizer Playground", "📐 Symbolic Analysis"])
 
 with tab1:
-    st.title("📘 Optimization Guide")
+    # st.title("📘 Optimization Guide")
 
     # Section 1: Intro
     st.header("🧭 How to Use the Optimizer Playground")
