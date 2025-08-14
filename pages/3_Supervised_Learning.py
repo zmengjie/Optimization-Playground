@@ -85,6 +85,14 @@ def supervised_ui():
 
         task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
 
+        if task_type == "Linear Regression":
+            tool = st.selectbox("Tool", ["Simple", "Polynomial", "Multi-Feature", "Diagnostics"])
+        elif task_type == "Logistic Regression":
+            tool = "Basic"  # or provide options if you have any
+        else:
+            tool = "Classifier"  # or similar fallback
+
+
     st.subheader("📊 Sample Data Preview")
     st.dataframe(df.head())
 
