@@ -1147,7 +1147,7 @@ def run_auto_tuning_simulation(f_func, optimizer, x0, y0=None):
 
             for t in range(1, steps + 1):
                 if is_univariate:
-                    dx = (f_func(x_t + 1e-5) - f_func(x_t - 1e-5)) / 2e-5
+                    dx = (f_func(x_t + 1e-5) - f_func(x_t - 1e-5)) / (2e-5)
                     grad = dx
 
                     if abs(grad) < 1e-3:
@@ -1155,12 +1155,12 @@ def run_auto_tuning_simulation(f_func, optimizer, x0, y0=None):
 
                     if optimizer == "Adam":
                         m = beta1 * m + (1 - beta1) * grad
-                        v = beta2 * v + (1 - beta2) * (grad ** 2)
+                        v = beta2 * v + (1 - beta2) * grad**2
                         m_hat = m / (1 - beta1 ** t)
                         v_hat = v / (1 - beta2 ** t)
                         update = lr * m_hat / (np.sqrt(v_hat) + eps)
                     elif optimizer == "RMSProp":
-                        v = beta2 * v + (1 - beta2) * (grad ** 2)
+                        v = beta2 * v + (1 - beta2) * grad**2
                         update = lr * grad / (np.sqrt(v) + eps)
                     else:
                         update = lr * grad
@@ -1168,8 +1168,8 @@ def run_auto_tuning_simulation(f_func, optimizer, x0, y0=None):
                     x_t -= update
 
                 else:
-                    dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
-                    dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
+                    dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / (2e-5)
+                    dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / (2e-5)
                     grad = np.array([dx, dy])
 
                     if np.linalg.norm(grad) < 1e-3:
@@ -1190,11 +1190,20 @@ def run_auto_tuning_simulation(f_func, optimizer, x0, y0=None):
                     x_t -= update[0]
                     y_t -= update[1]
 
-            loss = f_func(x_t) if is_univariate else f_func(x_t, y_t)
-            score = loss + 0.01 * steps
-            logs.append({"lr": lr, "steps": steps, "loss": loss, "score": score})
+            final_loss = f_func(x_t) if is_univariate else f_func(x_t, y_t)
+            score = final_loss + 0.01 * steps
+
+            logs.append({
+                "lr": lr,
+                "steps": steps,
+                "loss": final_loss,
+                "score": score
+            })
+
             if score < best_score:
-                best_score, best_lr, best_steps = score, lr, steps
+                best_score = score
+                best_lr = lr
+                best_steps = steps
 
     st.session_state.df_log = pd.DataFrame(logs)
     return best_lr, best_steps
