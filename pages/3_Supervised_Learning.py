@@ -52,26 +52,6 @@ def encode_target_column(df, target):
 
 # === Supervised Learning Section ===
 def supervised_ui():
-def load_builtin_dataset(name):
-    loaders = {
-        "Iris": load_iris(as_frame=True),
-        "Wine": load_wine(as_frame=True),
-        "Breast Cancer": load_breast_cancer(as_frame=True)
-    }
-    data = loaders[name]
-    df = data.frame.copy()
-    df["target"] = data.target
-    return df, data.target_names
-
-# === Shared: Encode Target if Needed ===
-def encode_target_column(df, target):
-    if df[target].dtype == 'object' or df[target].dtype.name == 'category':
-        df[target] = df[target].astype('category').cat.codes
-        return df, df[target].astype('category').cat.categories.tolist()
-    return df, None
-
-# === Supervised Learning Section ===
-def supervised_ui():
     st.subheader("📈 Supervised Learning Playground")
 
     with st.sidebar:
@@ -102,6 +82,14 @@ def supervised_ui():
         }
         initial_features = default_features.get(dataset_choice, [])
         features = st.multiselect("🧹 Feature Columns", feature_candidates, default=initial_features)
+
+        if target and features:
+            X = df[features].select_dtypes(include=[np.number])
+            y = pd.to_numeric(df[target], errors="coerce")
+            X = X[~y.isna()]
+            y = y.dropna()
+            y_class = y.round().astype(int)
+
 
         task_type = st.radio("Select Task", ["Data Preview", "Linear Regression", "Logistic Regression", "Classification"])
 
@@ -1003,18 +991,7 @@ def supervised_ui():
                             ax.set_title(f"{col} Distribution", fontsize=10)
                         st.pyplot(fig)
 
-    # Additional task logic (Regression/Classification) continues here
 
-    if target and features:
-        X = df[features].select_dtypes(include=[np.number])
-        y = pd.to_numeric(df[target], errors="coerce")
-        X = X[~y.isna()]
-        y = y.dropna()
-        y_class = y.round().astype(int)
-
-        # task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
-
- 
 
 
 
