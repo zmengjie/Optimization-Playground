@@ -52,6 +52,26 @@ def encode_target_column(df, target):
 
 # === Supervised Learning Section ===
 def supervised_ui():
+def load_builtin_dataset(name):
+    loaders = {
+        "Iris": load_iris(as_frame=True),
+        "Wine": load_wine(as_frame=True),
+        "Breast Cancer": load_breast_cancer(as_frame=True)
+    }
+    data = loaders[name]
+    df = data.frame.copy()
+    df["target"] = data.target
+    return df, data.target_names
+
+# === Shared: Encode Target if Needed ===
+def encode_target_column(df, target):
+    if df[target].dtype == 'object' or df[target].dtype.name == 'category':
+        df[target] = df[target].astype('category').cat.codes
+        return df, df[target].astype('category').cat.categories.tolist()
+    return df, None
+
+# === Supervised Learning Section ===
+def supervised_ui():
     st.subheader("📈 Supervised Learning Playground")
 
     with st.sidebar:
@@ -83,64 +103,11 @@ def supervised_ui():
         initial_features = default_features.get(dataset_choice, [])
         features = st.multiselect("🧹 Feature Columns", feature_candidates, default=initial_features)
 
-        task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
+        task_type = st.radio("Select Task", ["Data Preview", "Linear Regression", "Logistic Regression", "Classification"])
 
         if task_type == "Linear Regression":
             tool = st.selectbox("Tool", ["Simple", "Polynomial", "Multi-Feature", "Diagnostics"])
-        elif task_type == "Logistic Regression":
-            tool = "Basic"  # or provide options if you have any
-        else:
-            tool = "Classifier"  # or similar fallback
 
-
-    st.subheader("📊 Sample Data Preview")
-    st.dataframe(df.head())
-
-    # === Move below to MAIN DISPLAY ===
-    st.markdown("## 🎯 Target Distribution")
-    target_dist = df[target].value_counts().reset_index()
-    target_dist.columns = [target, "count"]
-    target_dist = target_dist.astype(str)  # Ensures compatibility
-    st.dataframe(target_dist)
-
-    st.markdown("## 🔍 Feature Correlation")
-    corr = df.select_dtypes(include=[np.number]).corr()
-    fig, ax = plt.subplots(figsize=(5, 4))
-    sns.heatmap(corr, cmap="coolwarm", annot=True, fmt=".2f", ax=ax)
-    st.pyplot(fig)
-
-    st.markdown("### 📊 Feature Distributions")
-    st.caption("Boxplots by class (if categorical target) or histograms otherwise")
-
-    n_cols = min(3, len(features))
-    rows = (len(features) + n_cols - 1) // n_cols
-    for r in range(rows):
-        cols = st.columns(n_cols)
-        for i in range(n_cols):
-            idx = r * n_cols + i
-            if idx < len(features):
-                col = features[idx]
-                with cols[i]:
-                    fig, ax = plt.subplots(figsize=(3.5, 3))
-                    if df[target].nunique() < 10:
-                        sns.boxplot(x=df[target], y=df[col], ax=ax)
-                        ax.set_title(f"{col} by {target}", fontsize=10)
-                    else:
-                        sns.histplot(df[col], kde=True, ax=ax)
-                        ax.set_title(f"{col} Distribution", fontsize=10)
-                    st.pyplot(fig)
-        
-    if target and features:
-        X = df[features].select_dtypes(include=[np.number])
-        y = pd.to_numeric(df[target], errors="coerce")
-        X = X[~y.isna()]
-        y = y.dropna()
-        y_class = y.round().astype(int)
-
-        # task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
-
-        if task_type == "Linear Regression":
-            tool = st.selectbox("Tool", ["Simple", "Polynomial", "Multi-Feature", "Diagnostics"])
             if tool == "Simple":
                 if len(features) == 1:
                     feature = features[0]
@@ -220,7 +187,6 @@ def supervised_ui():
                 plt.title("Distribution of Residuals")
                 st.pyplot(fig2)
 
-
         elif task_type == "Logistic Regression":
             C_val = st.slider("Regularization Strength (C)", 0.01, 10.0, 1.0)
             max_iter_val = st.slider("Max Iterations", 100, 1000, 300)
@@ -256,7 +222,6 @@ def supervised_ui():
 
             st.write("📋 Classification Report")
             st.dataframe(pd.DataFrame(classification_report(y_class, y_pred, output_dict=True)).transpose())
-
 
 
         elif task_type == "Classification":
@@ -1000,6 +965,60 @@ def supervised_ui():
                     - Dots = actual data points.  
                     - Overlaps mean misclassification or boundary limitations.
                     """)
+
+    if task_type == "Data Preview":
+        st.subheader("📊 Sample Data Preview")
+        st.dataframe(df.head())
+
+        st.markdown("## 🎯 Target Distribution")
+        target_dist = df[target].value_counts().reset_index()
+        target_dist.columns = [target, "count"]
+        target_dist = target_dist.astype(str)
+        st.dataframe(target_dist)
+
+        st.markdown("## 🔍 Feature Correlation")
+        corr = df.select_dtypes(include=[np.number]).corr()
+        fig, ax = plt.subplots(figsize=(5, 4))
+        sns.heatmap(corr, cmap="coolwarm", annot=True, fmt=".2f", ax=ax)
+        st.pyplot(fig)
+
+        st.markdown("### 📊 Feature Distributions")
+        st.caption("Boxplots by class (if categorical target) or histograms otherwise")
+
+        n_cols = min(3, len(features))
+        rows = (len(features) + n_cols - 1) // n_cols
+        for r in range(rows):
+            cols = st.columns(n_cols)
+            for i in range(n_cols):
+                idx = r * n_cols + i
+                if idx < len(features):
+                    col = features[idx]
+                    with cols[i]:
+                        fig, ax = plt.subplots(figsize=(3.5, 3))
+                        if df[target].nunique() < 10:
+                            sns.boxplot(x=df[target], y=df[col], ax=ax)
+                            ax.set_title(f"{col} by {target}", fontsize=10)
+                        else:
+                            sns.histplot(df[col], kde=True, ax=ax)
+                            ax.set_title(f"{col} Distribution", fontsize=10)
+                        st.pyplot(fig)
+
+    # Additional task logic (Regression/Classification) continues here
+
+    if target and features:
+        X = df[features].select_dtypes(include=[np.number])
+        y = pd.to_numeric(df[target], errors="coerce")
+        X = X[~y.isna()]
+        y = y.dropna()
+        y_class = y.round().astype(int)
+
+        # task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
+
+ 
+
+
+
+
 
 
 
