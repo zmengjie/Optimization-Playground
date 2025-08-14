@@ -387,32 +387,20 @@ with tab1:
     """, unsafe_allow_html=True)
 
     # --- Symbolic Tab ---
-    st.markdown("""
-    <div style='background-color: #f0f4ff; padding: 25px 30px; border-radius: 12px;'>
+    st.markdown("### 🧮 Symbolic Analysis Tab")
 
-    <h3 style='margin-top: 0;'>🧮 Symbolic Analysis Tab</h3>
+    st.markdown("This tab helps build intuition with key mathematical expressions:")
 
-    <ul>
-    <li>This tab helps build intuition with key mathematical expressions:
-        <ul>
-        <li><strong>Objective Function</strong>: \\( f(x, y) \\)</li>
-        <li><strong>Lagrangian</strong>: \\( \\mathcal{L}(x, y, \\lambda) \\)</li>
-        <li><strong>KKT Conditions</strong> (for constrained problems)</li>
-        <li>Symbolic <strong>Gradient</strong> and <strong>Hessian</strong></li>
-        </ul>
-    </li>
+    st.markdown("- **Objective Function**: $f(x, y)$")
+    st.markdown("- **Lagrangian**: $\\mathcal{L}(x, y, \\lambda)$")
+    st.markdown("- **KKT Conditions** (for constrained problems)")
+    st.markdown("- Symbolic **Gradient** and **Hessian**")
 
-    <li>✅ If <strong>Newton’s Method</strong> is selected:
-        <ul>
-        <li>The <strong>Hessian matrix</strong> is shown</li>
-        <li>The <strong>determinant</strong> is calculated</li>
-        <li>This explains how Newton's step direction and size are determined</li>
-        </ul>
-    </li>
-    </ul>
+    st.markdown("✅ If **Newton’s Method** is selected:")
+    st.markdown("- The **Hessian matrix** is shown")
+    st.markdown("- The **determinant** is calculated")
+    st.markdown("- This explains how Newton's step direction and size are determined")
 
-    </div>
-    """, unsafe_allow_html=True)
 
     st.markdown("---")  
 
