@@ -1580,18 +1580,39 @@ with tab2:
         if auto_tune:
             # Ensure function is properly initialized
             x_sym, y_sym, w_sym = sp.symbols("x y w")
-            symbolic_expr = predefined_funcs[func_name][0]
 
-            if func_name == "Multi-Objective" and w_val is not None:
-                symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+            if mode_dim == "Univariate (f(x))":
+                # Fallback univariate function for tuning (x**2)
+                symbolic_expr = x_sym**2
+                f_lambdified = sp.lambdify(x_sym, symbolic_expr, modules="numpy")
 
-            # Lambdify the symbolic function to make it usable
-            f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
+                # Dummy wrapper to adapt univariate f to existing tuner
+                f_2d = lambda x, y: f_lambdified(x)  # ignore y
+                best_lr, best_steps = run_auto_tuning_simulation(f_2d, optimizer, default_x, 0.0)
 
-            # Call the auto-tuning simulation function
-            best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
-            # st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
+            else:
+                symbolic_expr = predefined_funcs[func_name][0]
+                if func_name == "Multi-Objective" and w_val is not None:
+                    symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+
+                f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
+                best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
+
             default_lr, default_steps = best_lr, best_steps
+
+        
+            # symbolic_expr = predefined_funcs[func_name][0]
+
+            # if func_name == "Multi-Objective" and w_val is not None:
+            #     symbolic_expr = symbolic_expr.subs(w_sym, w_val)
+
+            # # Lambdify the symbolic function to make it usable
+            # f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
+
+            # # Call the auto-tuning simulation function
+            # best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
+            # # st.success(f"✅ Auto-tuned: lr={best_lr}, steps={best_steps}, start=({default_x},{default_y})")
+            # default_lr, default_steps = best_lr, best_steps
 
         if auto_tune:
             # Run the auto-tuning simulation to find the best lr and steps
