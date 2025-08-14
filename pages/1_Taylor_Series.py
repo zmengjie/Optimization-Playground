@@ -35,45 +35,42 @@ mode = st.sidebar.radio("Select Mode", ["📘 Guide", "📈 Univariate", "🌐 M
 if mode == "📘 Guide":
     st.header("🧭 How to Use the Taylor Visualization Tool")
 
-    # st.subheader("📈 Univariate Mode")
+    # Univariate Mode
     st.markdown("""
-    <div style='background-color: #f9f9f9; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
+    <div style='background-color: #f9f9f9; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
     ### 📈 Univariate Mode
 
     - Choose from **predefined functions** (e.g., `cos(x)`) or select **custom** to enter your own.
-    - Use checkboxes to toggle:
-    - **1st-order** (Linear)  
-    - **2nd-order** (Parabola)  
-    - **3rd & 4th-order** terms  
+    - Toggle display terms:
+      - **1st-order** (Linear)  
+      - **2nd-order** (Parabola)  
+      - **3rd & 4th-order** terms  
     - Adjust the **expansion point `a`** using the slider.
     - Enable **animation** to dynamically view the approximation update.
 
     </div>
     """, unsafe_allow_html=True)
 
-
-    # st.subheader("🌐 Multivariable Mode")
+    # Multivariable Mode
     st.markdown("""
     <div style='background-color: #f0f4ff; padding: 25px 30px; border-radius: 12px;'>
 
     ### 🌐 Multivariable Mode
 
-    - Select from predefined 2D functions or enter a **custom** bivariate function.
-    - Adjust **center a (x)** and **b (y)** using sliders.
-    - Toggle animation to move:
-    - Only `a`, only `b`, or both together.
-    - Visual comparison between the **true function** and its **2nd-order approximation** is shown in 3D.
+    - Select from **predefined 2D functions** or enter a **custom** bivariate function.
+    - Adjust center points:
+      - **a (x)** and **b (y)** via sliders.
+    - Toggle animation path to move:
+      - Only `a`, only `b`, or both together.
+    - View the **true surface** vs its **2nd-order Taylor approximation** in 3D.
 
     </div>
     """, unsafe_allow_html=True)
 
-
-    st.info("ℹ️ You can switch between Univariate and Multivariable using the sidebar selector.")
-    st.info(
-        "📘 For math and theory, visit the **Resources** page. "
-        "This will help you understand how Taylor series underpins optimization methods."
-    )
+    # Sidebar and Theory notes
+    st.info("📎 Use the **sidebar** to switch between Univariate and Multivariable modes.")
+    st.info("📘 For full math/theory, explore the **Resources** page — it's great for deeper understanding.")
 
 
 
