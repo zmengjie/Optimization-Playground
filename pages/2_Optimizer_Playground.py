@@ -1123,44 +1123,120 @@ st.markdown(
 
 
 # === Auto-Tuning Simulation Function ===
-def run_auto_tuning_simulation(f_func, optimizer, x0, y0):
+def run_auto_tuning_simulation(f_func, optimizer, x0, y0=None):
     lr_grid = list(np.logspace(-4, -1, 6))
     step_grid = [20, 30, 40, 50, 60, 80]
     best_score = float("inf")
     best_lr, best_steps = lr_grid[0], step_grid[0]
     logs = []
 
+    is_univariate = y0 is None
+
     for lr in lr_grid:
         for steps in step_grid:
-            x_t, y_t = x0, y0
-            m, v = np.zeros(2), np.zeros(2)
+            if is_univariate:
+                x_t = x0
+                m = 0.0
+                v = 0.0
+            else:
+                x_t, y_t = x0, y0
+                m = np.zeros(2)
+                v = np.zeros(2)
+
             beta1, beta2, eps = 0.9, 0.999, 1e-8
+
             for t in range(1, steps + 1):
-                dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
-                dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
-                grad = np.array([dx, dy])
-                if np.linalg.norm(grad) < 1e-3:
-                    break
-                if optimizer == "Adam":
-                    m = beta1 * m + (1 - beta1) * grad
-                    v = beta2 * v + (1 - beta2) * (grad ** 2)
-                    m_hat = m / (1 - beta1 ** t)
-                    v_hat = v / (1 - beta2 ** t)
-                    update = lr * m_hat / (np.sqrt(v_hat) + eps)
-                elif optimizer == "RMSProp":
-                    v = beta2 * v + (1 - beta2) * (grad ** 2)
-                    update = lr * grad / (np.sqrt(v) + eps)
+                if is_univariate:
+                    dx = (f_func(x_t + 1e-5) - f_func(x_t - 1e-5)) / 2e-5
+                    grad = dx
+
+                    if abs(grad) < 1e-3:
+                        break
+
+                    if optimizer == "Adam":
+                        m = beta1 * m + (1 - beta1) * grad
+                        v = beta2 * v + (1 - beta2) * (grad ** 2)
+                        m_hat = m / (1 - beta1 ** t)
+                        v_hat = v / (1 - beta2 ** t)
+                        update = lr * m_hat / (np.sqrt(v_hat) + eps)
+                    elif optimizer == "RMSProp":
+                        v = beta2 * v + (1 - beta2) * (grad ** 2)
+                        update = lr * grad / (np.sqrt(v) + eps)
+                    else:
+                        update = lr * grad
+
+                    x_t -= update
+
                 else:
-                    update = lr * grad
-                x_t -= update[0]
-                y_t -= update[1]
-            loss = f_func(x_t, y_t)
+                    dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
+                    dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
+                    grad = np.array([dx, dy])
+
+                    if np.linalg.norm(grad) < 1e-3:
+                        break
+
+                    if optimizer == "Adam":
+                        m = beta1 * m + (1 - beta1) * grad
+                        v = beta2 * v + (1 - beta2) * (grad ** 2)
+                        m_hat = m / (1 - beta1 ** t)
+                        v_hat = v / (1 - beta2 ** t)
+                        update = lr * m_hat / (np.sqrt(v_hat) + eps)
+                    elif optimizer == "RMSProp":
+                        v = beta2 * v + (1 - beta2) * (grad ** 2)
+                        update = lr * grad / (np.sqrt(v) + eps)
+                    else:
+                        update = lr * grad
+
+                    x_t -= update[0]
+                    y_t -= update[1]
+
+            loss = f_func(x_t) if is_univariate else f_func(x_t, y_t)
             score = loss + 0.01 * steps
             logs.append({"lr": lr, "steps": steps, "loss": loss, "score": score})
             if score < best_score:
                 best_score, best_lr, best_steps = score, lr, steps
+
     st.session_state.df_log = pd.DataFrame(logs)
     return best_lr, best_steps
+
+# def run_auto_tuning_simulation(f_func, optimizer, x0, y0):
+#     lr_grid = list(np.logspace(-4, -1, 6))
+#     step_grid = [20, 30, 40, 50, 60, 80]
+#     best_score = float("inf")
+#     best_lr, best_steps = lr_grid[0], step_grid[0]
+#     logs = []
+
+#     for lr in lr_grid:
+#         for steps in step_grid:
+#             x_t, y_t = x0, y0
+#             m, v = np.zeros(2), np.zeros(2)
+#             beta1, beta2, eps = 0.9, 0.999, 1e-8
+#             for t in range(1, steps + 1):
+#                 dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / 2e-5
+#                 dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / 2e-5
+#                 grad = np.array([dx, dy])
+#                 if np.linalg.norm(grad) < 1e-3:
+#                     break
+#                 if optimizer == "Adam":
+#                     m = beta1 * m + (1 - beta1) * grad
+#                     v = beta2 * v + (1 - beta2) * (grad ** 2)
+#                     m_hat = m / (1 - beta1 ** t)
+#                     v_hat = v / (1 - beta2 ** t)
+#                     update = lr * m_hat / (np.sqrt(v_hat) + eps)
+#                 elif optimizer == "RMSProp":
+#                     v = beta2 * v + (1 - beta2) * (grad ** 2)
+#                     update = lr * grad / (np.sqrt(v) + eps)
+#                 else:
+#                     update = lr * grad
+#                 x_t -= update[0]
+#                 y_t -= update[1]
+#             loss = f_func(x_t, y_t)
+#             score = loss + 0.01 * steps
+#             logs.append({"lr": lr, "steps": steps, "loss": loss, "score": score})
+#             if score < best_score:
+#                 best_score, best_lr, best_steps = score, lr, steps
+#     st.session_state.df_log = pd.DataFrame(logs)
+#     return best_lr, best_steps
 
 
 def optimize_univariate(x0, optimizer, lr, steps, f_func, grad_f, options=None):
