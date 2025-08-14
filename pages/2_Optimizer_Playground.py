@@ -516,6 +516,24 @@ with tab2:
             "Styblinski-Tang": (-2.5, -2.5), "Sphere": (-3.0, 3.0), "Himmelblau": (0.0, 0.0),
             "Booth": (1.0, 1.0), "Beale": (-2.0, 2.0)
         }
+
+        valid_xy_ranges = {
+            "Quadratic Bowl": (-5.0, 5.0),
+            "Saddle": (-5.0, 5.0),
+            "Rosenbrock": (-3.0, 3.0),
+            "Constrained Circle": (-2.0, 2.0),
+            "Double Constraint": (-3.0, 3.0),
+            "Multi-Objective": (-3.0, 3.0),
+            "Ackley": (-5.0, 5.0),
+            "Rastrigin": (-5.12, 5.12),
+            "Styblinski-Tang": (-5.0, 5.0),
+            "Sphere": (-5.0, 5.0),
+            "Himmelblau": (-6.0, 6.0),
+            "Booth": (-10.0, 10.0),
+            "Beale": (-4.5, 4.5)
+        }
+
+        # Default values for starting positions and learning rate    
         default_x, default_y = start_xy_defaults.get(func_name, (-3.0, 3.0))
         default_lr = 0.005
         default_steps = 50
@@ -615,10 +633,12 @@ with tab2:
             st.session_state["start_y"] = 3.0
 
         # Sliders for the initial starting positions
-        st.slider("Initial x", -5.0, 5.0, st.session_state.start_x, key="start_x")
+        range_min, range_max = valid_xy_ranges.get(func_name, (-5.0, 5.0))
+
+        st.slider("Initial x", range_min, range_max, st.session_state.start_x, key="start_x")
 
         if mode_dim == "Bivariate (f(x,y))":
-            st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
+            st.slider("Initial y", range_min, range_max, st.session_state.start_y, key="start_y")
         else:
             st.session_state["start_y"] = 0.0
 
