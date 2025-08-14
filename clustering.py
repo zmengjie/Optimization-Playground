@@ -18,13 +18,34 @@ def clustering_ui():
     st.header("🔹 Clustering Playground")
 
     # --- Dataset selection ---
-    dataset_choice = st.selectbox("Select a dataset", ["Blobs", "Moons", "Iris"])
-    dataset_explanations = {
-        "Blobs": "🔵 **Blobs**: Artificial Gaussian clusters, good for testing spherical cluster algorithms.",
-        "Moons": "🌙 **Moons**: Two interleaving half-circles. Ideal for non-convex clustering tests.",
-        "Iris": "🌸 **Iris**: Real-world flower dataset. We use the first two features for 2D clustering."
-    }
-    st.info(dataset_explanations[dataset_choice])
+    with st.sidebar:
+        st.header("⚙️ Clustering Settings")
+        dataset_choice = st.selectbox("Select a dataset", ["Blobs", "Moons", "Iris"])
+        dataset_explanations = {
+            "Blobs": "🔵 **Blobs**: Artificial Gaussian clusters, good for testing spherical cluster algorithms.",
+            "Moons": "🌙 **Moons**: Two interleaving half-circles. Ideal for non-convex clustering tests.",
+            "Iris": "🌸 **Iris**: Real-world flower dataset. We use the first two features for 2D clustering."
+        }
+
+        st.caption(dataset_explanations[dataset_choice])
+
+        if dataset_choice == "Blobs" or dataset_choice == "Moons":
+            n_samples = st.slider("Number of Samples", 100, 1000, 300, 50)
+
+        method = st.radio("Choose clustering method", [
+            "K-Means", "DBSCAN", "Agglomerative", "Birch", "GMM", "Spectral"
+        ])
+
+        if method in ["K-Means", "Agglomerative", "Birch", "GMM", "Spectral"]:
+            k = st.slider("Number of Clusters", 2, 10, 3)
+        if method == "DBSCAN":
+            eps = st.slider("Epsilon (eps)", 0.1, 2.0, 0.5, 0.1)
+            min_samples = st.slider("min_samples", 2, 20, 5)
+            metric = st.selectbox("Distance Metric", ["euclidean", "manhattan", "cosine"])
+        if method == "Agglomerative":
+            linkage = st.selectbox("Linkage", ["ward", "complete", "average", "single"])
+        if method == "Birch":
+            threshold = st.slider("Threshold", 0.01, 2.0, 0.5, 0.01)
 
     if dataset_choice == "Blobs":
         n_samples = st.slider("Number of Samples", 100, 1000, 300, 50)
@@ -36,10 +57,6 @@ def clustering_ui():
         iris = load_iris()
         X = iris.data[:, :2]
 
-    # --- Clustering method ---
-    method = st.radio("Choose clustering method", [
-        "K-Means", "DBSCAN", "Agglomerative", "Birch", "GMM", "Spectral"
-    ])
 
     algo_explanations = {
         "K-Means": "**K-Means**: Fast, scalable method that minimizes intra-cluster distance. Best for spherical clusters.",
@@ -49,6 +66,9 @@ def clustering_ui():
         "GMM": "**GMM (Gaussian Mixture Model)**: Soft clustering based on probabilistic assignment using Gaussian distributions.",
         "Spectral": "**Spectral Clustering**: Converts data into a graph structure and performs dimensionality reduction before clustering."
     }
+
+
+    st.markdown(f"### ℹ️ Selected Method: **{method}**")
     st.markdown(algo_explanations[method])
     st.markdown("---")
 
