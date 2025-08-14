@@ -387,19 +387,18 @@ with tab1:
     """, unsafe_allow_html=True)
 
     # --- Symbolic Tab ---
-    st.markdown("### 🧮 Symbolic Analysis Tab")
 
-    st.markdown("This tab helps build intuition with key mathematical expressions:")
+    st.markdown("""
+    <div style='background:#f9f9f9; padding: 20px; border-radius:12px'>
+    <h3>🧮 Symbolic Analysis Tab</h3>
+    <p>This tab shows key math expressions:</p>
+    </div>
+    """, unsafe_allow_html=True)
 
+    # Render LaTeX separately
     st.markdown("- **Objective Function**: $f(x, y)$")
     st.markdown("- **Lagrangian**: $\\mathcal{L}(x, y, \\lambda)$")
-    st.markdown("- **KKT Conditions** (for constrained problems)")
-    st.markdown("- Symbolic **Gradient** and **Hessian**")
-
-    st.markdown("✅ If **Newton’s Method** is selected:")
-    st.markdown("- The **Hessian matrix** is shown")
-    st.markdown("- The **determinant** is calculated")
-    st.markdown("- This explains how Newton's step direction and size are determined")
+    st.markdown("- **KKT Conditions**: Explained with constraints")
 
 
     st.markdown("---")  
