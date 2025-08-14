@@ -1126,7 +1126,7 @@ with tab2:
                 frames.append(Image.open(buf).convert("P"))
                 buf.close()
 
-        elif mode_dim == "Univariate (f(x))":
+        elif mode_dim == "Univariate (f(x))" and xs and ys:
             x_vals = np.linspace(-5, 5, 500)
             y_vals = [f_func(xi) for xi in x_vals]
 
@@ -1137,7 +1137,6 @@ with tab2:
             ax.set_ylabel("f(x)")
             ax.set_title("Gradient Descent on f(x)")
 
-            # Plot the function
             ax.plot(x_vals, y_vals, label="f(x)", color="blue", linewidth=2, alpha=0.6)
             line, = ax.plot([], [], 'r*-', label="Descent Path")
             start_dot, = ax.plot([], [], 'go', label="Start")
@@ -1150,19 +1149,20 @@ with tab2:
                 return line, start_dot, current_dot
 
             def update(i):
-                line.set_data(xs[:i+1], ys[:i+1])
-                start_dot.set_data(xs[0], ys[0])
-                current_dot.set_data(xs[i], ys[i])
+                if i < len(xs):
+                    line.set_data(xs[:i+1], ys[:i+1])
+                    start_dot.set_data(xs[0], ys[0])
+                    current_dot.set_data(xs[i], ys[i])
                 return line, start_dot, current_dot
 
             ani = FuncAnimation(fig, update, frames=len(xs), init_func=init, blit=True)
 
-            # Save to a temporary GIF file
-            tmpfile = tempfile.NamedTemporaryFile(suffix='.gif', delete=False)
-            ani.save(tmpfile.name, writer='pillow', fps=4)
+            # Save as GIF
+            with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
+                ani.save(tmpfile.name, writer="pillow", fps=4)
+                st.image(tmpfile.name)
 
-            # Display in Streamlit
-            st.image(tmpfile.name)
+
             # for i in range(1, len(path) + 1):
             #     ax_anim.clear()
             #     x_vals_anim = path[:i]
