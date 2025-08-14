@@ -68,7 +68,7 @@ def clustering_ui():
 
 
 
-    st.markdown(f"### ℹ️ Selected Method: **{method}**")
+    # st.markdown(f"### ℹ️ Selected Method: **{method}**")
     st.markdown(algo_explanations[method])
     st.markdown("---")
 
