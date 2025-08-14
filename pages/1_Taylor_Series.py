@@ -21,82 +21,40 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Optionally put this in taylor_guide.py and import it
-def show_taylor_sidebar_guide():
-    st.sidebar.markdown("## 🧭 How to Use This Tool")
-
-    st.sidebar.markdown("### 🧮 Select Mode")
-    st.sidebar.markdown("- Choose between:")
-    st.sidebar.markdown("  - **Univariate** (e.g., `cos(x)`)")
-    st.sidebar.markdown("  - **Multivariable** (e.g., `x² + y²`)")
-
-    st.sidebar.markdown("### 🔢 Function Options")
-    st.sidebar.markdown("- **Univariate Mode**:")
-    st.sidebar.markdown("  - Choose predefined or custom function")
-    st.sidebar.markdown("  - Toggle Taylor orders (1st–4th)")
-    st.sidebar.markdown("  - Adjust expansion point `a` with slider")
-    st.sidebar.markdown("  - Optionally animate the approximation")
-
-    st.sidebar.markdown("- **Multivariable Mode**:")
-    st.sidebar.markdown("  - Choose or define a bivariate function")
-    st.sidebar.markdown("  - Adjust expansion center `(a, b)` with sliders")
-    st.sidebar.markdown("  - Use animation to explore Taylor surface")
-
-    st.sidebar.info("📘 For math and theory, visit the **Resources** page.")
-
 # Define the run function for this page
 
 st.title("📐 Taylor Series & Optimizer Foundations")
 
 mode = st.sidebar.radio("Select Mode", ["📘 Guide", "📈 Univariate", "🌐 Multivariable"])
 
-if mode in ["📈 Univariate", "🌐 Multivariable"]:
-    show_taylor_sidebar_guide()
 
 # tab1, tab2, tab3 = st.tabs(["📘 Guide", "📈 Univariate", "🌐 Multivariable"])
 
 if mode == "📘 Guide":
 # with tab1:
-    # Section 1: Explaining Taylor Series
-    st.markdown("### 📚 How Taylor Series Explains Optimizers")
+    st.header("🧭 How to Use the Taylor Visualization Tool")
+
+    st.subheader("📈 Univariate Mode")
     st.markdown("""
-    Many optimization algorithms are grounded in the **Taylor series expansion**, 
-    which provides a local approximation of a function using its derivatives:
+    - Choose from **predefined functions** (e.g., `cos(x)`) or select **custom** to enter your own.
+    - Use checkboxes to toggle:
+    - **1st-order** (Linear)
+    - **2nd-order** (Parabola)
+    - **3rd & 4th-order** terms
+    - Adjust the **expansion point `a`** using the slider to see how Taylor approximation changes.
+    - Enable **animation** to dynamically view the approximation update.
     """)
 
-    # First-order Taylor expansion formula
-    st.latex(r"""
-    f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x
-    """)
+    st.subheader("🌐 Multivariable Mode")
     st.markdown("""
-    - This is the **first-order Taylor expansion**, forming the basis of **Gradient Descent**.  
-    - It uses only the **gradient (slope)** to determine the update direction.
+    - Select from predefined 2D functions or enter a **custom** bivariate function.
+    - Adjust **center a (x)** and **b (y)** using sliders.
+    - Toggle animation to move:
+    - Only `a`, only `b`, or both together.
+    - Visual comparison between the **true function** and its **2nd-order approximation** is shown in 3D.
     """)
 
-    # Second-order Taylor expansion formula
-    st.latex(r"""
-    f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x + \frac{1}{2} \Delta x^T H(x) \Delta x
-    """)
-    st.markdown("""
-    - This is the **second-order Taylor expansion**, used in **Newton's Method**.  
-    - It incorporates the **Hessian matrix (curvature)** to adjust both direction and step size, often accelerating convergence.
-    """)
-
-    # Section 2: Visual Summary
-    st.markdown("### ✍️ Summary")
-    st.markdown("""
-    Think of it visually:
-
-    - ✅ **First-order**: Approximates the function using a **tangent line** (just the slope).
-    - ✅ **Second-order**: Approximates using a **parabola** (slope + curvature).
-
-    These expansions reveal the underlying logic of optimizers:
-
-    - **Gradient Descent** → uses **first-order** info (gradient only).
-    - **Newton’s Method** → uses **second-order** info (gradient + curvature).
-
-    Understanding Taylor series helps you develop a deeper intuition about how optimizers explore the **loss landscape**.
-    """)
+    st.info("ℹ️ You can switch between Univariate and Multivariable using the sidebar selector.")
 
 
 
