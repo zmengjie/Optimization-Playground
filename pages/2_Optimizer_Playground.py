@@ -318,7 +318,7 @@ with tab1:
     # --- Optimizer Config ---
 # --- Optimizer Config ---
     st.markdown("""
-    <div style='background-color: #d8cfd0; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
+    <div style='background-color: #e8e5e1; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
     <h3 style='margin-top: 0;'>🚀 Optimizer Configuration</h3>
 
@@ -362,7 +362,7 @@ with tab1:
 
     # --- Auto-Tune & Animation ---
     st.markdown("""
-    <div style='background-color: #cfc1b5; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
+    <div style='background-color: #e9eff1; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
     <h3 style='margin-top: 0;'>⚙️ Auto-Tune & Animation</h3>
 
@@ -388,7 +388,7 @@ with tab1:
 
     # --- Symbolic Tab ---
     st.markdown("""
-    <div style='background-color: #c3cfd9; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
+    <div style='background-color: #eee8e1; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
 
     <h3>📐 Symbolic Analysis Tab</h3>
 
