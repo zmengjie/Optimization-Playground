@@ -1,7 +1,7 @@
 import streamlit as st
 
 def show_resources():
-    st.title("📚 Educational Resources")
+    # st.title("📚 Educational Resources")
 
     section = st.sidebar.selectbox("Select a topic:", [
         "🔎 Taylor Series",
@@ -10,7 +10,7 @@ def show_resources():
     ])
 
     if section == "🔎 Taylor Series":
-        st.header("How Taylor Series Explains Optimizers")
+        st.header("📚 How Taylor Series Explains Optimizers")
         st.markdown("""
         Many optimization algorithms are grounded in the **Taylor series expansion**, 
         which provides a local approximation of a function using its derivatives:
