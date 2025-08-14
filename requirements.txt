@@ -8,3 +8,23 @@ pandas
 statsmodels
 matplotlib
 
+
+scikit-learn
+xgboost
+statsmodels==0.13.5
+scipy==1.10.1
+seaborn
+sympy
+Pillow
+openai
+tabulate
+tqdm
+requests
+python-dotenv
+pytesseract
+# langchain-community
+langchain-experimental
+tensorflow>=2.0.0
+
+plotly==5.19.0
+mlxtend
