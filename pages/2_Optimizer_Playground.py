@@ -809,7 +809,7 @@ with tab2:
 
     # --- Taylor Expansion Toggle ---
 
-    show_taylor = st.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
+    show_taylor = st.sidebar.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
 
     show_2nd = False
     Z_t1 = None
