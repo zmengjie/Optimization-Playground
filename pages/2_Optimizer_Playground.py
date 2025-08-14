@@ -1573,8 +1573,13 @@ with tab2:
 
             # --- Function definition based on mode_dim ---
 
+        if mode_dim == "Univariate (f(x))":
+            optimizers = ["GradientDescent", "Momentum", "Adam", "RMSProp"]
+        else:
+            optimizers = ["GradientDescent", "Momentum", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
 
-        optimizers = ["GradientDescent",  "Momentum", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
+
+        # optimizers = ["GradientDescent",  "Momentum", "Adam", "RMSProp", "Newton's Method", "Simulated Annealing", "Genetic Algorithm"]
         optimizer = st.selectbox("Optimizer", optimizers)
         
         options = {}
@@ -1594,7 +1599,7 @@ with tab2:
 
         auto_tune = False
 
-        if optimizer in ["GradientDescent", "Adam", "RMSProp"]:
+        if mode_dim == "Bivariate (f(x,y))" and optimizer in ["GradientDescent", "Adam", "RMSProp"]:
             if optimizer == "GradientDescent":
                 use_backtracking = st.checkbox("🔍 Use Backtracking Line Search", value=False)
                 options["use_backtracking"] = use_backtracking
@@ -2157,7 +2162,15 @@ with tab2:
         # Do NOT zip(*path); path is a list of scalars.
         # Use the xs, ys you already computed earlier.
         fig_uni, ax_uni = plt.subplots()
+
+        # 1. Plot full function curve
+        x_curve = np.linspace(-5, 5, 400)
+        y_curve = [f_func(xi) for xi in x_curve]
+        ax_uni.plot(x_curve, y_curve, "g--", label="f(x)")
+
+        # 2. Overlay descent points
         ax_uni.plot(xs, ys, "ro-", label="Descent Path")
+
         ax_uni.set_xlabel("x")
         ax_uni.set_ylabel("f(x)")
         ax_uni.set_title("Univariate Optimization Path")
