@@ -37,14 +37,14 @@ def render_taylor_guide_modal():
     # --- CSS ---
     st.markdown("""
     <style>
-    /* Overlay behind the modal */
+    /* Overlay */
     #guide-overlay {
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.55);
         z-index: 1000;
     }
-    /* The modal card */
+    /* Modal card */
     .guide-modal {
         position: fixed;
         top: 50%;
@@ -59,11 +59,21 @@ def render_taylor_guide_modal():
         padding: 28px 30px 22px 30px;
         box-shadow: 0 20px 60px rgba(0,0,0,.35);
     }
-    /* Put the Streamlit form's button (our X) at the top-right */
-    .guide-modal .stButton button {
-        position: absolute;
-        top: 10px;
-        right: 12px;
+
+    /* --- CLOSE BUTTON: WRAPPER + BUTTON --- */
+    /* 1) Kill the big white bar (wrapper) and position it */
+    .guide-modal .stButton {
+        position: absolute !important;
+        top: 10px !important;
+        right: 12px !important;
+        width: auto !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    /* 2) Style the actual button */
+    .guide-modal .stButton > button {
         font-size: 22px;
         line-height: 1;
         padding: 2px 10px;
@@ -73,26 +83,16 @@ def render_taylor_guide_modal():
         color: #555;
         cursor: pointer;
     }
-    .guide-modal .stButton button:hover { background:#ececec; color:#111; }
+    .guide-modal .stButton > button:hover { background:#ececec; color:#111; }
 
-    .guide-modal h1, .guide-modal h2, .guide-modal h3, .guide-modal h4 {
-        margin-top: 0;
-    }
-    .guide-title {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 8px;
-    }
-    .guide-title .emoji {
-        font-size: 28px;
-    }
-    .dim-note {
-        color: #6b7280;
-        font-size: 0.95rem;
-    }
+    /* Optional: headings tweak */
+    .guide-modal h1, .guide-modal h2, .guide-modal h3, .guide-modal h4 { margin-top: 0; }
+    .guide-title { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .guide-title .emoji { font-size: 28px; }
+    .dim-note { color: #6b7280; font-size: 0.95rem; }
     </style>
     """, unsafe_allow_html=True)
+
 
     # Show the small launcher button
     if "show_taylor_guide" not in st.session_state:
