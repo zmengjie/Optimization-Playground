@@ -15,7 +15,7 @@ import pandas as pd
 from io import BytesIO
 
 def clustering_ui():
-    st.header("🔹 Clustering Playground")
+    st.subheader("📌 Module: Clustering")
 
     # --- Dataset selection ---
     with st.sidebar:
