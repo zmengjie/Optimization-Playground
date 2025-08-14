@@ -283,10 +283,6 @@ def supervised_ui():
             st.error("Need at least two classes in the target.")
             return
 
-        classifier = st.radio("Classifier", [
-            "Naive Bayes", "Decision Tree", "K-Nearest Neighbors", "Random Forest", "MLP", "XGBoost", "SVM"
-        ])
-
         # Helper to draw 2D boundary
         def draw_2d_boundary(model, X, y_class, title):
             if X.shape[1] != 2:
