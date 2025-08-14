@@ -1123,90 +1123,53 @@ st.markdown(
 
 
 # === Auto-Tuning Simulation Function ===
-def run_auto_tuning_simulation(f_func, optimizer, x0, y0=None):
+def run_auto_tuning_simulation(f_func, optimizer, x0, y0, is_univariate=False):
     lr_grid = list(np.logspace(-4, -1, 6))
     step_grid = [20, 30, 40, 50, 60, 80]
     best_score = float("inf")
     best_lr, best_steps = lr_grid[0], step_grid[0]
     logs = []
 
-    is_univariate = y0 is None
-
     for lr in lr_grid:
         for steps in step_grid:
-            if is_univariate:
-                x_t = x0
-                m = 0.0
-                v = 0.0
-            else:
-                x_t, y_t = x0, y0
-                m = np.zeros(2)
-                v = np.zeros(2)
-
+            x_t, y_t = x0, y0
+            m, v = np.zeros(2), np.zeros(2)
             beta1, beta2, eps = 0.9, 0.999, 1e-8
 
             for t in range(1, steps + 1):
                 if is_univariate:
-                    dx = (f_func(x_t + 1e-5) - f_func(x_t - 1e-5)) / (2e-5)
-                    grad = dx
-
-                    if abs(grad) < 1e-3:
-                        break
-
-                    if optimizer == "Adam":
-                        m = beta1 * m + (1 - beta1) * grad
-                        v = beta2 * v + (1 - beta2) * grad**2
-                        m_hat = m / (1 - beta1 ** t)
-                        v_hat = v / (1 - beta2 ** t)
-                        update = lr * m_hat / (np.sqrt(v_hat) + eps)
-                    elif optimizer == "RMSProp":
-                        v = beta2 * v + (1 - beta2) * grad**2
-                        update = lr * grad / (np.sqrt(v) + eps)
-                    else:
-                        update = lr * grad
-
-                    x_t -= update
-
+                    grad_x = (f_func(x_t + 1e-5, 0.0) - f_func(x_t - 1e-5, 0.0)) / (2 * 1e-5)
+                    grad = np.array([grad_x, 0.0])
                 else:
-                    dx = (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / (2e-5)
-                    dy = (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / (2e-5)
-                    grad = np.array([dx, dy])
+                    grad = np.array([
+                        (f_func(x_t + 1e-5, y_t) - f_func(x_t - 1e-5, y_t)) / (2 * 1e-5),
+                        (f_func(x_t, y_t + 1e-5) - f_func(x_t, y_t - 1e-5)) / (2 * 1e-5)
+                    ])
 
-                    if np.linalg.norm(grad) < 1e-3:
-                        break
+                if np.linalg.norm(grad) < 1e-3:
+                    break
 
-                    if optimizer == "Adam":
-                        m = beta1 * m + (1 - beta1) * grad
-                        v = beta2 * v + (1 - beta2) * (grad ** 2)
-                        m_hat = m / (1 - beta1 ** t)
-                        v_hat = v / (1 - beta2 ** t)
-                        update = lr * m_hat / (np.sqrt(v_hat) + eps)
-                    elif optimizer == "RMSProp":
-                        v = beta2 * v + (1 - beta2) * (grad ** 2)
-                        update = lr * grad / (np.sqrt(v) + eps)
-                    else:
-                        update = lr * grad
+                if optimizer == "Adam":
+                    m = beta1 * m + (1 - beta1) * grad
+                    v = beta2 * v + (1 - beta2) * (grad ** 2)
+                    m_hat = m / (1 - beta1 ** t)
+                    v_hat = v / (1 - beta2 ** t)
+                    update = lr * m_hat / (np.sqrt(v_hat) + eps)
+                else:  # Gradient Descent
+                    update = lr * grad
 
-                    x_t -= update[0]
-                    y_t -= update[1]
+                x_t -= update[0]
+                y_t -= update[1]
 
-            final_loss = f_func(x_t) if is_univariate else f_func(x_t, y_t)
-            score = final_loss + 0.01 * steps
-
-            logs.append({
-                "lr": lr,
-                "steps": steps,
-                "loss": final_loss,
-                "score": score
-            })
+            score = f_func(x_t, y_t)
+            logs.append((lr, steps, score))
 
             if score < best_score:
                 best_score = score
-                best_lr = lr
-                best_steps = steps
+                best_lr, best_steps = lr, steps
 
-    st.session_state.df_log = pd.DataFrame(logs)
     return best_lr, best_steps
+
 
 # def run_auto_tuning_simulation(f_func, optimizer, x0, y0):
 #     lr_grid = list(np.logspace(-4, -1, 6))
@@ -1682,7 +1645,7 @@ with tab2:
 
                 # Wrap to make it compatible with tuner that expects (x, y)
                 f_2d = lambda x, y: f_lambdified(x)  # ignore y
-                best_lr, best_steps = run_auto_tuning_simulation(f_2d, optimizer, default_x, 0.0)
+                best_lr, best_steps = run_auto_tuning_simulation(f_2d, optimizer, default_x, 0.0, is_univariate=True)
 
             else:
                 # Multivariable
@@ -1691,7 +1654,7 @@ with tab2:
                     symbolic_expr = symbolic_expr.subs(w_sym, w_val)
 
                 f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
-                best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
+                best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y, is_univariate=False)
 
             default_lr, default_steps = best_lr, best_steps
 
