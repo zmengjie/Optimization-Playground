@@ -616,7 +616,11 @@ with tab2:
 
         # Sliders for the initial starting positions
         st.slider("Initial x", -5.0, 5.0, st.session_state.start_x, key="start_x")
-        st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
+
+        if mode_dim == "Bivariate (f(x,y))":
+            st.slider("Initial y", -5.0, 5.0, st.session_state.start_y, key="start_y")
+        else:
+            st.session_state["start_y"] = 0.0
 
         # Animation toggle
         show_animation = st.checkbox("🎮 Animate Descent Steps", key="show_animation")
