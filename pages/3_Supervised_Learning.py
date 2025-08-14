@@ -107,7 +107,7 @@ def supervised_ui():
             logit_params["penalty"] = st.selectbox("Penalty", valid_penalties)
 
         elif task_type == "Classification":
-            Pass
+            pass
 
 
     X = pd.DataFrame()
