@@ -37,23 +37,37 @@ if mode == "📘 Guide":
 
     st.subheader("📈 Univariate Mode")
     st.markdown("""
+    <div style='background-color: #f9f9f9; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
+
+    ### 📈 Univariate Mode
+
     - Choose from **predefined functions** (e.g., `cos(x)`) or select **custom** to enter your own.
     - Use checkboxes to toggle:
-        - **1st-order** (Linear)
-        - **2nd-order** (Parabola)
-        - **3rd & 4th-order** terms
-    - Adjust the **expansion point `a`** using the slider to see how Taylor approximation changes.
+    - **1st-order** (Linear)  
+    - **2nd-order** (Parabola)  
+    - **3rd & 4th-order** terms  
+    - Adjust the **expansion point `a`** using the slider.
     - Enable **animation** to dynamically view the approximation update.
-    """)
+
+    </div>
+    """, unsafe_allow_html=True)
+
 
     st.subheader("🌐 Multivariable Mode")
     st.markdown("""
+    <div style='background-color: #f0f4ff; padding: 25px 30px; border-radius: 12px;'>
+
+    ### 🌐 Multivariable Mode
+
     - Select from predefined 2D functions or enter a **custom** bivariate function.
     - Adjust **center a (x)** and **b (y)** using sliders.
     - Toggle animation to move:
-        - Only `a`, only `b`, or both together.
+    - Only `a`, only `b`, or both together.
     - Visual comparison between the **true function** and its **2nd-order approximation** is shown in 3D.
-    """)
+
+    </div>
+    """, unsafe_allow_html=True)
+
 
     st.info("ℹ️ You can switch between Univariate and Multivariable using the sidebar selector.")
     st.info(
