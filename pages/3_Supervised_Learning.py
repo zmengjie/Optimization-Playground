@@ -61,7 +61,7 @@ def supervised_ui():
         if dataset_choice != "Upload Your Own":
             df, label_names = load_builtin_dataset(dataset_choice)
             st.success(f"Loaded **{dataset_choice}** dataset with shape {df.shape}")
-            st.markdown("#### 🧪 Sample Preview")
+            st.markdown("#### 🥪 Sample Preview")
             st.dataframe(df.head())
         else:
             uploaded_file = st.file_uploader("📂 Upload CSV", type=["csv"])
@@ -83,14 +83,16 @@ def supervised_ui():
             "Breast Cancer": ["mean radius", "mean texture", "mean perimeter"]
         }
         initial_features = default_features.get(dataset_choice, [])
-        features = st.multiselect("🧩 Feature Columns", feature_candidates, default=initial_features)
+        features = st.multiselect("🧹 Feature Columns", feature_candidates, default=initial_features)
 
         task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
 
+    # === Move below to MAIN DISPLAY ===
     st.markdown("## 🎯 Target Distribution")
-    st.dataframe(
-    df[target].value_counts().reset_index().rename(columns={"index": target, target: "count"})
-    )
+    target_dist = df[target].value_counts().reset_index()
+    target_dist.columns = [target, "count"]
+    target_dist = target_dist.astype(str)  # Ensures compatibility
+    st.dataframe(target_dist)
 
     st.markdown("## 🔍 Feature Correlation")
     corr = df.select_dtypes(include=[np.number]).corr()
