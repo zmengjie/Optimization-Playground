@@ -1507,9 +1507,16 @@ with tab2:
         mode_dim = st.radio("Function Type", ["Bivariate (f(x,y))", "Univariate (f(x))"])
 
         mode = st.radio("Function Source", ["Predefined", "Custom"])
-        func_name = st.selectbox("Function", list(predefined_funcs.keys())) if mode == "Predefined" else None
-        expr_str = st.text_input("Enter function f(x,y):", "x**2 + y**2") if mode == "Custom" else ""
-        w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
+
+        if mode_dim == "Bivariate (f(x,y))":
+            mode = st.radio("Function Source", ["Predefined", "Custom"])
+            func_name = st.selectbox("Function", list(predefined_funcs.keys())) if mode == "Predefined" else None
+            expr_str = st.text_input("Enter function f(x,y):", "x**2 + y**2") if mode == "Custom" else ""
+            w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
+        else:
+            func_name, mode, expr_str, w_val = None, None, None, None  # Clear these for univariate
+
+
 
             # --- Function definition based on mode_dim ---
 
@@ -1974,24 +1981,44 @@ with tab2:
         st.error("❌ Cannot plot — optimization path is empty or too short. Please adjust parameters.")
         st.stop()
 
-    # 👇 Patch for univariate mode: promote to 2D
     if mode_dim == "Univariate (f(x))":
-        path = [(x, 0.0) for x in path]  # make it (x, y=0.0) tuples
-        Z_path = ys  # already computed
-        
-    plot_3d_descent(
-        x_vals=x_vals,
-        y_vals=y_vals,
-        Z=Z,
-        path=path,
-        Z_path=Z_path,
-        Z_t1=Z_t1,
-        Z_t2=Z_t2,
-        show_taylor=show_taylor,
-        show_2nd=show_2nd,
-        expansion_point=expansion_point,
-        f_func=f_func
-    )
+        fig_uni, ax_uni = plt.subplots()
+        ax_uni.plot(xs, ys, "ro-", label="Descent Path")
+        ax_uni.set_xlabel("x")
+        ax_uni.set_ylabel("f(x)")
+        ax_uni.set_title("Univariate Optimization Path")
+        ax_uni.grid(True)
+        ax_uni.legend()
+        st.pyplot(fig_uni)
+    else:
+        plot_3d_descent(
+            x_vals=x_vals,
+            y_vals=y_vals,
+            Z=Z,
+            path=path,
+            Z_path=Z_path,
+            Z_t1=Z_t1,
+            Z_t2=Z_t2,
+            show_taylor=show_taylor,
+            show_2nd=show_2nd,
+            expansion_point=expansion_point,
+            f_func=f_func
+        )
+
+
+    # plot_3d_descent(
+    #     x_vals=x_vals,
+    #     y_vals=y_vals,
+    #     Z=Z,
+    #     path=path,
+    #     Z_path=Z_path,
+    #     Z_t1=Z_t1,
+    #     Z_t2=Z_t2,
+    #     show_taylor=show_taylor,
+    #     show_2nd=show_2nd,
+    #     expansion_point=expansion_point,
+    #     f_func=f_func
+    # )
 
 
     st.markdown("### 🗺️ 2D View")
