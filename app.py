@@ -1,18 +1,8 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
-# Inject Google Analytics tracking
-components.html("""
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4LXS47NYC0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+from streamlit_analytics import TrackPage
 
-  gtag('config', 'G-4LXS47NYC0');
-</script>
-""", height=0)
+
 
 st.markdown(
     """
@@ -36,24 +26,24 @@ st.markdown(
 
 st.set_page_config(page_title="Optimization Playground", layout="wide")
 
+with TrackPage():
+    # Title and main description
+    st.title("🎯 Welcome to the Optimization Playground")
 
-# Title and main description
-st.title("🎯 Welcome to the Optimization Playground")
+    st.markdown("""
+    This interactive app lets you explore:
 
-st.markdown("""
-This interactive app lets you explore:
+    - 📘 **Key optimization concepts** like gradient, Hessian, KKT conditions  
+    - 🧪 **Playground** for experimenting with optimizers on custom functions  
+    - 📐 **Symbolic tools** for visualizing Taylor expansions, curvature, and more  
+    - 🧮 **Taylor Series** module to understand how optimizers arise from first- and second-order approximations
 
-- 📘 **Key optimization concepts** like gradient, Hessian, KKT conditions  
-- 🧪 **Playground** for experimenting with optimizers on custom functions  
-- 📐 **Symbolic tools** for visualizing Taylor expansions, curvature, and more  
-- 🧮 **Taylor Series** module to understand how optimizers arise from first- and second-order approximations
+    """)
 
-""")
+    st.info("👉 Use the sidebar to dive into each section. You can switch between **Taylor Series** and **Optimizer Playground** tabs.")
 
-st.info("👉 Use the sidebar to dive into each section. You can switch between **Taylor Series** and **Optimizer Playground** tabs.")
-
-st.markdown(
-    "If you have any feedback regarding the application, kindly fill out this [form](https://forms.gle/tae4s9EH5dqcG6rm9).",
-    unsafe_allow_html=True
-)
+    st.markdown(
+        "If you have any feedback regarding the application, kindly fill out this [form](https://forms.gle/tae4s9EH5dqcG6rm9).",
+        unsafe_allow_html=True
+    )
 
