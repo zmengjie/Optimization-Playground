@@ -318,8 +318,12 @@ with tab1:
     st.markdown("""
     - Select from:
       - `GradientDescent`
+      - `Momentum`
+      - `Adam`
+      - `RMSProp`
       - `Newton's Method`
-      - `Quasi-Newton (e.g., BFGS)`
+      - `Simulated Annealing`
+      - `Genetic Algorithm`
     - Configure:
       - **Learning Rate**
       - **Steps**
