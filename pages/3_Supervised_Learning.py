@@ -89,7 +89,7 @@ def supervised_ui():
         tool = None
         lr_params = {}
         logit_params = {}
-        clf_choice = None
+        classifier = None
 
         if task_type == "Linear Regression":
             tool = st.selectbox("Tool", ["Simple", "Polynomial", "Multi-Feature", "Diagnostics"])
@@ -107,7 +107,12 @@ def supervised_ui():
             logit_params["penalty"] = st.selectbox("Penalty", valid_penalties)
 
         elif task_type == "Classification":
-            pass
+            classifier = st.radio("Classifier", [
+                "Naive Bayes", "Decision Tree", "K-Nearest Neighbors",
+                "Random Forest", "MLP", "XGBoost", "SVM"
+            ])
+
+            
 
 
     X = pd.DataFrame()
