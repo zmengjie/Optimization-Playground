@@ -34,7 +34,9 @@ def render_taylor_guide_modal():
     - On click, opens a centered modal with a top-right X close button
     - Pure Streamlit + CSS (no extra JS/components)
     """
-    # --- CSS ---
+    import streamlit as st
+
+    # --- CSS to style overlay and modal ---
     st.markdown("""
     <style>
     /* Overlay */
@@ -44,7 +46,8 @@ def render_taylor_guide_modal():
         background: rgba(0,0,0,0.55);
         z-index: 1000;
     }
-    /* Modal card */
+
+    /* Modal container */
     .guide-modal {
         position: fixed;
         top: 50%;
@@ -60,20 +63,13 @@ def render_taylor_guide_modal():
         box-shadow: 0 20px 60px rgba(0,0,0,.35);
     }
 
-    /* --- CLOSE BUTTON: WRAPPER + BUTTON --- */
-    /* 1) Kill the big white bar (wrapper) and position it */
-    .guide-modal .stButton {
-        position: absolute !important;
-        top: 10px !important;
-        right: 12px !important;
-        width: auto !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
+    /* Kill the wrapper that creates white bar */
+    .guide-modal .element-container {
+        display: contents !important;
     }
-    /* 2) Style the actual button */
-    .guide-modal .stButton > button {
+
+    /* Style the close button */
+    .guide-modal .stButton>button {
         font-size: 22px;
         line-height: 1;
         padding: 2px 10px;
@@ -82,19 +78,37 @@ def render_taylor_guide_modal():
         border: 1px solid #e6e6e6;
         color: #555;
         cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        z-index: 1002;
     }
-    .guide-modal .stButton > button:hover { background:#ececec; color:#111; }
+    .guide-modal .stButton>button:hover {
+        background: #ececec;
+        color: #111;
+    }
 
-    /* Optional: headings tweak */
-    .guide-modal h1, .guide-modal h2, .guide-modal h3, .guide-modal h4 { margin-top: 0; }
-    .guide-title { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
-    .guide-title .emoji { font-size: 28px; }
-    .dim-note { color: #6b7280; font-size: 0.95rem; }
+    /* Headings and layout */
+    .guide-modal h1, .guide-modal h2, .guide-modal h3, .guide-modal h4 {
+        margin-top: 0;
+    }
+    .guide-title {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .guide-title .emoji {
+        font-size: 28px;
+    }
+    .dim-note {
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-
-    # Show the small launcher button
+    # Launcher button logic
     if "show_taylor_guide" not in st.session_state:
         st.session_state.show_taylor_guide = False
 
@@ -104,18 +118,16 @@ def render_taylor_guide_modal():
             st.session_state.show_taylor_guide = True
             st.rerun()
 
-    # Render modal if needed
     if not st.session_state.show_taylor_guide:
         return
 
-    # Dark overlay
+    # Overlay
     st.markdown('<div id="guide-overlay"></div>', unsafe_allow_html=True)
 
-    # Modal body (use a form so we can catch the close click without JS)
+    # Modal
     with st.container():
         st.markdown('<div class="guide-modal">', unsafe_allow_html=True)
         with st.form("taylor_guide_close"):
-            # This button is styled by CSS to sit at top-right
             close = st.form_submit_button("×")
 
             st.markdown("""
@@ -125,7 +137,6 @@ def render_taylor_guide_modal():
             </div>
             """, unsafe_allow_html=True)
 
-            # --- Your guide content (edit freely) ---
             st.markdown("### Univariate Mode")
             st.markdown("""
             - Choose a **predefined function** or select **Custom** to enter your own.
@@ -152,6 +163,7 @@ def render_taylor_guide_modal():
                 st.rerun()
 
         st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 # Define the run function for this page
