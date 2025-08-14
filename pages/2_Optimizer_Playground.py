@@ -1971,9 +1971,9 @@ with tab2:
 
             
     if not path or len(path) < 2:
-        st.error("Optimization path is empty or too short to plot. Please adjust settings.")
+        st.error("❌ Cannot plot — optimization path is empty or too short. Please adjust parameters.")
         st.stop()
-
+        
     plot_3d_descent(
         x_vals=x_vals,
         y_vals=y_vals,
