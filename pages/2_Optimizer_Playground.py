@@ -364,17 +364,24 @@ with tab1:
     st.markdown("""
     <div style='background-color: #fef9e7; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
-    ### ⚙️ Auto-Tune & Animation
+    <h3 style='margin-top: 0;'>⚙️ Auto-Tune & Animation</h3>
 
-    - Enable **Auto-Tune** to select good defaults for:
-      - Learning Rate  
-      - Steps  
-      - Starting Point
-    - Press **🔄 Reset to Auto-Tuned** to apply recommended values for the selected function.
-
-    - Toggle **🎮 Animate Descent Steps** to see optimization progress visually.
-    - In **bivariate mode**, enable:
-      - 🧮 **Show Taylor Approximation at (a, b)** for curvature overlay
+    <ul>
+    <li><strong>Enable Auto-Tune</strong> to select good defaults for:
+        <ul>
+        <li>Learning Rate</li>
+        <li>Steps</li>
+        <li>Starting Point</li>
+        </ul>
+    </li>
+    <li>Click <strong>🔄 Reset to Auto-Tuned</strong> to apply recommended values</li>
+    <li><strong>🎮 Animate Descent Steps</strong> to visualize optimization progress</li>
+    <li>In <strong>bivariate mode</strong>, enable:
+        <ul>
+        <li>🧮 <strong>Show Taylor Approximation at (a, b)</strong> to view curvature overlay</li>
+        </ul>
+    </li>
+    </ul>
 
     </div>
     """, unsafe_allow_html=True)
@@ -383,19 +390,26 @@ with tab1:
     st.markdown("""
     <div style='background-color: #f0f4ff; padding: 25px 30px; border-radius: 12px;'>
 
-    ### 🧮 Symbolic Analysis Tab
+    <h3 style='margin-top: 0;'>🧮 Symbolic Analysis Tab</h3>
 
-    This tab helps build intuition by showing key mathematical expressions:
+    <ul>
+    <li>This tab helps build intuition with key mathematical expressions:
+        <ul>
+        <li><strong>Objective Function</strong>: \\( f(x, y) \\)</li>
+        <li><strong>Lagrangian</strong>: \\( \\mathcal{L}(x, y, \\lambda) \\)</li>
+        <li><strong>KKT Conditions</strong> (for constrained problems)</li>
+        <li>Symbolic <strong>Gradient</strong> and <strong>Hessian</strong></li>
+        </ul>
+    </li>
 
-    - **Objective Function**: \\( f(x, y) \\)  
-    - **Lagrangian**: \\( \\mathcal{L}(x, y, \\lambda) \\)  
-    - **KKT Conditions** (for constrained problems)  
-    - Symbolic **Gradient** and **Hessian**
-
-    ✅ If **Newton’s Method** is selected:
-    - The **Hessian matrix** is shown
-    - The **determinant** is calculated  
-    - This explains how Newton's step direction and size are determined
+    <li>✅ If <strong>Newton’s Method</strong> is selected:
+        <ul>
+        <li>The <strong>Hessian matrix</strong> is shown</li>
+        <li>The <strong>determinant</strong> is calculated</li>
+        <li>This explains how Newton's step direction and size are determined</li>
+        </ul>
+    </li>
+    </ul>
 
     </div>
     """, unsafe_allow_html=True)
