@@ -124,45 +124,48 @@ def render_taylor_guide_modal():
     # Overlay
     st.markdown('<div id="guide-overlay"></div>', unsafe_allow_html=True)
 
-    # Modal
+    # Modal body
     with st.container():
         st.markdown('<div class="guide-modal">', unsafe_allow_html=True)
-        with st.form("taylor_guide_close"):
-            close = st.form_submit_button("×")
 
-            st.markdown("""
-            <div class="guide-title">
-              <span class="emoji">🧭</span>
-              <h2 style="margin:0;">How to use</h2>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.markdown("### Univariate Mode")
-            st.markdown("""
-            - Choose a **predefined function** or select **Custom** to enter your own.
-            - Toggle:
-              - **1st-order** (Linear)  
-              - **2nd-order** (Parabola)  
-              - **3rd & 4th-order** terms
-            - Drag the **expansion point `a`** slider to see how the approximation changes.
-            - Turn on **Animate** to watch the approximation update dynamically.
-            """)
-
-            st.markdown("### Multivariable Mode")
-            st.markdown("""
-            - Select a predefined 2D function or enter a **custom** bivariate function.
-            - Adjust the centers **a (x)** and **b (y)** with sliders.
-            - **Animate path** for **a**, **b**, or **both**, then press **Play**.
-            - Compare the **true surface** with its **2nd-order Taylor approximation** in 3D.
-            """)
-
-            st.caption("Tip: Switch between Univariate and Multivariable from the sidebar. Theory lives in the Resources page.")
-
-            if close:
+        # Inject close button directly
+        close_btn_col = st.columns([10, 1])
+        with close_btn_col[1]:
+            if st.button("×", key="close_modal_button"):
                 st.session_state.show_taylor_guide = False
                 st.rerun()
 
+        # Modal content
+        st.markdown("""
+        <div class="guide-title">
+        <span class="emoji">🧭</span>
+        <h2 style="margin:0;">How to use</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("### Univariate Mode")
+        st.markdown("""
+        - Choose a **predefined function** or select **Custom** to enter your own.
+        - Toggle:
+        - **1st-order** (Linear)  
+        - **2nd-order** (Parabola)  
+        - **3rd & 4th-order** terms
+        - Drag the **expansion point `a`** slider to see how the approximation changes.
+        - Turn on **Animate** to watch the approximation update dynamically.
+        """)
+
+        st.markdown("### Multivariable Mode")
+        st.markdown("""
+        - Select a predefined 2D function or enter a **custom** bivariate function.
+        - Adjust the centers **a (x)** and **b (y)** with sliders.
+        - **Animate path** for **a**, **b**, or **both**, then press **Play**.
+        - Compare the **true surface** with its **2nd-order Taylor approximation** in 3D.
+        """)
+
+        st.caption("Tip: Switch between Univariate and Multivariable from the sidebar. Theory lives in the Resources page.")
+
         st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
