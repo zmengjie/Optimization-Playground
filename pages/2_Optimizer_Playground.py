@@ -316,6 +316,7 @@ with tab1:
     """, unsafe_allow_html=True)
 
     # --- Optimizer Config ---
+# --- Optimizer Config ---
     st.markdown("""
     <div style='background-color: #eaf7ff; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
@@ -324,13 +325,21 @@ with tab1:
     <ul>
     <li><strong>Choose from:</strong>
         <ul>
-        <li><code>GradientDescent</code></li>
-        <li><code>Momentum</code></li>
-        <li><code>Adam</code></li>
-        <li><code>RMSProp</code></li>
-        <li><code>Newton's Method</code></li>
-        <li><code>Simulated Annealing</code></li>
-        <li><code>Genetic Algorithm</code></li>
+        <li><strong>🧮 Deterministic Methods</strong>
+            <ul>
+            <li><code>GradientDescent</code></li>
+            <li><code>Momentum</code></li>
+            <li><code>Adam</code></li>
+            <li><code>RMSProp</code></li>
+            <li><code>Newton's Method</code></li>
+            </ul>
+        </li>
+        <li><strong>🎲 Stochastic Methods</strong>
+            <ul>
+            <li><code>Simulated Annealing</code></li>
+            <li><code>Genetic Algorithm</code></li>
+            </ul>
+        </li>
         </ul>
     </li>
 
@@ -348,6 +357,7 @@ with tab1:
 
     </div>
     """, unsafe_allow_html=True)
+
 
 
     # --- Auto-Tune & Animation ---
