@@ -411,15 +411,6 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
 
-    # Then separately, render LaTeX + markdown for Newton explanation
-    st.markdown("✅ If **Newton’s Method** is selected:")
-    st.markdown("""
-    - The **Hessian matrix** is shown  
-    - The **determinant** is calculated  
-    - This explains how Newton's step direction and size are determined
-    """)
-
-
 
     st.markdown("---")  
 
