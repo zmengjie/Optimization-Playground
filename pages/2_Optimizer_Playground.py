@@ -2168,8 +2168,20 @@ with tab2:
         y_curve = [f_func(xi) for xi in x_curve]
         ax_uni.plot(x_curve, y_curve, "g--", label="f(x)")
 
-        # 2. Overlay descent points
+        min_idx = np.argmin(ys)
+        ax_uni.axvspan(xs[min_idx] - 0.1, xs[min_idx] + 0.1, color='green', alpha=0.2, label="Min region")
+
+        # 📍 Descent path
         ax_uni.plot(xs, ys, "ro-", label="Descent Path")
+
+        # 🟢 Start and end points
+        ax_uni.plot(xs[0], ys[0], "bs", label="Start")  # Blue square
+        ax_uni.plot(xs[-1], ys[-1], "k*", markersize=10, label="End")  # Black star
+
+        # 🏁 Text labels
+        ax_uni.text(xs[0], ys[0], " Start", verticalalignment='bottom', fontsize=9)
+        ax_uni.text(xs[-1], ys[-1], " End", verticalalignment='top', fontsize=9)
+
 
         ax_uni.set_xlabel("x")
         ax_uni.set_ylabel("f(x)")
