@@ -1659,7 +1659,7 @@ with tab2:
                     if func_name == "Multi-Objective" and w_val is not None:
                         symbolic_expr = symbolic_expr.subs(w_sym, w_val)
                 else:
-                    symbolic_expr = st.session_state.custom_expr
+                    symbolic_expr = st.session_state.get("custom_expr", "x**2 + y**2")
 
                 
                 f_lambdified = sp.lambdify((x_sym, y_sym), symbolic_expr, modules="numpy")
