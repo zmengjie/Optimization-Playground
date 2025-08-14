@@ -20,11 +20,38 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+# Optionally put this in taylor_guide.py and import it
+def show_taylor_sidebar_guide():
+    st.sidebar.markdown("## 🧭 How to Use This Tool")
+
+    st.sidebar.markdown("### 🧮 Select Mode")
+    st.sidebar.markdown("- Choose between:")
+    st.sidebar.markdown("  - **Univariate** (e.g., `cos(x)`)")
+    st.sidebar.markdown("  - **Multivariable** (e.g., `x² + y²`)")
+
+    st.sidebar.markdown("### 🔢 Function Options")
+    st.sidebar.markdown("- **Univariate Mode**:")
+    st.sidebar.markdown("  - Choose predefined or custom function")
+    st.sidebar.markdown("  - Toggle Taylor orders (1st–4th)")
+    st.sidebar.markdown("  - Adjust expansion point `a` with slider")
+    st.sidebar.markdown("  - Optionally animate the approximation")
+
+    st.sidebar.markdown("- **Multivariable Mode**:")
+    st.sidebar.markdown("  - Choose or define a bivariate function")
+    st.sidebar.markdown("  - Adjust expansion center `(a, b)` with sliders")
+    st.sidebar.markdown("  - Use animation to explore Taylor surface")
+
+    st.sidebar.info("📘 For math and theory, visit the **Resources** page.")
+
 # Define the run function for this page
 
 st.title("📐 Taylor Series & Optimizer Foundations")
 
 mode = st.sidebar.radio("Select Mode", ["📘 Guide", "📈 Univariate", "🌐 Multivariable"])
+
+if mode in ["📈 Univariate", "🌐 Multivariable"]:
+    show_taylor_sidebar_guide()
 
 # tab1, tab2, tab3 = st.tabs(["📘 Guide", "📈 Univariate", "🌐 Multivariable"])
 
