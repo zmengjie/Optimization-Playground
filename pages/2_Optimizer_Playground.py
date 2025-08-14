@@ -1506,17 +1506,22 @@ with tab2:
     with col_left:
         mode_dim = st.radio("Function Type", ["Bivariate (f(x,y))", "Univariate (f(x))"])
 
-        mode = st.radio("Function Source", ["Predefined", "Custom"])
-
         if mode_dim == "Bivariate (f(x,y))":
             mode = st.radio("Function Source", ["Predefined", "Custom"])
-            func_name = st.selectbox("Function", list(predefined_funcs.keys())) if mode == "Predefined" else None
-            expr_str = st.text_input("Enter function f(x,y):", "x**2 + y**2") if mode == "Custom" else ""
-            w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
+            if mode == "Predefined":
+                func_name = st.selectbox("Function", list(predefined_funcs.keys()))
+                expr_str = ""
+                w_val = st.slider("Weight w (Multi-Objective)", 0.0, 1.0, 0.5) if func_name == "Multi-Objective" else None
+            else:
+                func_name = None
+                expr_str = st.text_input("Enter function f(x,y):", "x**2 + y**2")
+                w_val = None
         else:
-            func_name, mode, expr_str, w_val = None, None, None, None  # Clear these for univariate
-
-
+            # For Univariate: hide both function source and selection
+            mode = "Predefined"
+            func_name = "Quadratic Bowl"
+            expr_str = ""
+            w_val = None
 
             # --- Function definition based on mode_dim ---
 
@@ -1582,15 +1587,20 @@ with tab2:
             x_sym, y_sym, w_sym = sp.symbols("x y w")
 
             if mode_dim == "Univariate (f(x))":
-                # Fallback univariate function for tuning (x**2)
-                symbolic_expr = x_sym**2
+                # Use selected or custom symbolic expression
+                if source_mode == "Predefined":
+                    symbolic_expr = predefined_funcs[func_name][0]
+                else:
+                    symbolic_expr = st.session_state.custom_expr
+
                 f_lambdified = sp.lambdify(x_sym, symbolic_expr, modules="numpy")
 
-                # Dummy wrapper to adapt univariate f to existing tuner
+                # Wrap to make it compatible with tuner that expects (x, y)
                 f_2d = lambda x, y: f_lambdified(x)  # ignore y
                 best_lr, best_steps = run_auto_tuning_simulation(f_2d, optimizer, default_x, 0.0)
 
             else:
+                # Multivariable
                 symbolic_expr = predefined_funcs[func_name][0]
                 if func_name == "Multi-Objective" and w_val is not None:
                     symbolic_expr = symbolic_expr.subs(w_sym, w_val)
@@ -1599,6 +1609,7 @@ with tab2:
                 best_lr, best_steps = run_auto_tuning_simulation(f_lambdified, optimizer, default_x, default_y)
 
             default_lr, default_steps = best_lr, best_steps
+
 
         
             # symbolic_expr = predefined_funcs[func_name][0]
