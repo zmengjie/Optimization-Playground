@@ -319,27 +319,36 @@ with tab1:
     st.markdown("""
     <div style='background-color: #eaf7ff; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
-    ### 🚀 Optimizer Configuration
+    <h3 style='margin-top: 0;'>🚀 Optimizer Configuration</h3>
 
-    - Choose from:
-      - `GradientDescent`  
-      - `Momentum`  
-      - `Adam`  
-      - `RMSProp`  
-      - `Newton's Method`  
-      - `Simulated Annealing`  
-      - `Genetic Algorithm`
+    <ul>
+    <li><strong>Choose from:</strong>
+        <ul>
+        <li><code>GradientDescent</code></li>
+        <li><code>Momentum</code></li>
+        <li><code>Adam</code></li>
+        <li><code>RMSProp</code></li>
+        <li><code>Newton's Method</code></li>
+        <li><code>Simulated Annealing</code></li>
+        <li><code>Genetic Algorithm</code></li>
+        </ul>
+    </li>
 
-    - Tune hyperparameters:
-      - **Learning Rate**  
-      - **Steps**  
-      - **Initial values** (`x` or `(x, y)` depending on mode)
+    <li><strong>Tune hyperparameters:</strong>
+        <ul>
+        <li><strong>Learning Rate</strong></li>
+        <li><strong>Steps</strong></li>
+        <li><strong>Initial values</strong> (<code>x</code> or <code>(x, y)</code> depending on mode)</li>
+        </ul>
+    </li>
 
-    - 🔍 <b>Backtracking Line Search</b> is only available for <b>Gradient Descent</b>  
-    - 🧠 <b>Newton’s Method</b> uses the <b>Hessian inverse</b> to compute its step size — <b>learning rate is ignored</b>.
+    <li>🔍 <strong>Backtracking Line Search</strong> is <em>only available</em> for <strong>Gradient Descent</strong></li>
+    <li>🧠 <strong>Newton’s Method</strong> uses the <strong>Hessian inverse</strong> to compute its step size — <em>learning rate is ignored</em>.</li>
+    </ul>
 
     </div>
     """, unsafe_allow_html=True)
+
 
     # --- Auto-Tune & Animation ---
     st.markdown("""
@@ -380,6 +389,8 @@ with tab1:
 
     </div>
     """, unsafe_allow_html=True)
+
+    st.markdown("---")  
 
     st.info("💡 Tip: If you're unsure about the math, check the **Resources** page for detailed explanations and reference links.")
 
