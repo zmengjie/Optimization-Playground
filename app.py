@@ -1,4 +1,18 @@
 import streamlit as st
+import streamlit.components.v1 as components
+
+# Inject Google Analytics tracking
+components.html("""
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4LXS47NYC0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-4LXS47NYC0');
+</script>
+""", height=0)
 
 st.markdown(
     """
