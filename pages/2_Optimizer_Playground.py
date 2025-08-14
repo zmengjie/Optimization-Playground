@@ -388,7 +388,7 @@ with tab1:
 
     # --- Symbolic Tab ---
     st.markdown("""
-    <div style='background-color: #fffbe6; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
+    <div style='background-color: #f9f9f9; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
 
     <h3>📐 Symbolic Analysis Tab</h3>
 
@@ -398,9 +398,16 @@ with tab1:
     <li><strong>Objective Function</strong>: <code>f(x, y)</code></li>
     <li><strong>Lagrangian</strong>: <code>𝓛(x, y, λ)</code></li>
     <li><strong>KKT Conditions</strong> (for constrained problems)</li>
-    <li>Symbolic <strong>Gradient</strong> and <strong>Hessian</strong></li>
+    <li>Symbolic <strong>Gradient</strong> and <strong>Hessian</strong></li>         
+                
+    <li><strong>Newton’s Method (✅)</strong>:
+        <ul>
+        <li>The <strong>Hessian matrix</strong> is shown</li>
+        <li>The <strong>determinant</strong> is calculated</li>
+        <li>This explains how Newton's step direction and size are determined</li>
+        </ul>
+    </li>
     </ul>
-
     </div>
     """, unsafe_allow_html=True)
 
