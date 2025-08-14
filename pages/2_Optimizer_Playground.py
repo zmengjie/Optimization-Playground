@@ -1104,20 +1104,41 @@ with tab2:
         frames = []
         fig_anim, ax_anim = plt.subplots(figsize=(5, 4))
 
-        for i in range(1, len(path) + 1):
-            ax_anim.clear()
-            ax_anim.contour(X, Y, Z, levels=30, cmap="viridis")
-            ax_anim.plot(*zip(*path[:i]), 'r*-')
-            ax_anim.set_xlim([-5, 5])
-            ax_anim.set_ylim([-5, 5])
-            ax_anim.set_title(f"Step {i}/{len(path)-1}")
+        if mode_dim == "Bivariate (f(x,y))":
+            for i in range(1, len(path) + 1):
+                ax_anim.clear()
+                ax_anim.contour(X, Y, Z, levels=30, cmap="viridis")
+                ax_anim.plot(*zip(*path[:i]), 'r*-')  # Bivariate uses (x, y)
+                ax_anim.set_xlim([-5, 5])
+                ax_anim.set_ylim([-5, 5])
+                ax_anim.set_title(f"Step {i}/{len(path)-1}")
 
-            buf = BytesIO()
-            fig_anim.savefig(buf, format='png', dpi=100)  # optional: set dpi
-            buf.seek(0)
-            frames.append(Image.open(buf).convert("P"))  # convert to palette for GIF efficiency
-            buf.close()
+                buf = BytesIO()
+                fig_anim.savefig(buf, format='png', dpi=100)
+                buf.seek(0)
+                frames.append(Image.open(buf).convert("P"))
+                buf.close()
 
+        elif mode_dim == "Univariate (f(x))":
+            for i in range(1, len(path) + 1):
+                ax_anim.clear()
+                x_vals_anim = path[:i]
+                y_vals_anim = [float(f_func(xi)) for xi in x_vals_anim]
+                ax_anim.plot(x_vals_anim, y_vals_anim, "ro-", label="Descent Path")
+                ax_anim.set_xlim([-5, 5])
+                ax_anim.set_ylim([min(y_vals_anim) - 1, max(y_vals_anim) + 1])
+                ax_anim.set_xlabel("x")
+                ax_anim.set_ylabel("f(x)")
+                ax_anim.set_title(f"Step {i}/{len(path)-1}")
+                ax_anim.grid(True)
+
+                buf = BytesIO()
+                fig_anim.savefig(buf, format='png', dpi=100)
+                buf.seek(0)
+                frames.append(Image.open(buf).convert("P"))
+                buf.close()
+
+        # Final rendering
         gif_buf = BytesIO()
         frames[0].save(
             gif_buf, format="GIF", save_all=True,
@@ -1125,6 +1146,33 @@ with tab2:
         )
         gif_buf.seek(0)
         st.image(gif_buf, caption="📽️ Animated Descent Path", use_container_width=True)
+
+
+    # if show_animation:
+    #     frames = []
+    #     fig_anim, ax_anim = plt.subplots(figsize=(5, 4))
+
+    #     for i in range(1, len(path) + 1):
+    #         ax_anim.clear()
+    #         ax_anim.contour(X, Y, Z, levels=30, cmap="viridis")
+    #         ax_anim.plot(*zip(*path[:i]), 'r*-')
+    #         ax_anim.set_xlim([-5, 5])
+    #         ax_anim.set_ylim([-5, 5])
+    #         ax_anim.set_title(f"Step {i}/{len(path)-1}")
+
+    #         buf = BytesIO()
+    #         fig_anim.savefig(buf, format='png', dpi=100)  # optional: set dpi
+    #         buf.seek(0)
+    #         frames.append(Image.open(buf).convert("P"))  # convert to palette for GIF efficiency
+    #         buf.close()
+
+    #     gif_buf = BytesIO()
+    #     frames[0].save(
+    #         gif_buf, format="GIF", save_all=True,
+    #         append_images=frames[1:], duration=300, loop=0
+    #     )
+    #     gif_buf.seek(0)
+    #     st.image(gif_buf, caption="📽️ Animated Descent Path", use_container_width=True)
 
 
 
