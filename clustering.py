@@ -45,10 +45,8 @@ def clustering_ui():
             "Spectral": "**Spectral Clustering**: Converts data into a graph structure and performs dimensionality reduction before clustering."
         }
 
-        st.markdown("### 📘 Method Explanation")
-        st.markdown(algo_explanations.get(method, "No explanation available."))
 
-        
+
         if method in ["K-Means", "Agglomerative", "Birch", "GMM", "Spectral"]:
             k = st.slider("Number of Clusters", 2, 10, 3)
         if method == "DBSCAN":
@@ -67,8 +65,6 @@ def clustering_ui():
     elif dataset_choice == "Iris":
         iris = load_iris()
         X = iris.data[:, :2]
-
-
 
 
 
