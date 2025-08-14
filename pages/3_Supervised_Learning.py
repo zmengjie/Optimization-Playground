@@ -61,7 +61,7 @@ def supervised_ui():
         if dataset_choice != "Upload Your Own":
             df, label_names = load_builtin_dataset(dataset_choice)
             st.success(f"Loaded **{dataset_choice}** dataset with shape {df.shape}")
-            st.markdown("#### 🥪 Sample Preview")
+            # st.markdown("#### 🥪 Sample Preview")
             st.dataframe(df.head())
         else:
             uploaded_file = st.file_uploader("📂 Upload CSV", type=["csv"])
@@ -86,6 +86,9 @@ def supervised_ui():
         features = st.multiselect("🧹 Feature Columns", feature_candidates, default=initial_features)
 
         task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
+
+    st.subheader("📊 Sample Data Preview")
+    st.dataframe(df.head())
 
     # === Move below to MAIN DISPLAY ===
     st.markdown("## 🎯 Target Distribution")
