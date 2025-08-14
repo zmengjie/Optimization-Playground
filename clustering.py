@@ -107,9 +107,9 @@ def clustering_ui():
 
 
     elif method == "DBSCAN":
-        eps = st.slider("Epsilon (eps)", 0.1, 2.0, 0.5, 0.1)
-        min_samples = st.slider("min_samples", 2, 20, 5)
-        metric = st.selectbox("Distance Metric", ["euclidean", "manhattan", "cosine"], key="db_metric")
+        # eps = st.slider("Epsilon (eps)", 0.1, 2.0, 0.5, 0.1)
+        # min_samples = st.slider("min_samples", 2, 20, 5)
+        # metric = st.selectbox("Distance Metric", ["euclidean", "manhattan", "cosine"], key="db_metric")
         with st.expander("❓ What do these parameters mean?"):
             st.markdown("""
             - **Epsilon (eps)**: Radius to search for neighboring points. Smaller values mean tighter clusters.
@@ -129,19 +129,19 @@ def clustering_ui():
 
 
     elif method == "Agglomerative":
-        k = st.slider("Number of Clusters", 2, 10, 3)
-        linkage = st.selectbox("Linkage", ["ward", "complete", "average", "single"])
+        # k = st.slider("Number of Clusters", 2, 10, 3)
+        # linkage = st.selectbox("Linkage", ["ward", "complete", "average", "single"])
         model = AgglomerativeClustering(n_clusters=k, linkage=linkage)
         labels = model.fit_predict(X)
 
     elif method == "Birch":
-        threshold = st.slider("Threshold", 0.01, 2.0, 0.5, 0.01)
-        k = st.slider("Number of Clusters", 2, 10, 3)
+        # threshold = st.slider("Threshold", 0.01, 2.0, 0.5, 0.01)
+        # k = st.slider("Number of Clusters", 2, 10, 3)
         model = Birch(threshold=threshold, n_clusters=k)
         labels = model.fit_predict(X)
 
     elif method == "GMM":
-        k = st.slider("Number of Components", 2, 10, 3)
+        # k = st.slider("Number of Components", 2, 10, 3)
         model = GaussianMixture(n_components=k, random_state=0)
         labels = model.fit_predict(X)
         centers = model.means_
@@ -157,7 +157,7 @@ def clustering_ui():
                 covariances = [np.eye(X.shape[1]) * cov for cov in model.covariances_]
 
     elif method == "Spectral":
-        k = st.slider("Number of Clusters", 2, 10, 3)
+        # k = st.slider("Number of Clusters", 2, 10, 3)
         model = SpectralClustering(n_clusters=k, affinity='nearest_neighbors', assign_labels='kmeans')
         labels = model.fit_predict(X)
 
