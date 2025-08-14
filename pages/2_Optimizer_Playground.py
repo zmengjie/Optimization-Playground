@@ -1126,64 +1126,24 @@ with tab2:
                 frames.append(Image.open(buf).convert("P"))
                 buf.close()
 
-        elif mode_dim == "Univariate (f(x))" and xs and ys and len(xs) >= 2:
-            x_vals = np.linspace(-5, 5, 500)
-            y_vals_full = [f_func(xi) for xi in x_vals]
-            y_min = min(y_vals_full) - 1
-            y_max = max(y_vals_full) + 1
+        elif mode_dim == "Univariate (f(x))":
+            for i in range(1, len(path) + 1):
+                ax_anim.clear()
+                x_vals_anim = path[:i]
+                y_vals_anim = [float(f_func(xi)) for xi in x_vals_anim]
+                ax_anim.plot(x_vals_anim, y_vals_anim, "ro-", label="Descent Path")
+                ax_anim.set_xlim([-5, 5])
+                ax_anim.set_ylim([min(y_vals_anim) - 1, max(y_vals_anim) + 1])
+                ax_anim.set_xlabel("x")
+                ax_anim.set_ylabel("f(x)")
+                ax_anim.set_title(f"Step {i}/{len(path)-1}")
+                ax_anim.grid(True)
 
-            fig, ax = plt.subplots(figsize=(6, 4))
-            ax.plot(x_vals, y_vals_full, label="f(x)", color="blue", linewidth=2, alpha=0.6)
-            ax.set_xlim(-5, 5)
-            ax.set_ylim(y_min, y_max)
-            ax.set_xlabel("x")
-            ax.set_ylabel("f(x)")
-            ax.set_title("Univariate Gradient Descent")
-            ax.legend()
-
-            line, = ax.plot([], [], 'r*-', label="Path")
-            dot, = ax.plot([], [], 'go')  # final point
-
-            def init():
-                line.set_data([], [])
-                dot.set_data([], [])
-                return line, dot
-
-            def update(i):
-                if i < len(xs):
-                    line.set_data(xs[:i+1], ys[:i+1])
-                    dot.set_data(xs[i], ys[i])
-                return line, dot
-
-            ani = FuncAnimation(fig, update, frames=len(xs), init_func=init, blit=True)
-
-            if len(xs) > 1:  # ✅ Avoid crashing on single-point path
-                with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                    ani.save(tmpfile.name, writer="pillow", fps=4)
-                    st.image(tmpfile.name)
-            else:
-                st.warning("⚠️ Animation skipped: not enough points in path.")
-        else:
-            st.warning("⚠️ Animation not shown — make sure descent ran and path is valid.")
-
-
-            # for i in range(1, len(path) + 1):
-            #     ax_anim.clear()
-            #     x_vals_anim = path[:i]
-            #     y_vals_anim = [float(f_func(xi)) for xi in x_vals_anim]
-            #     ax_anim.plot(x_vals_anim, y_vals_anim, "ro-", label="Descent Path")
-            #     ax_anim.set_xlim([-5, 5])
-            #     ax_anim.set_ylim([min(y_vals_anim) - 1, max(y_vals_anim) + 1])
-            #     ax_anim.set_xlabel("x")
-            #     ax_anim.set_ylabel("f(x)")
-            #     ax_anim.set_title(f"Step {i}/{len(path)-1}")
-            #     ax_anim.grid(True)
-
-            #     buf = BytesIO()
-            #     fig_anim.savefig(buf, format='png', dpi=100)
-            #     buf.seek(0)
-            #     frames.append(Image.open(buf).convert("P"))
-            #     buf.close()
+                buf = BytesIO()
+                fig_anim.savefig(buf, format='png', dpi=100)
+                buf.seek(0)
+                frames.append(Image.open(buf).convert("P"))
+                buf.close()
 
         # Final rendering
         gif_buf = BytesIO()
