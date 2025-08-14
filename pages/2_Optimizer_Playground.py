@@ -437,6 +437,10 @@ with tab2:
     with st.sidebar:
         mode_dim = st.radio("Function Type", ["Univariate (f(x))", "Bivariate (f(x,y))"])
 
+
+        if mode_dim == "Univariate (f(x))":
+            expr_uni = st.sidebar.text_input("Enter univariate function f(x):", "x**2")
+
         if mode_dim == "Bivariate (f(x,y))":
             mode = st.radio("Function Source", ["Predefined", "Custom"])
             if mode == "Predefined":
@@ -622,7 +626,6 @@ with tab2:
     # Decide f_expr + constraints + description ONCE
     if mode_dim == "Univariate (f(x))":
         # Univariate input (separate prompt if you like; keeping your default here)
-        expr_uni = st.sidebar.text_input("Enter univariate function f(x):", "x**2")
         try:
             f_expr = sp.sympify(expr_uni)
             constraints = []
