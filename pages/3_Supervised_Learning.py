@@ -61,8 +61,6 @@ def supervised_ui():
         if dataset_choice != "Upload Your Own":
             df, label_names = load_builtin_dataset(dataset_choice)
             st.success(f"Loaded **{dataset_choice}** dataset with shape {df.shape}")
-            # st.markdown("#### 🥪 Sample Preview")
-            st.dataframe(df.head())
         else:
             uploaded_file = st.file_uploader("📂 Upload CSV", type=["csv"])
             if uploaded_file:
