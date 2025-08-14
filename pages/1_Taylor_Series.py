@@ -31,16 +31,15 @@ mode = st.sidebar.radio("Select Mode", ["📘 Guide", "📈 Univariate", "🌐 M
 # tab1, tab2, tab3 = st.tabs(["📘 Guide", "📈 Univariate", "🌐 Multivariable"])
 
 if mode == "📘 Guide":
-# with tab1:
     st.header("🧭 How to Use the Taylor Visualization Tool")
 
     st.subheader("📈 Univariate Mode")
     st.markdown("""
     - Choose from **predefined functions** (e.g., `cos(x)`) or select **custom** to enter your own.
     - Use checkboxes to toggle:
-    - **1st-order** (Linear)
-    - **2nd-order** (Parabola)
-    - **3rd & 4th-order** terms
+        - **1st-order** (Linear)
+        - **2nd-order** (Parabola)
+        - **3rd & 4th-order** terms
     - Adjust the **expansion point `a`** using the slider to see how Taylor approximation changes.
     - Enable **animation** to dynamically view the approximation update.
     """)
@@ -50,11 +49,11 @@ if mode == "📘 Guide":
     - Select from predefined 2D functions or enter a **custom** bivariate function.
     - Adjust **center a (x)** and **b (y)** using sliders.
     - Toggle animation to move:
-    - Only `a`, only `b`, or both together.
+        - Only `a`, only `b`, or both together.
     - Visual comparison between the **true function** and its **2nd-order approximation** is shown in 3D.
     """)
 
-    st.info("ℹ️ You can switch between Univariate and Multivariable using the sidebar selector. ")
+    st.info("ℹ️ You can switch between Univariate and Multivariable using the sidebar selector.")
     st.info(
         "📘 For math and theory, visit the **Resources** page. "
         "This will help you understand how Taylor series underpins optimization methods."
