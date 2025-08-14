@@ -22,153 +22,6 @@ st.markdown(
 )
 
 
-# --- Add near the top of your Taylor page (after imports) ---
-
-
-# Add CSS for overlay and modal with close button
-
-def render_taylor_guide_modal():
-    """
-    Renders a floating guide modal for the Taylor page.
-    - Shows a small '❓ Guide' button
-    - On click, opens a centered modal with a top-right X close button
-    - Pure Streamlit + CSS (no extra JS/components)
-    """
-    import streamlit as st
-
-    # --- CSS to style overlay and modal ---
-    st.markdown("""
-    <style>
-    /* Overlay */
-    #guide-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.55);
-        z-index: 1000;
-    }
-
-    /* Modal container */
-    .guide-modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1001;
-        background: #fff;
-        width: min(900px, 92vw);
-        max-height: 86vh;
-        overflow: auto;
-        border-radius: 18px;
-        padding: 28px 30px 22px 30px;
-        box-shadow: 0 20px 60px rgba(0,0,0,.35);
-    }
-
-    /* Kill the wrapper that creates white bar */
-    .guide-modal .element-container {
-        display: contents !important;
-    }
-
-    /* Style the close button */
-    .guide-modal .stButton>button {
-        font-size: 22px;
-        line-height: 1;
-        padding: 2px 10px;
-        border-radius: 10px;
-        background: #f4f4f4;
-        border: 1px solid #e6e6e6;
-        color: #555;
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        right: 12px;
-        z-index: 1002;
-    }
-    .guide-modal .stButton>button:hover {
-        background: #ececec;
-        color: #111;
-    }
-
-    /* Headings and layout */
-    .guide-modal h1, .guide-modal h2, .guide-modal h3, .guide-modal h4 {
-        margin-top: 0;
-    }
-    .guide-title {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 8px;
-    }
-    .guide-title .emoji {
-        font-size: 28px;
-    }
-    .dim-note {
-        color: #6b7280;
-        font-size: 0.95rem;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # Launcher button logic
-    if "show_taylor_guide" not in st.session_state:
-        st.session_state.show_taylor_guide = False
-
-    cols = st.columns([1, 9])
-    with cols[0]:
-        if st.button("❓ Guide"):
-            st.session_state.show_taylor_guide = True
-            st.rerun()
-
-    if not st.session_state.show_taylor_guide:
-        return
-
-    # Overlay
-    st.markdown('<div id="guide-overlay"></div>', unsafe_allow_html=True)
-
-    # Modal body
-    with st.container():
-        st.markdown('<div class="guide-modal">', unsafe_allow_html=True)
-
-        # Inject close button directly
-        close_btn_col = st.columns([10, 1])
-        with close_btn_col[1]:
-            if st.button("×", key="close_modal_button"):
-                st.session_state.show_taylor_guide = False
-                st.rerun()
-
-        # Modal content
-        st.markdown("""
-        <div class="guide-title">
-        <span class="emoji">🧭</span>
-        <h2 style="margin:0;">How to use</h2>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("### Univariate Mode")
-        st.markdown("""
-        - Choose a **predefined function** or select **Custom** to enter your own.
-        - Toggle:
-        - **1st-order** (Linear)  
-        - **2nd-order** (Parabola)  
-        - **3rd & 4th-order** terms
-        - Drag the **expansion point `a`** slider to see how the approximation changes.
-        - Turn on **Animate** to watch the approximation update dynamically.
-        """)
-
-        st.markdown("### Multivariable Mode")
-        st.markdown("""
-        - Select a predefined 2D function or enter a **custom** bivariate function.
-        - Adjust the centers **a (x)** and **b (y)** with sliders.
-        - **Animate path** for **a**, **b**, or **both**, then press **Play**.
-        - Compare the **true surface** with its **2nd-order Taylor approximation** in 3D.
-        """)
-
-        st.caption("Tip: Switch between Univariate and Multivariable from the sidebar. Theory lives in the Resources page.")
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
 # Define the run function for this page
 
 st.title("📐 Taylor Series & Optimizer Foundations")
@@ -211,7 +64,6 @@ if mode == "📘 Guide":
 
 
 elif mode == "📈 Univariate":
-    render_taylor_guide_modal()
     # -------------------- LEFT: controls --------------------
     with st.sidebar:
         st.markdown("### 📈 Univariate Settings")
@@ -278,7 +130,6 @@ elif mode == "📈 Univariate":
 # Section 3: Interactive Visualization
 # Tab 3: Multivariable Visualizer
 elif mode == "🌐 Multivariable":
-    render_taylor_guide_modal()
     # st.markdown("### 🌐 Multivariable Taylor Expansion Visualizer")
     show_multivariable_taylor()
 
