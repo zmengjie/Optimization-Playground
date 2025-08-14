@@ -20,72 +20,98 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-def guide_content(mode: str):
-    if mode == "📈 Univariate":
-        return """
-**Univariate Mode**
-- Choose a predefined function or select **Custom** and enter your own.
-- Toggle:
-  - **1st-order** (Linear)
-  - **2nd-order** (Parabola)
-  - **3rd & 4th-order** terms
-- Drag **expansion point `a`** to see how the approximation changes.
-- Turn on **Animate** to watch the approximation update dynamically.
-"""
-    else:
-        return """
-**Multivariable Mode**
-- Choose a predefined 2D function or enter a **custom** bivariate function.
-- Drag **center a (x)** and **b (y)**.
-- Animation path: **a only**, **b only**, or **both a & b**.
-- Compare the **true surface** vs its **2nd-order Taylor approx** in 3D.
-"""
 
-# one-time auto-open per session (optional)
-st.session_state.setdefault("show_taylor_guide", False)
 
-top_cols = st.columns([1,1,6])
-with top_cols[0]:
-    if st.button("❓ Guide"):
-        st.session_state.show_taylor_guide = True
+# --- Add near the top of your Taylor page (after imports) ---
 
-# --- draw modal if toggled ---
-if st.session_state.show_taylor_guide:
-    # backdrop
+import streamlit as st
+
+def guide_modal(key="taylor"):
+    # one-time CSS
     st.markdown("""
     <style>
-      ._modal-backdrop {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-        z-index: 1000;
+      /* overlay */
+      #guide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 9998; }
+      /* modal panel */
+      .guide-modal {
+        position: fixed; z-index: 9999;
+        top: 8vh; left: 50%; transform: translateX(-50%);
+        width: min(880px, 92vw);
+        background: #fff; border-radius: 14px;
+        padding: 22px 26px; box-shadow: 0 25px 80px rgba(0,0,0,.35);
       }
-      ._modal {
-        position: fixed; top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        width: min(720px, 90vw);
-        max-height: 80vh; overflow: auto;
-        background: #ffffff; padding: 1.25rem 1.5rem;
-        border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.25);
-        z-index: 1001;
+      .guide-modal h2 { margin: 0 0 .6rem 0; }
+      .guide-modal h4 { margin: 1.1rem 0 .4rem 0; }
+      .guide-modal ul { margin: .25rem 0 .6rem 1.2rem; }
+      /* make Streamlit button compact and not full-width */
+      .guide-actions .stButton > button {
+        width: auto !important; padding: .45rem .9rem;
+        border-radius: 10px;
       }
-      ._modal h3 { margin-top: 0; }
+      /* right-align the Close button row */
+      .guide-actions { display: flex; justify-content: flex-end; margin-top: .5rem; }
     </style>
-    <div class="_modal-backdrop"></div>
     """, unsafe_allow_html=True)
 
-    # modal body
-    with st.container():
-        st.markdown('<div class="_modal">', unsafe_allow_html=True)
-        st.markdown("### 🧭 How to use")
-        st.markdown(guide_content(st.session_state.get("taylor_mode", "📈 Univariate")))
-        colA, colB = st.columns([1,5])
-        with colA:
-            if st.button("Close"):
-                st.session_state.show_taylor_guide = False
-        st.markdown('</div>', unsafe_allow_html=True)
+    # state key names
+    open_key  = f"{key}_guide_open"
+    show_key  = f"{key}_show_guide"
+
+    if show_key not in st.session_state:
+        st.session_state[show_key] = False
+
+    # small trigger button (put wherever you like)
+    if st.button("❓ Guide", key=open_key):
+        st.session_state[show_key] = True
+
+    # render modal
+    if st.session_state[show_key]:
+        # overlay + panel
+        st.markdown('<div id="guide-overlay"></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="guide-modal">
+          <h2>🧭 How to use</h2>
+
+          <h4>Univariate Mode</h4>
+          <ul>
+            <li>Choose a predefined function or select <b>Custom</b> and enter your own.</li>
+            <li>Toggle:
+              <ul>
+                <li><b>1st-order</b> (Linear)</li>
+                <li><b>2nd-order</b> (Parabola)</li>
+                <li><b>3rd &amp; 4th-order</b> terms</li>
+              </ul>
+            </li>
+            <li>Drag the <b>expansion point a</b> to see how the approximation changes.</li>
+            <li>Turn on <b>Animate</b> to watch the approximation update dynamically.</li>
+          </ul>
+
+          <h4>Multivariable Mode</h4>
+          <ul>
+            <li>Select a predefined 2D function or enter a <b>custom</b> bivariate function.</li>
+            <li>Adjust the centers <b>a (x)</b> and <b>b (y)</b> with sliders.</li>
+            <li>Animate the path for <b>a</b>, <b>b</b>, or <b>both</b>, then press <b>Play</b>.</li>
+            <li>Compare the <b>true surface</b> with its <b>2nd-order Taylor approximation</b> in 3D.</li>
+          </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # right-aligned Close button (no full-width bar)
+        actions = st.container()
+        with actions:
+            st.markdown('<div class="guide-actions">', unsafe_allow_html=True)
+            if st.button("Close", key=f"{key}_close"):
+                st.session_state[show_key] = False
+            st.markdown('</div>', unsafe_allow_html=True)
+
+# --- Call this once on the page (e.g., right under your title) ---
+
 
 # Define the run function for this page
 
 st.title("📐 Taylor Series & Optimizer Foundations")
+
+guide_modal("taylor")
 
 mode = st.sidebar.radio("Select Mode", ["📘 Guide", "📈 Univariate", "🌐 Multivariable"])
 
