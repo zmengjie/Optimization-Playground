@@ -4,13 +4,13 @@ def show_resources():
     # st.title("📚 Educational Resources")
 
     section = st.sidebar.selectbox("Select a topic:", [
-        "",  # Default empty option for intro screen
+        "📖 Overview",  # Default empty option for intro screen
         "🔎 Taylor Series",
         "🛠️ Optimization",
         "🌐 External References"
     ])
 
-    if section == "":
+    if section == "📖 Overview":
         st.markdown("""
         <div style='background-color:#fef9e7; padding:20px 25px; border-radius:12px; margin-bottom:25px;'>
         <h3>📘 Welcome to the Learning Hub!</h3>
