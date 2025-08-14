@@ -1126,41 +1126,45 @@ with tab2:
                 frames.append(Image.open(buf).convert("P"))
                 buf.close()
 
-        elif mode_dim == "Univariate (f(x))" and xs and ys:
+        elif mode_dim == "Univariate (f(x))" and xs and ys and len(xs) >= 2:
             x_vals = np.linspace(-5, 5, 500)
-            y_vals = [f_func(xi) for xi in x_vals]
+            y_vals_full = [f_func(xi) for xi in x_vals]
+            y_min = min(y_vals_full) - 1
+            y_max = max(y_vals_full) + 1
 
             fig, ax = plt.subplots(figsize=(6, 4))
+            ax.plot(x_vals, y_vals_full, label="f(x)", color="blue", linewidth=2, alpha=0.6)
             ax.set_xlim(-5, 5)
-            ax.set_ylim(min(y_vals) - 1, max(y_vals) + 1)
+            ax.set_ylim(y_min, y_max)
             ax.set_xlabel("x")
             ax.set_ylabel("f(x)")
-            ax.set_title("Gradient Descent on f(x)")
+            ax.set_title("Univariate Gradient Descent")
+            ax.legend()
 
-            ax.plot(x_vals, y_vals, label="f(x)", color="blue", linewidth=2, alpha=0.6)
-            line, = ax.plot([], [], 'r*-', label="Descent Path")
-            start_dot, = ax.plot([], [], 'go', label="Start")
-            current_dot, = ax.plot([], [], 'ro', label="Current")
+            line, = ax.plot([], [], 'r*-', label="Path")
+            dot, = ax.plot([], [], 'go')  # final point
 
             def init():
                 line.set_data([], [])
-                start_dot.set_data([], [])
-                current_dot.set_data([], [])
-                return line, start_dot, current_dot
+                dot.set_data([], [])
+                return line, dot
 
             def update(i):
                 if i < len(xs):
                     line.set_data(xs[:i+1], ys[:i+1])
-                    start_dot.set_data(xs[0], ys[0])
-                    current_dot.set_data(xs[i], ys[i])
-                return line, start_dot, current_dot
+                    dot.set_data(xs[i], ys[i])
+                return line, dot
 
             ani = FuncAnimation(fig, update, frames=len(xs), init_func=init, blit=True)
 
-            # Save as GIF
-            with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
-                ani.save(tmpfile.name, writer="pillow", fps=4)
-                st.image(tmpfile.name)
+            if len(xs) > 1:  # ✅ Avoid crashing on single-point path
+                with tempfile.NamedTemporaryFile(suffix=".gif", delete=False) as tmpfile:
+                    ani.save(tmpfile.name, writer="pillow", fps=4)
+                    st.image(tmpfile.name)
+            else:
+                st.warning("⚠️ Animation skipped: not enough points in path.")
+        else:
+            st.warning("⚠️ Animation not shown — make sure descent ran and path is valid.")
 
 
             # for i in range(1, len(path) + 1):
