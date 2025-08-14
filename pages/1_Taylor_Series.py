@@ -35,7 +35,7 @@ mode = st.sidebar.radio("Select Mode", ["📘 Guide", "📈 Univariate", "🌐 M
 if mode == "📘 Guide":
     st.header("🧭 How to Use the Taylor Visualization Tool")
 
-    st.subheader("📈 Univariate Mode")
+    # st.subheader("📈 Univariate Mode")
     st.markdown("""
     <div style='background-color: #f9f9f9; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
 
@@ -53,7 +53,7 @@ if mode == "📘 Guide":
     """, unsafe_allow_html=True)
 
 
-    st.subheader("🌐 Multivariable Mode")
+    # st.subheader("🌐 Multivariable Mode")
     st.markdown("""
     <div style='background-color: #f0f4ff; padding: 25px 30px; border-radius: 12px;'>
 
