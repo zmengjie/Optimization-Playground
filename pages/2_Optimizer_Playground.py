@@ -388,7 +388,7 @@ with tab1:
 
     # --- Symbolic Tab ---
     st.markdown("""
-    <div style='background-color: #eee8e1; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
+    <div style='background-color: #e3e9e4; padding: 25px 30px; border-radius: 12px; margin-bottom: 20px;'>
 
     <h3>📐 Symbolic Analysis Tab</h3>
 
