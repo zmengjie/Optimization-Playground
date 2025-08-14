@@ -1130,24 +1130,39 @@ with tab2:
             x_vals = np.linspace(-5, 5, 500)
             y_vals = [f_func(xi) for xi in x_vals]
 
-            for i in range(1, len(xs) + 1):
-                fig_anim, ax_anim = plt.subplots(figsize=(6, 4))
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.set_xlim(-5, 5)
+            ax.set_ylim(min(y_vals) - 1, max(y_vals) + 1)
+            ax.set_xlabel("x")
+            ax.set_ylabel("f(x)")
+            ax.set_title("Gradient Descent on f(x)")
 
-                # Plot the full f(x) function
-                ax_anim.plot(x_vals, y_vals, label="f(x)", color="blue", linewidth=2, alpha=0.7)
+            # Plot the function
+            ax.plot(x_vals, y_vals, label="f(x)", color="blue", linewidth=2, alpha=0.6)
+            line, = ax.plot([], [], 'r*-', label="Descent Path")
+            start_dot, = ax.plot([], [], 'go', label="Start")
+            current_dot, = ax.plot([], [], 'ro', label="Current")
 
-                # Plot descent steps so far
-                ax_anim.plot(xs[:i], ys[:i], 'r*-', label="Descent Path")
+            def init():
+                line.set_data([], [])
+                start_dot.set_data([], [])
+                current_dot.set_data([], [])
+                return line, start_dot, current_dot
 
-                # Optional: mark start and end points
-                ax_anim.plot(xs[0], ys[0], 'go', label="Start")       # green start
-                ax_anim.plot(xs[i-1], ys[i-1], 'ro', label="Current")  # red current
+            def update(i):
+                line.set_data(xs[:i+1], ys[:i+1])
+                start_dot.set_data(xs[0], ys[0])
+                current_dot.set_data(xs[i], ys[i])
+                return line, start_dot, current_dot
 
-                ax_anim.set_title("Univariate Gradient Descent Animation")
-                ax_anim.set_xlabel("x")
-                ax_anim.set_ylabel("f(x)")
-                ax_anim.legend()
-                st.pyplot(fig_anim)
+            ani = FuncAnimation(fig, update, frames=len(xs), init_func=init, blit=True)
+
+            # Save to a temporary GIF file
+            tmpfile = tempfile.NamedTemporaryFile(suffix='.gif', delete=False)
+            ani.save(tmpfile.name, writer='pillow', fps=4)
+
+            # Display in Streamlit
+            st.image(tmpfile.name)
             # for i in range(1, len(path) + 1):
             #     ax_anim.clear()
             #     x_vals_anim = path[:i]
