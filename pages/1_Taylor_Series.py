@@ -20,6 +20,68 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+def guide_content(mode: str):
+    if mode == "📈 Univariate":
+        return """
+**Univariate Mode**
+- Choose a predefined function or select **Custom** and enter your own.
+- Toggle:
+  - **1st-order** (Linear)
+  - **2nd-order** (Parabola)
+  - **3rd & 4th-order** terms
+- Drag **expansion point `a`** to see how the approximation changes.
+- Turn on **Animate** to watch the approximation update dynamically.
+"""
+    else:
+        return """
+**Multivariable Mode**
+- Choose a predefined 2D function or enter a **custom** bivariate function.
+- Drag **center a (x)** and **b (y)**.
+- Animation path: **a only**, **b only**, or **both a & b**.
+- Compare the **true surface** vs its **2nd-order Taylor approx** in 3D.
+"""
+
+# one-time auto-open per session (optional)
+st.session_state.setdefault("show_taylor_guide", False)
+
+top_cols = st.columns([1,1,6])
+with top_cols[0]:
+    if st.button("❓ Guide"):
+        st.session_state.show_taylor_guide = True
+
+# --- draw modal if toggled ---
+if st.session_state.show_taylor_guide:
+    # backdrop
+    st.markdown("""
+    <style>
+      ._modal-backdrop {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+        z-index: 1000;
+      }
+      ._modal {
+        position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(720px, 90vw);
+        max-height: 80vh; overflow: auto;
+        background: #ffffff; padding: 1.25rem 1.5rem;
+        border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+        z-index: 1001;
+      }
+      ._modal h3 { margin-top: 0; }
+    </style>
+    <div class="_modal-backdrop"></div>
+    """, unsafe_allow_html=True)
+
+    # modal body
+    with st.container():
+        st.markdown('<div class="_modal">', unsafe_allow_html=True)
+        st.markdown("### 🧭 How to use")
+        st.markdown(guide_content(st.session_state.get("taylor_mode", "📈 Univariate")))
+        colA, colB = st.columns([1,5])
+        with colA:
+            if st.button("Close"):
+                st.session_state.show_taylor_guide = False
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # Define the run function for this page
 
