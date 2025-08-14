@@ -54,9 +54,11 @@ if mode == "📘 Guide":
     - Visual comparison between the **true function** and its **2nd-order approximation** is shown in 3D.
     """)
 
-    st.info("ℹ️ You can switch between Univariate and Multivariable using the sidebar selector. " \
-    "📘 For math and theory, visit the **Resources** page.")
-    # st.sidebar.info("📘 For math and theory, visit the **Resources** page.")
+    st.info("ℹ️ You can switch between Univariate and Multivariable using the sidebar selector. ")
+    st.info(
+        "📘 For math and theory, visit the **Resources** page. "
+        "This will help you understand how Taylor series underpins optimization methods."
+    )
 
 
 
