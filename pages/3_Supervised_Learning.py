@@ -88,7 +88,9 @@ def supervised_ui():
         task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
 
     st.markdown("## 🎯 Target Distribution")
-    st.dataframe(df[target].value_counts().reset_index(names=[target, "count"]))
+    st.dataframe(
+    df[target].value_counts().reset_index().rename(columns={"index": target, target: "count"})
+    )
 
     st.markdown("## 🔍 Feature Correlation")
     corr = df.select_dtypes(include=[np.number]).corr()
