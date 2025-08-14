@@ -345,9 +345,9 @@ with tab1:
 
     <li><strong>Tune hyperparameters:</strong>
         <ul>
-        <li><strong>Learning Rate</strong></li>
-        <li><strong>Steps</strong></li>
-        <li><strong>Initial values</strong> (<code>x</code> or <code>(x, y)</code> depending on mode)</li>
+        <li>Learning Rate</li>
+        <li>Steps</li>
+        <li>Initial values (<code>x</code> or <code>(x, y)</code> depending on mode)</li>
         </ul>
     </li>
 
