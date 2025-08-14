@@ -481,7 +481,7 @@ with tab2:
             options["pop_size"] = st.slider("Population Size", 10, 100, 20)
             options["mutation_std"] = st.slider("Mutation Std Dev", 0.1, 1.0, 0.3)
         elif optimizer == "Momentum":
-            options["momentum"] = st.slider("Momentum Coefficient", 0.0, 0.99, 0.9)
+            options["momentum"] = st.slider("Momentum Coefficient", 0.0, 0.99, 0.9, step=0.01)
             
 
         auto_tune = False
@@ -809,7 +809,10 @@ with tab2:
 
     # --- Taylor Expansion Toggle ---
 
-    show_taylor = st.sidebar.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
+    if mode_dim == "Bivariate (f(x,y))":
+        show_taylor = st.sidebar.checkbox("📐 Show Taylor Approximation at (a, b)", value=False)
+    else:
+        show_taylor = False
 
     show_2nd = False
     Z_t1 = None
