@@ -297,76 +297,91 @@ st.title("🚀 Optimizer Visual Playground")
 tab1, tab2, tab3 = st.tabs(["📘 Guide", "🧪 Optimizer Playground", "📐 Symbolic Analysis"])
 
 with tab1:
-    # st.title("📘 Optimization Guide")
-
-    # Section 1: Intro
     st.header("🧭 How to Use the Optimizer Playground")
 
-    st.subheader("🎯 Function Type")
+    # --- Function Type & Source ---
     st.markdown("""
-    - **Univariate**: Optimize functions of one variable \\( f(x) \\)
-    - **Bivariate**: Optimize functions of two variables \\( f(x, y) \\)
-    """)
+    <div style='background-color: #f9f9f9; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
-    st.subheader("🧪 Function Source")
-    st.markdown("""
-    - **Predefined**: Use built-in benchmark functions (e.g., `Quadratic Bowl`)
-    - **Custom**: Enter your own expression using Python-style syntax, e.g., `x**2 + y**2`
-    """)
+    ### 🎯 Function Setup
 
-    st.subheader("🚀 Optimizer Configuration")
+    - **Function Type**:
+      - **Univariate**: Optimize functions of one variable \\( f(x) \\)  
+      - **Bivariate**: Optimize functions of two variables \\( f(x, y) \\)
+    - **Function Source**:
+      - **Predefined**: Use built-in benchmark functions (e.g., `Quadratic Bowl`)  
+      - **Custom**: Enter your own expression (e.g., `x**2 + y**2`) using Python-style syntax
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- Optimizer Config ---
     st.markdown("""
-    - Select from:
-      - `GradientDescent`
-      - `Momentum`
-      - `Adam`
-      - `RMSProp`
-      - `Newton's Method`
-      - `Simulated Annealing`
+    <div style='background-color: #eaf7ff; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
+
+    ### 🚀 Optimizer Configuration
+
+    - Choose from:
+      - `GradientDescent`  
+      - `Momentum`  
+      - `Adam`  
+      - `RMSProp`  
+      - `Newton's Method`  
+      - `Simulated Annealing`  
       - `Genetic Algorithm`
-    - Configure:
-      - **Learning Rate**
-      - **Steps**
-      - **Initial x / (x, y)** for starting position
-    """)
 
-    st.info("🔍 **Backtracking Line Search** is only available for **Gradient Descent**.")
-    st.info("🧠 **Newton’s Method** computes its own step size using the **Hessian inverse** — no learning rate is needed.")
+    - Tune hyperparameters:
+      - **Learning Rate**  
+      - **Steps**  
+      - **Initial values** (`x` or `(x, y)` depending on mode)
 
-    st.subheader("⚙️ Auto-Tune Learning Rate & Steps")
+    - 🔍 <b>Backtracking Line Search</b> is only available for <b>Gradient Descent</b>  
+    - 🧠 <b>Newton’s Method</b> uses the <b>Hessian inverse</b> to compute its step size — <b>learning rate is ignored</b>.
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- Auto-Tune & Animation ---
     st.markdown("""
-    - Enable to automatically pick good values for learning rate and steps.
-    - Press **🔄 Reset to Auto-Tuned** to apply defaults for current function.
-    """)
+    <div style='background-color: #fef9e7; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
-    st.subheader("🎮 Animate Descent")
+    ### ⚙️ Auto-Tune & Animation
+
+    - Enable **Auto-Tune** to select good defaults for:
+      - Learning Rate  
+      - Steps  
+      - Starting Point
+    - Press **🔄 Reset to Auto-Tuned** to apply recommended values for the selected function.
+
+    - Toggle **🎮 Animate Descent Steps** to see optimization progress visually.
+    - In **bivariate mode**, enable:
+      - 🧮 **Show Taylor Approximation at (a, b)** for curvature overlay
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- Symbolic Tab ---
     st.markdown("""
-    - Toggle **Animate Descent Steps** to visualize the optimization process.
-    - For bivariate mode, enable **Show Taylor Approximation at (a, b)** to display the second-order approximation surface.
-    """)
+    <div style='background-color: #f0f4ff; padding: 25px 30px; border-radius: 12px;'>
 
-    st.markdown("---")
+    ### 🧮 Symbolic Analysis Tab
 
-    # Section 2: Symbolic Tab
-    st.header("🧮 Symbolic Analysis Tab")
-    st.markdown("""
-    The **Symbolic Analysis** tab helps reinforce theoretical understanding.
+    This tab helps build intuition by showing key mathematical expressions:
 
-    You’ll find:
-    - The **Objective Function**: \\( f(x, y) \\)
-    - The **Lagrangian**: \\( \\mathcal{L}(x, y, \\lambda) \\)
-    - **KKT Conditions** for constrained optimization
+    - **Objective Function**: \\( f(x, y) \\)  
+    - **Lagrangian**: \\( \\mathcal{L}(x, y, \\lambda) \\)  
+    - **KKT Conditions** (for constrained problems)  
     - Symbolic **Gradient** and **Hessian**
-    
-    ✅ When **Newton’s Method** is selected, the **Hessian** is shown, and its **determinant** is computed.
-    This helps explain how Newton chooses its update step.
 
-    Use this to connect the math with what you see in the optimizer simulation.
-    """)
+    ✅ If **Newton’s Method** is selected:
+    - The **Hessian matrix** is shown
+    - The **determinant** is calculated  
+    - This explains how Newton's step direction and size are determined
+
+    </div>
+    """, unsafe_allow_html=True)
 
     st.info("💡 Tip: If you're unsure about the math, check the **Resources** page for detailed explanations and reference links.")
-
-
 
 
 
