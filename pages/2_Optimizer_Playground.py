@@ -1588,7 +1588,7 @@ with tab2:
 
             if mode_dim == "Univariate (f(x))":
                 # Use selected or custom symbolic expression
-                if source_mode == "Predefined":
+                if mode == "Predefined":
                     symbolic_expr = predefined_funcs[func_name][0]
                 else:
                     symbolic_expr = st.session_state.custom_expr
