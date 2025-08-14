@@ -1313,6 +1313,11 @@ def optimize_path(x0, y0, optimizer, lr, steps, f_func, grad_f=None, hessian_f=N
         path.append((new_x, new_y))
 
     meta["callback_steps"] = len(path)
+
+    if not path or len(path) == 0:
+        path = [(x0, y0)]
+        meta["callback_steps"] = 1
+
     return path, None, meta
 
 def backtracking_line_search_sym(f_sym, grad_f_sym, x0, y0, alpha0=1.0, beta=0.5, c=1e-4, max_iters=100):
@@ -1718,6 +1723,8 @@ with tab2:
             hessian_f=hessian_f,
             options=options
         )
+        if not path or len(path) == 0:
+            raise ValueError("Empty path passed to plot_3d_descent(). Check optimization logic.")
         xs, ys = zip(*path)
         Z_path = [float(f_func(xp, yp)) for xp, yp in path]
 
@@ -1805,6 +1812,12 @@ with tab2:
             hessian_f=hessian_f,
             options=options
         )
+        # ✅ Fix: insert this block
+        if not path or len(path) == 0:
+            st.error("❌ Optimization path is empty. The optimizer might have failed or exited early.")
+            st.stop()
+
+        # Safe to unpack now
         xs, ys = zip(*path)
         Z_path = [float(f_func(xp, yp)) for xp, yp in path]
 
@@ -1956,6 +1969,10 @@ with tab2:
             Z_t2 = None
 
             
+    if not path or len(path) < 2:
+    st.error("Optimization path is empty or too short to plot. Please adjust settings.")
+    st.stop()
+
     plot_3d_descent(
         x_vals=x_vals,
         y_vals=y_vals,
