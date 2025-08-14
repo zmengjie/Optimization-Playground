@@ -1552,7 +1552,7 @@ with tab2:
     col_left, col_right = st.columns([1, 1])
 
     with col_left:
-        mode_dim = st.radio("Function Type", ["Bivariate (f(x,y))", "Univariate (f(x))"])
+        mode_dim = st.radio("Function Type", ["Univariate (f(x))", "Bivariate (f(x,y))"])
 
         if mode_dim == "Bivariate (f(x,y))":
             mode = st.radio("Function Source", ["Predefined", "Custom"])
