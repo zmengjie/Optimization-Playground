@@ -1314,9 +1314,10 @@ def optimize_path(x0, y0, optimizer, lr, steps, f_func, grad_f=None, hessian_f=N
 
     meta["callback_steps"] = len(path)
 
-    if not path or len(path) == 0:
-        path = [(x0, y0)]
-        meta["callback_steps"] = 1
+    if len(path) <= 1:
+        # Optimization likely failed to proceed; return at least one more step to avoid zip(*path) error
+        path.append((x0, y0))  # duplicate to ensure at least 2 points
+        meta["callback_steps"] = len(path)
 
     return path, None, meta
 
@@ -1970,8 +1971,8 @@ with tab2:
 
             
     if not path or len(path) < 2:
-    st.error("Optimization path is empty or too short to plot. Please adjust settings.")
-    st.stop()
+        st.error("Optimization path is empty or too short to plot. Please adjust settings.")
+        st.stop()
 
     plot_3d_descent(
         x_vals=x_vals,
