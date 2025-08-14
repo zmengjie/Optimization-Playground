@@ -299,110 +299,70 @@ tab1, tab2, tab3 = st.tabs(["📘 Guide", "🧪 Optimizer Playground", "📐 Sym
 with tab1:
     st.title("📘 Optimization Guide")
 
-    # 1. Optimization Overview
-    st.header("1. 🛠️ Optimization Methods")
+    # Section 1: Intro
+    st.header("🧭 How to Use the Optimizer Playground")
+
+    st.subheader("🎯 Function Type")
     st.markdown("""
-    Optimization methods aim to **find the minimum (or maximum)** of a function.
-    
-    There are two major types:
-    - **Unconstrained**: No restrictions on variable values.
-    - **Constrained**: Variables must satisfy conditions (e.g., \( g(x, y) = 0 \)).
-
-    Common methods include:
-    - **Gradient Descent**  
-    - **Newton's Method**  
-    - **Quasi-Newton (e.g., BFGS)**
+    - **Univariate**: Optimize functions of one variable \\( f(x) \\)
+    - **Bivariate**: Optimize functions of two variables \\( f(x, y) \\)
     """)
-    st.markdown("---")
 
-    # 2. Taylor Series
-    st.header("2. 🔎 Taylor Series in Optimization")
-    st.latex(r"f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x + \frac{1}{2} \Delta x^T \nabla^2 f(x) \Delta x")
+    st.subheader("🧪 Function Source")
     st.markdown("""
-    - **1st-order**: Linear approximation  
-    - **2nd-order**: Adds curvature (Newton's Method)
+    - **Predefined**: Use built-in benchmark functions (e.g., `Quadratic Bowl`)
+    - **Custom**: Enter your own expression using Python-style syntax, e.g., `x**2 + y**2`
     """)
-    st.markdown("---")
 
-    # 3. KKT Conditions
-    st.header("3. 🚦 KKT Conditions & Derivatives")
-
-    # 3.1 Objective & Lagrangian
-    st.markdown("### 🎯 Objective & Lagrangian")
-    st.write("The **objective function** defines what we aim to minimize or maximize:")
-    st.latex(r"f(x, y)")
-    st.write("The **Lagrangian** incorporates the objective and any constraints using Lagrange multipliers:")
-    st.latex(r"\mathcal{L}(x, y, \lambda) = f(x, y) + \lambda \cdot g(x, y)")
-    st.markdown("---")
-
-    # 3.2 KKT Conditions
-    st.markdown("###  ✅ KKT Conditions")
-    st.write("The **Karush–Kuhn–Tucker (KKT) conditions** are necessary for optimality in constrained optimization problems.")
-    st.write("They state that the gradient of the Lagrangian must vanish at the optimal point (stationarity condition):")
-    st.latex(r"\nabla_{x,y} \mathcal{L}(x, y, \lambda) = 0")
-    st.write("For unconstrained problems, this reduces to the gradient of the objective function being zero:")
-    st.latex(r"\nabla f(x, y) = 0")
-    st.markdown("---")
-
-    # 3.3 Gradient & Hessian
-    st.markdown("### 🧮 Gradient & Hessian")
-    st.write("The **gradient** vector points in the direction of steepest ascent or descent. At optimality, it becomes zero:")
-    st.latex(r"\nabla f(x, y) = \begin{bmatrix} \frac{\partial f}{\partial x} \\\\ \frac{\partial f}{\partial y} \end{bmatrix}")
-    st.write("The **Hessian matrix** captures second-order curvature (concavity/convexity) of the function:")
-    st.latex(r"""
-    \nabla^2 f(x, y) = \begin{bmatrix} 
-    \frac{\partial^2 f}{\partial x^2} & \frac{\partial^2 f}{\partial x \partial y} \\\\
-    \frac{\partial^2 f}{\partial y \partial x} & \frac{\partial^2 f}{\partial y^2} 
-    \end{bmatrix}
-    """)
-    st.markdown("**Interpretation of the Hessian:**")
+    st.subheader("🚀 Optimizer Configuration")
     st.markdown("""
-    - **Positive definite** → Local **minimum**  
-    - **Negative definite** → Local **maximum**  
-    - **Indefinite** → **Saddle point**
+    - Select from:
+      - `GradientDescent`
+      - `Newton's Method`
+      - `Quasi-Newton (e.g., BFGS)`
+    - Configure:
+      - **Learning Rate**
+      - **Steps**
+      - **Initial x / (x, y)** for starting position
     """)
-    st.markdown("---")
 
-    # 4. Newton Variants
-    st.header("4. 🔁 Newton Variants & Quasi-Newton")
+    st.info("🔍 **Backtracking Line Search** is only available for **Gradient Descent**.")
+    st.info("🧠 **Newton’s Method** computes its own step size using the **Hessian inverse** — no learning rate is needed.")
 
-    st.markdown("### 📘 Classic Newton vs. Numerical vs. Quasi-Newton")
-    st.markdown("Newton's Method is a powerful optimization technique that uses **second-order derivatives** or their approximations to accelerate convergence.")
-    
-    st.markdown("#### 🧮 Classic Newton (Symbolic)")
-    st.markdown("- Uses the **symbolic Hessian matrix** from calculus:")
-    st.latex(r"\nabla^2 f(x, y)")
-    st.markdown("- ✅ Very efficient and accurate for simple analytic functions (e.g., quadratic, convex).")
-    st.markdown("- ⚠️ Can fail or be unstable if the Hessian is singular or badly conditioned.")
-    st.markdown("---")
-    
-    st.markdown("#### 🔢 Numerical Newton")
-    st.markdown("- Uses **finite differences** to approximate the Hessian.")
-    st.markdown("- No need for symbolic derivatives.")
-    st.markdown("- ✅ More robust for complex or unknown functions.")
-    st.markdown("- 🐢 Slightly slower due to extra evaluations.")
-    st.markdown("---")
-    
-    st.markdown("#### 🔁 BFGS / L-BFGS (Quasi-Newton)")
-    st.markdown("- ✅ Avoids computing the full Hessian.")
-    st.markdown("- Builds curvature estimate using gradients:")
-    st.latex(r"""
-    H_{k+1} = H_k + \frac{y_k y_k^T}{y_k^T s_k} - \frac{H_k s_k s_k^T H_k}{s_k^T H_k s_k}
+    st.subheader("⚙️ Auto-Tune Learning Rate & Steps")
+    st.markdown("""
+    - Enable to automatically pick good values for learning rate and steps.
+    - Press **🔄 Reset to Auto-Tuned** to apply defaults for current function.
     """)
-    st.markdown("Where:")
-    st.latex(r"s_k = x_{k+1} - x_k")
-    st.latex(r"y_k = \nabla f(x_{k+1}) - \nabla f(x_k)")
-    st.markdown("- 🧠 **BFGS**: High accuracy, stores full matrix.")
-    st.markdown("- 🪶 **L-BFGS**: Stores only a few recent updates — ideal for high-dimensional problems.")
-    st.markdown("💡 Quasi-Newton methods **approximate** curvature and still converge fast — especially useful for functions like Rosenbrock!")
+
+    st.subheader("🎮 Animate Descent")
+    st.markdown("""
+    - Toggle **Animate Descent Steps** to visualize the optimization process.
+    - For bivariate mode, enable **Show Taylor Approximation at (a, b)** to display the second-order approximation surface.
+    """)
+
     st.markdown("---")
 
-    # 5. Learning Rate Insight
-    st.header("5. ✏️ Why No Learning Rate in Newton's Method?")
-    st.markdown("Newton’s Method computes:")
-    st.latex(r"x_{t+1} = x_t - H^{-1} \nabla f(x_t)")
-    st.markdown("So it **naturally determines the best step direction and size** — no need for manual tuning like in gradient descent.")
-    st.markdown("---")
+    # Section 2: Symbolic Tab
+    st.header("🧮 Symbolic Analysis Tab")
+    st.markdown("""
+    The **Symbolic Analysis** tab helps reinforce theoretical understanding.
+
+    You’ll find:
+    - The **Objective Function**: \\( f(x, y) \\)
+    - The **Lagrangian**: \\( \\mathcal{L}(x, y, \\lambda) \\)
+    - **KKT Conditions** for constrained optimization
+    - Symbolic **Gradient** and **Hessian**
+    
+    ✅ When **Newton’s Method** is selected, the **Hessian** is shown, and its **determinant** is computed.
+    This helps explain how Newton chooses its update step.
+
+    Use this to connect the math with what you see in the optimizer simulation.
+    """)
+
+    st.info("💡 Tip: If you're unsure about the math, check the **Resources** page for detailed explanations and reference links.")
+
+
 
 
 
