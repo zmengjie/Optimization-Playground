@@ -622,7 +622,7 @@ with tab2:
     # Decide f_expr + constraints + description ONCE
     if mode_dim == "Univariate (f(x))":
         # Univariate input (separate prompt if you like; keeping your default here)
-        expr_uni = st.text_input("Enter univariate function f(x):", "x**2")
+        expr_uni = st.sidebar.text_input("Enter univariate function f(x):", "x**2")
         try:
             f_expr = sp.sympify(expr_uni)
             constraints = []
