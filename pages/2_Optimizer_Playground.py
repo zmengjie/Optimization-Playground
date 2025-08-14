@@ -1973,6 +1973,11 @@ with tab2:
     if not path or len(path) < 2:
         st.error("❌ Cannot plot — optimization path is empty or too short. Please adjust parameters.")
         st.stop()
+
+    # 👇 Patch for univariate mode: promote to 2D
+    if mode_dim == "Univariate (f(x))":
+        path = [(x, 0.0) for x in path]  # make it (x, y=0.0) tuples
+        Z_path = ys  # already computed
         
     plot_3d_descent(
         x_vals=x_vals,
