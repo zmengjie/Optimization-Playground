@@ -68,6 +68,8 @@ if mode == "📘 Guide":
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdown("---")
+
     # Sidebar and Theory notes
     st.info("📎 Use the **sidebar** to switch between Univariate and Multivariable modes.")
     st.info("📘 For full math/theory, explore the **Resources** page — it's great for deeper understanding.")
