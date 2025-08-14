@@ -53,52 +53,48 @@ def encode_target_column(df, target):
 # === Supervised Learning Section ===
 def supervised_ui():
     st.subheader("📈 Supervised Learning Playground")
-    st.sidebar.markdown("## Dataset Source")
-    dataset_choice = st.sidebar.selectbox("Select Dataset", ["Iris", "Wine", "Breast Cancer", "Upload Your Own"])
 
-    if dataset_choice != "Upload Your Own":
-        df, label_names = load_builtin_dataset(dataset_choice)
-        st.sidebar.success(f"Loaded **{dataset_choice}** dataset with shape {df.shape}")
-        st.sidebar.markdown("#### 🧪 Sample Preview")
-        st.sidebar.dataframe(df.head())
+    with st.sidebar:
+        st.header("⚙️ Setup")
+        dataset_choice = st.selectbox("Select Dataset", ["Iris", "Wine", "Breast Cancer", "Upload Your Own"])
 
-        if "target" in df.columns:
-            st.sidebar.markdown("#### 🎯 Target Distribution")
-            st.sidebar.write(df["target"].value_counts())
-        
-        st.sidebar.markdown("#### 🔍 Feature Correlation")
-        corr = df.select_dtypes(include=[np.number]).corr()
-        fig, ax = plt.subplots(figsize=(4, 3))
-        sns.heatmap(corr, cmap="coolwarm", annot=False, ax=ax)
-        st.sidebar.pyplot(fig)
-    else:
-        uploaded_file = st.sidebar.file_uploader("📂 Upload CSV", type=["csv"])
-        if uploaded_file:
-            df = pd.read_csv(uploaded_file)
-            label_names = None
+        if dataset_choice != "Upload Your Own":
+            df, label_names = load_builtin_dataset(dataset_choice)
+            st.success(f"Loaded **{dataset_choice}** dataset with shape {df.shape}")
+            st.markdown("#### 🧪 Sample Preview")
+            st.dataframe(df.head())
         else:
-            st.stop()
+            uploaded_file = st.file_uploader("📂 Upload CSV", type=["csv"])
+            if uploaded_file:
+                df = pd.read_csv(uploaded_file)
+                label_names = None
+            else:
+                st.stop()
 
-    st.dataframe(df.head())
+        st.markdown("## Feature Selection")
+        default_target = "target" if "target" in df.columns else df.columns[0]
+        target = st.selectbox("🎯 Target Column", df.columns, index=df.columns.get_loc(default_target))
 
-    # Target + Feature selection
-    st.sidebar.markdown("## Feature Selection")
-    # Default target column if available
-    default_target = "target" if "target" in df.columns else df.columns[0]
-    target = st.sidebar.selectbox("🎯 Target Column", df.columns, index=df.columns.get_loc(default_target))
+        df, target_labels = encode_target_column(df, target)
+        feature_candidates = [col for col in df.columns if col != target]
+        default_features = {
+            "Iris": ["petal length (cm)", "petal width (cm)"],
+            "Wine": ["alcohol", "malic_acid", "color_intensity"],
+            "Breast Cancer": ["mean radius", "mean texture", "mean perimeter"]
+        }
+        initial_features = default_features.get(dataset_choice, [])
+        features = st.multiselect("🧩 Feature Columns", feature_candidates, default=initial_features)
 
-    df, target_labels = encode_target_column(df, target)
-    feature_candidates = [col for col in df.columns if col != target]
+        task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
 
-    # Auto feature defaults based on dataset
-    default_features = {
-        "Iris": ["petal length (cm)", "petal width (cm)"],
-        "Wine": ["alcohol", "malic_acid", "color_intensity"],
-        "Breast Cancer": ["mean radius", "mean texture", "mean perimeter"]
-    }
-    initial_features = default_features.get(dataset_choice, [])
-    features = st.sidebar.multiselect("🧩 Feature Columns", feature_candidates, default=initial_features)
+    st.markdown("## 🎯 Target Distribution")
+    st.dataframe(df[target].value_counts().reset_index(names=[target, "count"]))
 
+    st.markdown("## 🔍 Feature Correlation")
+    corr = df.select_dtypes(include=[np.number]).corr()
+    fig, ax = plt.subplots(figsize=(5, 4))
+    sns.heatmap(corr, cmap="coolwarm", annot=True, fmt=".2f", ax=ax)
+    st.pyplot(fig)
 
     st.markdown("### 📊 Feature Distributions")
     st.caption("Boxplots by class (if categorical target) or histograms otherwise")
