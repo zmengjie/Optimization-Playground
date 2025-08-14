@@ -2028,49 +2028,112 @@ with tab2:
             st.latex(T2_latex)
 
 
-    st.markdown("### 📈 3D View")
 
-    if show_2nd:
-        try:
-            if Z_t2 is not None:
-                # ❗ Reject raw scalar values
-                if isinstance(Z_t2, (int, float)):
-                    st.warning(f"❌ Z_t2 is a scalar ({Z_t2}), not an array.")
-                    Z_t2 = None
 
-                Z_t2 = np.array(Z_t2, dtype=np.float64)
+    # st.markdown("### 📈 3D View")
 
-                if Z_t2.ndim != 2:
-                    st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
-                    Z_t2 = None
-                elif np.isnan(Z_t2).any():
-                    st.warning("❌ Z_t2 contains NaNs.")
-                    Z_t2 = None
-                elif Z_t2.shape != (len(y_vals), len(x_vals)):
-                    if Z_t2.shape == (len(x_vals), len(y_vals)):
-                        Z_t2 = Z_t2.T
-                    else:
-                        st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape} vs mesh ({len(y_vals)}, {len(x_vals)})")
-                        Z_t2 = None
-        except Exception as e:
-            st.warning(f"❌ Error processing Z_t2: {e}")
-            Z_t2 = None
+    # if show_2nd:
+    #     try:
+    #         if Z_t2 is not None:
+    #             # ❗ Reject raw scalar values
+    #             if isinstance(Z_t2, (int, float)):
+    #                 st.warning(f"❌ Z_t2 is a scalar ({Z_t2}), not an array.")
+    #                 Z_t2 = None
+
+    #             Z_t2 = np.array(Z_t2, dtype=np.float64)
+
+    #             if Z_t2.ndim != 2:
+    #                 st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
+    #                 Z_t2 = None
+    #             elif np.isnan(Z_t2).any():
+    #                 st.warning("❌ Z_t2 contains NaNs.")
+    #                 Z_t2 = None
+    #             elif Z_t2.shape != (len(y_vals), len(x_vals)):
+    #                 if Z_t2.shape == (len(x_vals), len(y_vals)):
+    #                     Z_t2 = Z_t2.T
+    #                 else:
+    #                     st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape} vs mesh ({len(y_vals)}, {len(x_vals)})")
+    #                     Z_t2 = None
+    #     except Exception as e:
+    #         st.warning(f"❌ Error processing Z_t2: {e}")
+    #         Z_t2 = None
 
             
-    if not path or len(path) < 2:
-        st.error("❌ Cannot plot — optimization path is empty or too short. Please adjust parameters.")
-        st.stop()
+    # if not path or len(path) < 2:
+    #     st.error("❌ Cannot plot — optimization path is empty or too short. Please adjust parameters.")
+    #     st.stop()
 
-    if mode_dim == "Univariate (f(x))":
-        fig_uni, ax_uni = plt.subplots()
-        ax_uni.plot(xs, ys, "ro-", label="Descent Path")
-        ax_uni.set_xlabel("x")
-        ax_uni.set_ylabel("f(x)")
-        ax_uni.set_title("Univariate Optimization Path")
-        ax_uni.grid(True)
-        ax_uni.legend()
-        st.pyplot(fig_uni)
-    else:
+    # if mode_dim == "Univariate (f(x))":
+    #     fig_uni, ax_uni = plt.subplots()
+    #     ax_uni.plot(xs, ys, "ro-", label="Descent Path")
+    #     ax_uni.set_xlabel("x")
+    #     ax_uni.set_ylabel("f(x)")
+    #     ax_uni.set_title("Univariate Optimization Path")
+    #     ax_uni.grid(True)
+    #     ax_uni.legend()
+    #     st.pyplot(fig_uni)
+    # else:
+    #     plot_3d_descent(
+    #         x_vals=x_vals,
+    #         y_vals=y_vals,
+    #         Z=Z,
+    #         path=path,
+    #         Z_path=Z_path,
+    #         Z_t1=Z_t1,
+    #         Z_t2=Z_t2,
+    #         show_taylor=show_taylor,
+    #         show_2nd=show_2nd,
+    #         expansion_point=expansion_point,
+    #         f_func=f_func
+    #     )
+
+
+    # st.markdown("### 🗺️ 2D View")
+    # plot_2d_contour(
+    #     x_vals=x_vals,
+    #     y_vals=y_vals,
+    #     Z=Z,
+    #     path=path,
+    #     g_funcs=g_funcs if constraints else None,
+    #     X=X, Y=Y,
+    #     Z_t2=Z_t2,
+    #     show_2nd=show_2nd,
+    #     expansion_point=expansion_point
+    # )
+
+
+    if mode_dim == "Bivariate (f(x,y))":
+
+        st.markdown("### 📈 3D View")
+
+        if show_2nd:
+            try:
+                if Z_t2 is not None:
+                    if isinstance(Z_t2, (int, float)):
+                        st.warning(f"❌ Z_t2 is a scalar ({Z_t2}), not an array.")
+                        Z_t2 = None
+                    Z_t2 = np.array(Z_t2, dtype=np.float64)
+                    if Z_t2.ndim != 2:
+                        st.warning(f"❌ Z_t2 is not 2D — shape: {Z_t2.shape}")
+                        Z_t2 = None
+                    elif np.isnan(Z_t2).any():
+                        st.warning("❌ Z_t2 contains NaNs.")
+                        Z_t2 = None
+                    elif Z_t2.shape != (len(y_vals), len(x_vals)):
+                        if Z_t2.shape == (len(x_vals), len(y_vals)):
+                            Z_t2 = Z_t2.T
+                        else:
+                            st.warning(f"❌ Z_t2 shape mismatch: {Z_t2.shape} vs mesh ({len(y_vals)}, {len(x_vals)})")
+                            Z_t2 = None
+            except Exception as e:
+                st.warning(f"❌ Error processing Z_t2: {e}")
+                Z_t2 = None
+
+        if not path or len(path) < 2:
+            st.error("❌ Cannot plot — optimization path is empty or too short. Please adjust parameters.")
+            st.stop()
+
+        # 3D (bivariate) plot
         plot_3d_descent(
             x_vals=x_vals,
             y_vals=y_vals,
@@ -2085,35 +2148,37 @@ with tab2:
             f_func=f_func
         )
 
+    elif mode_dim == "Univariate (f(x))":
 
-    # plot_3d_descent(
-    #     x_vals=x_vals,
-    #     y_vals=y_vals,
-    #     Z=Z,
-    #     path=path,
-    #     Z_path=Z_path,
-    #     Z_t1=Z_t1,
-    #     Z_t2=Z_t2,
-    #     show_taylor=show_taylor,
-    #     show_2nd=show_2nd,
-    #     expansion_point=expansion_point,
-    #     f_func=f_func
-    # )
+        if not path or len(path) < 2:
+            st.error("❌ Cannot plot — optimization path is empty or too short. Please adjust parameters.")
+            st.stop()
 
+        # Do NOT zip(*path); path is a list of scalars.
+        # Use the xs, ys you already computed earlier.
+        fig_uni, ax_uni = plt.subplots()
+        ax_uni.plot(xs, ys, "ro-", label="Descent Path")
+        ax_uni.set_xlabel("x")
+        ax_uni.set_ylabel("f(x)")
+        ax_uni.set_title("Univariate Optimization Path")
+        ax_uni.grid(True)
+        ax_uni.legend()
+        st.pyplot(fig_uni)
 
-    st.markdown("### 🗺️ 2D View")
-    plot_2d_contour(
-        x_vals=x_vals,
-        y_vals=y_vals,
-        Z=Z,
-        path=path,
-        g_funcs=g_funcs if constraints else None,
-        X=X, Y=Y,
-        Z_t2=Z_t2,
-        show_2nd=show_2nd,
-        expansion_point=expansion_point
-    )
-
+    # 2D contour: bivariate ONLY
+    if mode_dim == "Bivariate (f(x,y))":
+        st.markdown("### 🗺️ 2D View")
+        plot_2d_contour(
+            x_vals=x_vals,
+            y_vals=y_vals,
+            Z=Z,
+            path=path,
+            g_funcs=g_funcs if constraints else None,
+            X=X, Y=Y,
+            Z_t2=Z_t2,
+            show_2nd=show_2nd,
+            expansion_point=expansion_point
+        )
 
 
     if show_taylor:
