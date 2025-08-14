@@ -318,7 +318,7 @@ with tab1:
     # --- Optimizer Config ---
 # --- Optimizer Config ---
     st.markdown("""
-    <div style='background-color: #e8e5e1; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
+    <div style='background-color: #e3e8ec; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;'>
 
     <h3 style='margin-top: 0;'>🚀 Optimizer Configuration</h3>
 
