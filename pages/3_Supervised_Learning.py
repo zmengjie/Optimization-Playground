@@ -137,7 +137,7 @@ def supervised_ui():
         y = y.dropna()
         y_class = y.round().astype(int)
 
-        task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
+        # task_type = st.radio("Select Task", ["Linear Regression", "Logistic Regression", "Classification"])
 
         if task_type == "Linear Regression":
             tool = st.selectbox("Tool", ["Simple", "Polynomial", "Multi-Feature", "Diagnostics"])
