@@ -21,7 +21,7 @@ st.markdown(
 )
 
 
-st.set_page_config(page_title="ML Visual Explorer", layout="wide")
+st.set_page_config(page_title="ML Visual Explorer", page_icon="🤖" , layout="wide")
 
 
 # Title and main description
