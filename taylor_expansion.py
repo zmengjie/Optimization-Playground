@@ -184,7 +184,7 @@ def show_univariate_taylor(
             taylor_series.append(term)
 
         # Static Plot
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(6, 3))
         ax.plot(x, f_np(x), label="f(x)", color='blue')
         if show_linear:
             ax.plot(x, np.sum(taylor_series[:2], axis=0), '--', label="1st-order", color='red')
