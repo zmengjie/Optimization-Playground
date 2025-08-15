@@ -266,17 +266,104 @@ def show_resources():
 
     elif section == "🧵 Unsupervised Learning":
         st.header("🧵 Unsupervised Learning")
-        st.markdown("""
-        Unsupervised learning uncovers hidden patterns in unlabeled data.  
-        - **Clustering**: Group similar instances (e.g., customer segmentation)  
-        - **Dimensionality Reduction**: Reduce input features (e.g., PCA, t-SNE)
 
-        🧠 Techniques included:
-        - K-Means
-        - DBSCAN
-        - Agglomerative Clustering
-        - PCA / t-SNE / LDA
+        st.markdown("""
+        Unsupervised learning deals with discovering patterns in data **without labeled outputs**.
+
+        ### 🧩 Common Tasks
+        - **Clustering**: Group similar samples (e.g., customer segmentation)
+        - **Dimensionality Reduction**: Reduce feature space for visualization or speed
+        - **Anomaly Detection**: Identify rare or unexpected patterns
+        - **Topic Modeling**: Extract latent topics from text
+        - **Association Rule Mining**: Discover interesting rules between variables (e.g., market basket analysis)
+
+        ---
+
+        ### 🔹 Clustering Algorithms
+
+        **1. K-Means**
+        - Partitions data into *k* clusters by minimizing intra-cluster distance.
+        - Fast and works well for spherical clusters.
+        - ⚠️ Sensitive to initialization and assumes equal-sized clusters.
+
+        **2. DBSCAN**
+        - Density-based clustering.
+        - Can find arbitrarily shaped clusters and detect noise.
+        - No need to specify the number of clusters.
+
+        **3. Agglomerative Clustering**
+        - Hierarchical bottom-up approach.
+        - Merges closest clusters based on linkage criteria (e.g., average, complete).
+
+        **4. Birch**
+        - Builds a tree of clustering features.
+        - Very efficient for large datasets.
+
+        **5. Gaussian Mixture Model (GMM)**
+        - Probabilistic clustering using Gaussian distributions.
+        - Allows soft assignment (sample can belong to multiple clusters with probabilities).
+
+        **6. Spectral Clustering**
+        - Leverages graph theory.
+        - Effective for non-convex clusters.
+
+        ---
+
+        ### 🔽 Dimensionality Reduction Techniques
+
+        **1. PCA (Principal Component Analysis)**
+        - Linear technique maximizing variance.
+        - Commonly used for visualization and noise reduction.
+
+        **2. t-SNE**
+        - Nonlinear, good for local structure.
+        - Suitable for 2D/3D visualization of high-dimensional data.
+
+        **3. Kernel PCA**
+        - Extension of PCA with kernel functions for non-linear mapping.
+
+        **4. LDA (Latent Dirichlet Allocation)**
+        - Often used for **topic modeling**, extracting topics from text corpora.
+
+        > ⚠️ Dimensionality reduction is often used as preprocessing before clustering or visualization.
+
+        ---
+
+        ### 🔍 Anomaly Detection Methods
+
+        **1. Isolation Forest**
+        - Randomly splits data to isolate anomalies.
+        - Efficient for high-dimensional data.
+
+        **2. One-Class SVM**
+        - Learns the boundary of normal data.
+        - Effective but sensitive to parameters.
+
+        **3. Elliptic Envelope**
+        - Assumes Gaussian distribution.
+        - Fits an ellipse to encapsulate normal data.
+
+        ---
+
+        ### 🗂️ Association Rule Mining
+
+        **1. Apriori**
+        - Identifies frequent itemsets.
+        - Derives association rules from them.
+        - Commonly used in market basket analysis.
+
+        > 🧮 Metrics like **Support**, **Confidence**, and **Lift** are key for interpreting rules.
+
+        ---
+
+        ### 🧵 Summary Tips:
+        - Unsupervised methods do not require labeled data.
+        - Dimensionality reduction can aid clustering and visualization.
+        - Use anomaly detection when outliers matter (e.g., fraud, defects).
+        - Topic modeling is essential in NLP.
         """)
+
+
 
     elif section == "🌐 External References":
         st.header("🌐 External References")
