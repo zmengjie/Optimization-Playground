@@ -7,6 +7,8 @@ def show_resources():
         "📖 Overview",  # Default empty option for intro screen
         "🔎 Taylor Series",
         "🛠️ Optimization",
+        "📊 Supervised Learning",
+        "🧵 Unsupervised Learning",
         "🌐 External References"
     ])
 
@@ -174,7 +176,34 @@ def show_resources():
         st.markdown("---")
 
 
+    elif section == "📊 Supervised Learning":
+        st.header("📊 Supervised Learning")
+        st.markdown("""
+        Supervised learning involves learning from labeled data.  
+        - **Classification**: Predict discrete labels (e.g., spam detection)  
+        - **Regression**: Predict continuous values (e.g., house prices)
 
+        🔧 Algorithms covered:
+        - Linear Regression
+        - Decision Trees
+        - Random Forests
+        - KNN
+        - SVM
+        """)
+
+    elif section == "🧵 Unsupervised Learning":
+        st.header("🧵 Unsupervised Learning")
+        st.markdown("""
+        Unsupervised learning uncovers hidden patterns in unlabeled data.  
+        - **Clustering**: Group similar instances (e.g., customer segmentation)  
+        - **Dimensionality Reduction**: Reduce input features (e.g., PCA, t-SNE)
+
+        🧠 Techniques included:
+        - K-Means
+        - DBSCAN
+        - Agglomerative Clustering
+        - PCA / t-SNE / LDA
+        """)
 
     elif section == "🌐 External References":
         st.header("🌐 External References")
