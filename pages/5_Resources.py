@@ -181,18 +181,88 @@ def show_resources():
 
     elif section == "📊 Supervised Learning":
         st.header("📊 Supervised Learning")
-        st.markdown("""
-        Supervised learning involves learning from labeled data.  
-        - **Classification**: Predict discrete labels (e.g., spam detection)  
-        - **Regression**: Predict continuous values (e.g., house prices)
 
-        🔧 Algorithms covered:
-        - Linear Regression
-        - Decision Trees
-        - Random Forests
-        - KNN
-        - SVM
+        st.markdown("""
+        Supervised learning is a machine learning technique where models learn from labeled data — input-output pairs.
+
+        ### 📂 Tasks
+        - 🔍 **Regression**: Predicting continuous values (e.g., price, temperature)
+        - 🧠 **Classification**: Predicting categories (e.g., spam vs. not spam)
+
+        ---
+
+        ### 🔢 Regression Tools
+
+        **1. Linear Regression**
+        - **Simple**: One-feature linear regression.
+        - **Polynomial**: Adds non-linear (polynomial) terms.
+        - **Multi-Feature**: Uses multiple variables.
+        - **Diagnostics**: Analyzes residuals and performance metrics.
+
+        > 📌 Use for tasks like predicting housing prices, sales, or any numeric outcome.
+
+        ---
+
+        ### 📈 Logistic Regression
+
+        Used for binary or multiclass classification problems.
+
+        **Tunable Parameters:**
+        - **Regularization Strength (C)**: Smaller = more regularization.
+        - **Max Iterations**: Training loop cap.
+        - **Solver**:
+            - `lbfgs`: Good for small datasets (supports L2).
+            - `liblinear`: Binary-focused, supports L1.
+            - `saga`: Supports L1, L2, and ElasticNet for larger datasets.
+        - **Penalty**:
+            - `l2`: Ridge-style regularization (default).
+            - `l1`: Lasso (sparse models).
+            - `elasticnet`: Combo of L1 and L2.
+
+        > 📌 Logistic regression is great for probability-based classification with interpretable coefficients.
+
+        ---
+
+        ### 🧠 Classification Algorithms
+
+        **1. Naive Bayes**
+        - Based on Bayes’ theorem.
+        - Assumes feature independence.
+        - Great for text data and spam filtering.
+
+        **2. Decision Tree**
+        - Intuitive tree structure.
+        - Can easily overfit (prune or limit depth).
+
+        **3. K-Nearest Neighbors (KNN)**
+        - Predicts by majority vote of nearby points.
+        - No training time; sensitive to scaling.
+
+        **4. Random Forest**
+        - Ensemble of decision trees.
+        - More accurate and robust than a single tree.
+
+        **5. Multi-Layer Perceptron (MLP)**
+        - A basic neural network.
+        - Good for learning complex patterns.
+        - Requires more computation and tuning.
+
+        **6. XGBoost**
+        - Fast, regularized boosting algorithm.
+        - Often used in competitions and structured data.
+
+        **7. Support Vector Machine (SVM)**
+        - Maximizes margin between classes.
+        - Can handle nonlinear data with kernels like RBF.
+
+        ---
+
+        ### 🧭 Tips:
+        - Use **Classification** when your output is categorical.
+        - Use **Regression** when your output is numeric.
+        - Your sidebar options in this app auto-adjust based on the selected task.
         """)
+
 
     elif section == "🧵 Unsupervised Learning":
         st.header("🧵 Unsupervised Learning")
