@@ -35,14 +35,14 @@ def dim_reduction_ui():
     # --- Preprocessing ---
         X = StandardScaler().fit_transform(X)
 
-    # # --- Technique Selection ---
-    #     st.markdown("""
-    #     **💡 Tip:**
-    #     - **PCA** is good for linear variance and visualization.
-    #     - **t-SNE** is nonlinear and preserves local structure.
-    #     - **LDA** is supervised and focuses on class separability.
-    #     - **KernelPCA** supports nonlinear mappings using different kernels.
-    #     """)
+    # --- Technique Selection ---
+        st.markdown("""
+        **💡 Tip:**
+        - **PCA** is good for linear variance and visualization.
+        - **t-SNE** is nonlinear and preserves local structure.
+        - **LDA** is supervised and focuses on class separability.
+        - **KernelPCA** supports nonlinear mappings using different kernels.
+        """)
         method = st.selectbox("Choose a Reduction Technique", ["PCA", "t-SNE", "LDA", "KernelPCA"])  # UMAP removed
 
 
