@@ -16,36 +16,50 @@ import pandas as pd
 def dim_reduction_ui():
     st.header("🔻 Dimensionality Reduction Playground")
 
-    # --- Dataset Selection ---
-    dataset = st.selectbox("Select Dataset", ["Blobs", "Iris", "Wine"])
-    if dataset == "Blobs":
-        X, y = make_blobs(n_samples=300, n_features=5, centers=4, random_state=42)
-    elif dataset == "Iris":
-        data = load_iris()
-        X, y = data.data, data.target
-        st.caption("Using all 4 numerical features from Iris dataset")
-    elif dataset == "Wine":
-        data = load_wine()
-        X, y = data.data, data.target
-        st.caption("Using all 13 numerical features from Wine dataset")
+    with st.sidebar:
+        # --- Dataset Selection ---
+        dataset = st.selectbox("Select Dataset", ["Blobs", "Iris", "Wine"])
+        if dataset == "Blobs":
+            X, y = make_blobs(n_samples=300, n_features=5, centers=4, random_state=42)
+        elif dataset == "Iris":
+            data = load_iris()
+            X, y = data.data, data.target
+            st.caption("Using all 4 numerical features from Iris dataset")
+        elif dataset == "Wine":
+            data = load_wine()
+            X, y = data.data, data.target
+            st.caption("Using all 13 numerical features from Wine dataset")
 
-    st.write(f"Original Data Shape: {X.shape}")
+        st.markdown(f"📐 **Original Shape:** {X.shape}")
 
     # --- Preprocessing ---
-    X = StandardScaler().fit_transform(X)
+        X = StandardScaler().fit_transform(X)
 
     # --- Technique Selection ---
-    st.markdown("""
-    **💡 Tip:**
-    - **PCA** is good for linear variance and visualization.
-    - **t-SNE** is nonlinear and preserves local structure.
-    - **LDA** is supervised and focuses on class separability.
-    - **KernelPCA** supports nonlinear mappings using different kernels.
-    """)
-    method = st.selectbox("Choose a Reduction Technique", ["PCA", "t-SNE", "LDA", "KernelPCA"])  # UMAP removed
+        st.markdown("""
+        **💡 Tip:**
+        - **PCA** is good for linear variance and visualization.
+        - **t-SNE** is nonlinear and preserves local structure.
+        - **LDA** is supervised and focuses on class separability.
+        - **KernelPCA** supports nonlinear mappings using different kernels.
+        """)
+        method = st.selectbox("Choose a Reduction Technique", ["PCA", "t-SNE", "LDA", "KernelPCA"])  # UMAP removed
+
+
+        if method in ["PCA", "KernelPCA"]:
+            n_components = st.slider("Components", 2, X.shape[1], 2)
+        if method == "t-SNE":
+            perplexity = st.slider("Perplexity", 5, 50, 30)
+            learning_rate = st.slider("Learning Rate", 10, 500, 200)
+        if method == "KernelPCA":
+            n_components = st.slider("Number of Components", 2, X.shape[1], min(2, X.shape[1]))
+            kernel = st.selectbox("Kernel", ["linear", "poly", "rbf", "sigmoid", "cosine"])
+        if method == "LDA":
+            n_components = st.slider("Components", 1, min(len(np.unique(y)) - 1, X.shape[1]), 1)
+
 
     if method == "PCA":
-        n_components = st.slider("Number of Components", 2, X.shape[1], min(2, X.shape[1]))
+        # n_components = st.slider("Number of Components", 2, X.shape[1], min(2, X.shape[1]))
         model = PCA(n_components=n_components)
         X_reduced = model.fit_transform(X)
         st.success(f"PCA reduced to shape: {X_reduced.shape}")
@@ -60,20 +74,20 @@ def dim_reduction_ui():
 
     elif method == "t-SNE":
         st.warning("t-SNE is slower. Recommended for small datasets.")
-        perplexity = st.slider("Perplexity", 5, 50, 30)
-        learning_rate = st.slider("Learning Rate", 10, 500, 200)
+        # perplexity = st.slider("Perplexity", 5, 50, 30)
+        # learning_rate = st.slider("Learning Rate", 10, 500, 200)
         X_reduced = TSNE(n_components=2, perplexity=perplexity, learning_rate=learning_rate, random_state=42).fit_transform(X)
         st.success("t-SNE reduced to 2D")
 
     elif method == "KernelPCA":
-        n_components = st.slider("Number of Components", 2, X.shape[1], min(2, X.shape[1]))
-        kernel = st.selectbox("Kernel Function", ["linear", "poly", "rbf", "sigmoid", "cosine"])
+        # n_components = st.slider("Number of Components", 2, X.shape[1], min(2, X.shape[1]))
+        # kernel = st.selectbox("Kernel Function", ["linear", "poly", "rbf", "sigmoid", "cosine"])
         kpca = KernelPCA(n_components=n_components, kernel=kernel, fit_inverse_transform=True)
         X_reduced = kpca.fit_transform(X)
         st.success(f"KernelPCA reduced to shape: {X_reduced.shape}")
 
     elif method == "LDA":
-        n_components = st.slider("Number of Components", 1, min(len(np.unique(y)) - 1, X.shape[1]), 1)
+        # n_components = st.slider("Number of Components", 1, min(len(np.unique(y)) - 1, X.shape[1]), 1)
         model = LDA(n_components=n_components)
         X_reduced = model.fit_transform(X, y)
         st.success(f"LDA reduced to shape: {X_reduced.shape}")
