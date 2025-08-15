@@ -21,6 +21,9 @@ def show_resources():
         <li>🔍 <strong>Taylor Series</strong>: Understand how derivatives power approximation.</li>
         <li>📐 <strong>Gradient & Hessian</strong>: Dive into first- and second-order methods.</li>
         <li>🚀 <strong>Optimizer Summary</strong>: Compare techniques and their behaviors.</li>
+        <li>📊 <strong>Supervised Learning</strong>: Learn from labeled data using regression and classification algorithms.</li>
+        <li>🧵 <strong>Unsupervised Learning</strong>: Discover hidden patterns and groupings in unlabeled data.</li>
+
         </ul>
         <p>Choose a topic from the dropdown in the sidebar to explore more.</p>
         </div>
