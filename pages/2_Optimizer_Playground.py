@@ -1091,7 +1091,7 @@ with tab2:
 
         # Do NOT zip(*path); path is a list of scalars.
         # Use the xs, ys you already computed earlier.
-        fig_uni, ax_uni = plt.subplots(figsize=(4.5, 3))
+        fig_uni, ax_uni = plt.subplots(figsize=(3, 3))
 
         # 1. Plot full function curve
         x_curve = np.linspace(-5, 5, 400)
